@@ -23,34 +23,40 @@ wrapperTemplate.innerHTML = `
       grid-row-start: middle-bottom;
       grid-row-end: bottom;
     }
+
+    #default {
+      grid-column-start: left;
+      grid-column-end: right;
+      grid-row-start: top;
+      grid-row-end: bottom;
+    }
   </style>
-  <slot></slot>
+  <slot name="default">
+    <code-editor id="default"></code-editor>
+  </slot>
 `;
 
 class EditorContainer extends HTMLElement {
   constructor() {
     super();
     // Create a shadow root for this element.
+    this._shadow = this.attachShadow({mode: "open"});
+
+    const content = wrapperTemplate.content.cloneNode(true);
+    
+    this._shadow.appendChild(content);
+
     try {
-      this._shadow = this.attachShadow({mode: "open"});
-      
-      
-      const content = wrapperTemplate.content.cloneNode(true);
-      const style = document.createElement("style");
-
-      style.innerHTML = `
-      #editorWrapper{
-        display: grid;
-        
-      }
-      `;
-
-      this._shadow.appendChild(content);
+      // Add child nodes to template slot.
+      // Note: This step could be skipped by using the default unnamed slot. However, the default slot can't have fallback content.
+      // Note: Raw text should be ignored.
+      this.childNodes.forEach(node => { (node.nodeName !== "#text") ? node.slot = "default" : null });
 
     }
     catch (err) {
-      this.innerHTML = `<h1>Error: ${ err.message }</h1>`;
+      this._shadow.innerHTML = `<h1>Error: ${ err.message }</h1>`;
     }
+
     
   }
 }
