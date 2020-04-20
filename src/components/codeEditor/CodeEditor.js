@@ -22,7 +22,6 @@ wrapperTemplate.innerHTML = `
 class CodeEditor extends HTMLElement {
   constructor() {
     super();
-    
     this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     this.editor;
 
@@ -34,8 +33,8 @@ class CodeEditor extends HTMLElement {
 
     this.editor = ace.edit(this.container);
     // Set style and default mode.
-    this.editor.setTheme("ace/theme/gob");
-    this.editor.session.setMode("ace/mode/python");
+    this.editor.setTheme("ace/theme/cobalt");
+    this.editor.session.setMode("ace/mode/javascript");
     this.editor.setValue("the new text here");
 
     // Finally attach to shadow root.
