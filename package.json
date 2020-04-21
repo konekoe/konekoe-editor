@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.config.js --mode development",
-    "test": "./node_modules/karma/bin/karma start"
+    "test": "./node_modules/karma/bin/karma start",
+    "build": "NODE_ENV=production node node_modules/.bin/webpack --config ./webpack.config.js && cp ./index.html ./dist/index.html"
   },
   "author": "",
   "license": "ISC",
@@ -27,7 +28,7 @@
     "karma-requirejs": "^1.1.0",
     "karma-safari-launcher": "^1.0.0",
     "karma-spec-reporter": "0.0.32",
-    "promisify": "0.0.3",
+    "karma-webpack": "^4.0.2",
     "requirejs": "^2.3.6",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
