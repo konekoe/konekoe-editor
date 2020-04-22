@@ -11,13 +11,6 @@ wrapperTemplate.innerHTML = `
       background-color: #00162a;
       color: white;
     }
-    ::slotted(#test) {
-      grid-column-start: left;
-      grid-column-end: right;
-      grid-row-start: top;
-      grid-row-end: middle-top;
-    }
-    
   </style>
   <slot name="default">
     <code-editor id="default"></code-editor>
