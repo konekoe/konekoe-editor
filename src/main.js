@@ -1,5 +1,4 @@
 import CodeEditor from "./components/codeEditor/CodeEditor.js"
-import Grid from "./utils/grid.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -55,18 +54,10 @@ class EditorContainer extends HTMLElement {
     return [];
   }
 
-  get grid() {
-    return this._grid;
-  }
-
   constructor() {
     super();
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
-
-    // TODO: Allow users to define the dimensions of the css grid.
-    this._grid = new Grid(3,3);
-
     
     const content = wrapperTemplate.content.cloneNode(true);
     
