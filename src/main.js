@@ -51,7 +51,7 @@ class EditorContainer extends HTMLElement {
     super();
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
-    
+
     const content = wrapperTemplate.content.cloneNode(true);
     
     this._shadow.appendChild(content);
@@ -75,12 +75,7 @@ class EditorContainer extends HTMLElement {
     
   }
 
-  // Throws an error if child elements overlap.
   _childNodesToShadow(style) {
-
-    // The children won't fit in the grid.
-    if (this.childElementCount > this.grid.cells)
-      throw Error("Too many children.");
 
     // Create stylings for each child.
     for (let node of this.childNodes) {
