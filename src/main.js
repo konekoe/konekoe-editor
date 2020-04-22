@@ -36,6 +36,24 @@ class EditorContainer extends HTMLElement {
     }`;
   }
 
+  // TODO: Allow users to define grid lines.
+  get gridLines() {
+    return ["left", "center-left", "center-right", "right", "top", "middle-top", "middle-bottom", "bottom"];
+  }
+
+  static get _styleAttributesMap() {
+    return {
+      "start-col": "grid-column-start",
+      "end-col": "grid-column-end" , 
+      "start-row": "grid-row-start",
+      "end-row": "grid-row-end"
+    };
+  }
+
+  // Placeholder for future attributes.
+  static get validAttributes() {
+    return [];
+  }
 
   get grid() {
     return this._grid;
@@ -49,6 +67,7 @@ class EditorContainer extends HTMLElement {
     // TODO: Allow users to define the dimensions of the css grid.
     this._grid = new Grid(3,3);
 
+    
     const content = wrapperTemplate.content.cloneNode(true);
     
     this._shadow.appendChild(content);
@@ -84,12 +103,10 @@ class EditorContainer extends HTMLElement {
       if (node.nodeName === "#text")
         continue;
 
-        const id = this._generateGuid(node.nodeName);
-        node.id = id;
+        node.id = this._generateGuid(node.nodeName);
 
-      // If element has styling attributes (startCol, endCol, startRow, endRow) determine a styling based on them
+        style.innerHTML += this._generateComponentStyle(node);
     }
-
 
     // Add child nodes to template slot.
     // Note: This step could be skipped by using the default unnamed slot. However, the default slot can't have fallback content.
@@ -97,6 +114,21 @@ class EditorContainer extends HTMLElement {
     this.childNodes.forEach(node => { (node.nodeName !== "#text") ? node.slot = "default" : null });
   }
 
+  // If element has styling attributes (startCol, endCol, startRow, endRow) determine a styling based on them
+  _generateComponentStyle(node) {
+    const styleObj = {};
+
+    // Assume style attributes only define start and end grid lines.
+    for (let {name, value} of node.attributes) {
+      if (EditorContainer._styleAttributesMap[name] && this.gridLines.includes(value)) {
+        styleObj[EditorContainer._styleAttributesMap[name]] = `${value};`;
+      }
+    }
+
+    // NOTE: JSON.stringify produces " characters around strings and , characters between properties which aren't valid in css.
+    // The replace statement removes these characters.
+    return `::slotted(#${ node.id }) ${ JSON.stringify(styleObj).replace(/[\",]/g, "") }`
+  }
 
   _generateGuid(name) {
     let s4 = () => {
