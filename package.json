@@ -12,7 +12,8 @@
   "license": "ISC",
   "dependencies": {
     "ace-builds": "^1.4.11",
-    "file-loader": "^6.0.0"
+    "file-loader": "^6.0.0",
+    "marked": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
