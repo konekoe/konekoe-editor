@@ -1,4 +1,5 @@
-import * as marked from "marked/marked.min.js"
+import * as marked from "marked/marked.min.js";
+import * as insane from "insane/insane.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -31,7 +32,13 @@ class InfoBox extends HTMLElement {
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this.container = node.getElementById("wrapper");
 
-    this.container.innerHTML = marked(this.innerHTML.trim());
+    // Parse with marked.
+    const unsafeHTML = marked(this.innerHTML.trim());
+
+    // Sanitize with insane.
+    const sanitized = insane(unsafeHTML);
+
+    this.container.innerHTML = sanitized;
     this.shadow.appendChild(node);
   }
   connectedCallback() {

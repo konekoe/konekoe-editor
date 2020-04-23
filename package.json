@@ -13,6 +13,7 @@
   "dependencies": {
     "ace-builds": "^1.4.11",
     "file-loader": "^6.0.0",
+    "insane": "^2.6.2",
     "marked": "^1.0.0"
   },
   "devDependencies": {

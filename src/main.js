@@ -7,7 +7,7 @@ wrapperTemplate.innerHTML = `
     :host{
       display: grid;
       min-height: 1rem;
-      grid-template-columns: [left] 33% [center-left] 33% [center-right] 33% [right];
+      grid-template-columns: [left] 33.2% [center-left] 33.2% [center-right] 33.2% [right];
       grid-template-rows: [top] 33% [middle-top] 33% [middle-bottom] 33% [bottom];
       column-gap: 1px;
       row-gap: 1px;
