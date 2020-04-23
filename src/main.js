@@ -1,4 +1,5 @@
-import CodeEditor from "./components/codeEditor/CodeEditor.js"
+import "./components/codeEditor/CodeEditor.js";
+import "./components/infoBox/InfoBox.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -8,7 +9,9 @@ wrapperTemplate.innerHTML = `
       min-height: 1rem;
       grid-template-columns: [left] 33% [center-left] 33% [center-right] 33% [right];
       grid-template-rows: [top] 33% [middle-top] 33% [middle-bottom] 33% [bottom];
-      background-color: #00162a;
+      column-gap: 1px;
+      row-gap: 1px;
+      background-color: gray;
       color: white;
     }
   </style>
@@ -95,7 +98,9 @@ class EditorContainer extends HTMLElement {
 
   // If element has styling attributes (startCol, endCol, startRow, endRow) determine a styling based on them
   _generateComponentStyle(node) {
-    const styleObj = {};
+    const styleObj = {
+      margin: "0;"
+    };
 
     // Assume style attributes only define start and end grid lines.
     for (let {name, value} of node.attributes) {
