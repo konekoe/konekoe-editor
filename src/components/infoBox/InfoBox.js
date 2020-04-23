@@ -11,6 +11,10 @@ wrapperTemplate.innerHTML = `
   #wrapper{
     flex: 1;
     height: 100%;
+    padding: 0.5rem;
+    overflow-y: scroll;
+    overflow-wrap: break-word;
+    scrollbar-color: #555555 #011e3a;
     background-color: #002240;
   }
   </style>
@@ -26,7 +30,8 @@ class InfoBox extends HTMLElement {
     
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this.container = node.getElementById("wrapper");
-    this.container.innerHTML = marked('# Marked in browser\n\nRendered by **marked**.');
+
+    this.container.innerHTML = marked(this.innerHTML.trim());
     this.shadow.appendChild(node);
   }
   connectedCallback() {
