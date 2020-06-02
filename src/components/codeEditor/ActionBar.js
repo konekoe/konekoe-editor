@@ -1,3 +1,5 @@
+import "./ActionButton.js";
+
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
@@ -9,7 +11,7 @@ wrapperTemplate.innerHTML = `
   
   #wrapper {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     background-color: #00162a;
   }
 
@@ -32,12 +34,6 @@ wrapperTemplate.innerHTML = `
   </style>
   
   <nav id="wrapper">
-    <button>
-      Run
-    </button>  
-    <button>
-      Change language
-    </button>
     <div id="tab-container">
       <span class="code_tab code_tab_active">
         Test.js
@@ -52,6 +48,15 @@ wrapperTemplate.innerHTML = `
         not_file.txt
       </span>
     </div>
+
+    <action-button block="true" color="cobalt">
+      Run
+    </action-button>
+    
+    <action-button>
+      Change language
+    </action-button>
+
   </nav>
 `;
 
