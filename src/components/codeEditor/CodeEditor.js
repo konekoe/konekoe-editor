@@ -1,5 +1,6 @@
 import * as ace from "ace-builds/src-min-noconflict/ace";
 import "ace-builds/webpack-resolver";
+import "./ActionBar.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -15,6 +16,10 @@ wrapperTemplate.innerHTML = `
     height: 100%;
   }
   </style>
+  
+  <action-bar id="action-bar">
+  </action-bar>
+
   <div id="editor">
   </div>
 `;
@@ -23,6 +28,7 @@ class CodeEditor extends HTMLElement {
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
+
     this.editor;
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
