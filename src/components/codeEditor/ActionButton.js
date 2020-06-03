@@ -84,7 +84,7 @@ function darkenRgb(color) {
   return color;
 };
 
-const colorStyling = (value, darken = false) => {
+const colorStyling = (value, outline, darken = false) => {
   // Add style related colors here
   const options = {
     red: "#db2828",
@@ -104,9 +104,17 @@ const colorStyling = (value, darken = false) => {
   if (darken)
     result = rgbToHex(darkenRgb(hexToRgb(result))); 
 
-  return `
+  return (outline) ? 
+  `
+  background-color: transparent;
+  outline: 1px solid ${ result };
+  outline-offset: -4px;
+  `
+  :
+  `
   background-color: ${ result };
-  `;
+  `
+  ;
 };
 
 const blockStyling = (block) => (block) ? `
@@ -138,12 +146,12 @@ class ActionButton extends HTMLElement {
 
       button {
         ${ sizeStyling(this.getAttribute("size")) }
-        ${ colorStyling(this.getAttribute("color")) }
+        ${ colorStyling(this.getAttribute("color"), this.getAttribute("secondary")) }
         ${ blockStyling(this.getAttribute("block")) }
       }
 
       button:hover {
-        ${ colorStyling(this.getAttribute("color"), true) }
+        ${ colorStyling(this.getAttribute("color"), this.getAttribute("secondary"), true) }
       }
     `;
     this.container.innerHTML = this.innerHTML;

@@ -49,12 +49,8 @@ wrapperTemplate.innerHTML = `
       </span>
     </div>
 
-    <action-button block="true" color="cobalt">
+    <action-button id="runButton" color="cobalt">
       Run
-    </action-button>
-    
-    <action-button>
-      Change language
     </action-button>
 
   </nav>
@@ -67,8 +63,19 @@ class ActionBar extends HTMLElement {
     
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this.container = node.getElementById("wrapper"); // This elements content will be placed here.
+
+    // Set click handlers 
+    node.getElementById("runButton").onclick = this.onRun;
+
     this.shadow.appendChild(node);
   }
+
+
+  onRun() {
+    console.log("RUN");
+  }
+
+
 }
 
 customElements.define("action-bar", ActionBar);
