@@ -1,4 +1,5 @@
 import "./ActionButton.js";
+import "./TabBar.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -15,39 +16,14 @@ wrapperTemplate.innerHTML = `
     background-color: #00162a;
   }
 
-  #tab-container {
-    display: flex;
-    flex-direction: row;
+  #tabContainer {
     width: 100%;
-  }
-
-  .code_tab {
-    display: inline-block;
-    padding: 0.5rem;
-    border-right: 1px solid #555555;
-  }
-
-  .code_tab_active {
-    background-color: #002240;
   }
 
   </style>
   
   <nav id="wrapper">
-    <div id="tab-container">
-      <span class="code_tab code_tab_active">
-        Test.js
-      </span>
-      <span class="code_tab">
-        not_file.txt
-      </span>
-      <span class="code_tab">
-        not_file.txt
-      </span>
-      <span class="code_tab">
-        not_file.txt
-      </span>
-    </div>
+    <tab-bar id="tabContainer" ></tab-bar>
 
     <action-button id="runButton" color="cobalt">
       Run

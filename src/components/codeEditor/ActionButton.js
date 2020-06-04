@@ -3,7 +3,7 @@ wrapperTemplate.innerHTML = `
   <style>
     button {
       display: inline-block;
-      border: none;
+      border-radius: 0.1rem;
       margin: 0;
       text-decoration: none;
       color: #ffffff;
@@ -21,12 +21,11 @@ wrapperTemplate.innerHTML = `
     }
 
     button:active {
-        outline: 1px solid #fff;
-        outline-offset: -4px;
+      border: 1px solid #fff;
     }
 
     button:active {
-        transform: scale(0.99);
+      transform: scale(0.99);
     }
   </style>
   
@@ -44,7 +43,7 @@ Number.prototype.clamp = function(min, max) {
   return Math.min(Math.max(this, min), max);
 };
 
-const sizeStyling = (sizeStr) => {
+const sizeStyling = (sizeStr, slim = false) => {
   const options = {
     sm: 0.5,
     md: 0.7,
@@ -57,7 +56,7 @@ const sizeStyling = (sizeStr) => {
 
   return `
   font-size: ${ fontSize }rem;
-  padding: ${ fontSize }rem ${ 1.2*fontSize }rem;
+  padding: ${ ((slim) ? 0.2 : 1.0 )*fontSize }rem ${ ((slim) ? 0.3 : 1.2 )*fontSize }rem;
   `;
 };
 
@@ -107,8 +106,7 @@ const colorStyling = (value, outline, darken = false) => {
   return (outline) ? 
   `
   background-color: transparent;
-  outline: 1px solid ${ result };
-  outline-offset: -4px;
+  border: 1px solid ${ result };
   `
   :
   `
@@ -145,13 +143,13 @@ class ActionButton extends HTMLElement {
       }
 
       button {
-        ${ sizeStyling(this.getAttribute("size")) }
-        ${ colorStyling(this.getAttribute("color"), this.getAttribute("secondary")) }
-        ${ blockStyling(this.getAttribute("block")) }
+        ${ sizeStyling(this.getAttribute("size"), this.hasAttribute("slim")) }
+        ${ colorStyling(this.getAttribute("color"), this.hasAttribute("secondary")) }
+        ${ blockStyling(this.hasAttribute("block")) }
       }
 
       button:hover {
-        ${ colorStyling(this.getAttribute("color"), this.getAttribute("secondary"), true) }
+        ${ colorStyling(this.getAttribute("color"), this.hasAttribute("secondary"), true) }
       }
     `;
     this.container.innerHTML = this.innerHTML;
