@@ -5,12 +5,16 @@ import Tab from "./Tab.js";
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
-  #wrapper {
-    display: flex;
-    flex-direction: row;
+  :host {
     width: 100%;
     overflow-x: scroll;
     scrollbar-color: #555555 #011e3a;
+  }
+  
+  #wrapper {
+    display: flex;
+    flex-direction: row;
+    background-color: #00162a;
   }
 
   </style>

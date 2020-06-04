@@ -13,7 +13,7 @@ wrapperTemplate.innerHTML = `
   #wrapper {
     display: flex;
     flex-direction: row;
-    background-color: #00162a;
+    background-color: #011e3a;
   }
 
   #tabContainer {

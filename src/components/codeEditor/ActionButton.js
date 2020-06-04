@@ -111,6 +111,7 @@ const colorStyling = (value, outline, darken = false) => {
   :
   `
   background-color: ${ result };
+  border: none;
   `
   ;
 };
