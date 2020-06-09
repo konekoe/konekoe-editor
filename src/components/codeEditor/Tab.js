@@ -48,18 +48,34 @@ wrapperTemplate.innerHTML = `
   </div>
 `;
 
+// https://www.w3resource.com/javascript-exercises/javascript-math-exercise-23.php
+function createUUID(){
+  var dt = new Date().getTime();
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = (dt + Math.random()*16)%16 | 0;
+      dt = Math.floor(dt/16);
+      return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+  });
+  return uuid;
+}
+
 class Tab extends HTMLElement {
+
+  get id() {
+    return this._id;
+  }
+
 
   constructor(name, removeCb) {
     super();
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     this._active = false;
     this._remove = removeCb;
+    this._id = createUUID();
 
     this.setActive = this.setActive.bind(this);
 
-    this.style
-
+    
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this._container = node.getElementById("wrapper");

@@ -42,6 +42,7 @@ class ActionBar extends HTMLElement {
 
     // Set click handlers 
     node.getElementById("runButton").onclick = this.onRun;
+    
 
     this.shadow.appendChild(node);
   }

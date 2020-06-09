@@ -1,4 +1,5 @@
 import * as ace from "ace-builds/src-min-noconflict/ace";
+
 import "ace-builds/webpack-resolver";
 import "./ActionBar.js";
 
@@ -17,7 +18,7 @@ wrapperTemplate.innerHTML = `
   }
   </style>
   
-  <action-bar id="action-bar">
+  <action-bar id="actionBar">
   </action-bar>
 
   <div id="editor">
@@ -27,24 +28,61 @@ wrapperTemplate.innerHTML = `
 class CodeEditor extends HTMLElement {
   constructor() {
     super();
-    this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
+    this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
-    this.editor;
+    this._sessions = {}; // Map of form ID string => Ace EditSession instance.
+    this._editor;
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
-    this.container = node.getElementById("editor"); // This elements content will be placed here.
-    this.shadow.appendChild(node);
+    
+    const actionBar = node.getElementById("actionBar");
+
+    this.addEditor = this.addEditor.bind(this);
+    this.changeEditor = this.changeEditor.bind(this);
+    this.removeEditor = this.removeEditor.bind(this);
+
+    // Handle action bar events
+    actionBar.addEventListener("tab-created", this.addEditor, false);
+    actionBar.addEventListener("tab-changed", this.changeEditor, false);
+    actionBar.addEventListener("tab-removed", this.removeEditor, false);
+
+    this._container = node.getElementById("editor"); // This elements content will be placed here.
+    this._shadow.appendChild(node);
   }
+
   connectedCallback() {
 
-    this.editor = ace.edit(this.container);
+    this._editor = ace.edit(this._container);
     // Set style and default mode.
-    this.editor.setTheme("ace/theme/cobalt");
-    this.editor.session.setMode("ace/mode/javascript");
-    this.editor.setValue("the new text here");
+    this._editor.setTheme("ace/theme/cobalt");
+    this._editor.session.setMode("ace/mode/javascript");
+    this._editor.setValue("text here");
+
+    this._sessions.default = this._editor.session;
 
     // Finally attach to shadow root.
-    this.editor.renderer.attachToShadowRoot();
+    this._editor.renderer.attachToShadowRoot();
+  }
+
+  addEditor({ data }) {
+    console.log("ADD");
+    const session = new ace.EditSession("");
+    
+    session.setMode("ace/mode/javascript");
+    
+    this._editor.setSession(session);
+    this._sessions[data.target.id] = session;
+  }
+
+  changeEditor({ data }) {
+    console.log("CHANGE");
+    this._editor.setSession(this._sessions[data.target.id]);
+  }
+
+  removeEditor({ data }) {
+    console.log("REMOVE");
+    this._editor.setSession(this._sessions.default);
+    delete this._sessions[data.target.id];
   }
 }
 

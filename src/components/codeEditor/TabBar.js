@@ -1,5 +1,4 @@
 import "./ActionButton.js";
-import "./Tab.js";
 import Tab from "./Tab.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -54,15 +53,29 @@ class TabBar extends HTMLElement {
 
   onAdd() {
     const add = new Tab("test", (event) => {
-      event.preventDefault();
+      event.stopPropagation();
       this._container.removeChild(add); 
+      
+      const removeEvent = new Event("tab-removed", { bubbles: true, composed: true });
+      removeEvent.data = { target: add };
+      
+      this.dispatchEvent(removeEvent);
     });
   
     add.onclick = () => {
       this.changeActive(add);
-      console.log(add);
+      // bubbles and composed will ensure this can be caught outside of the parent element's shadow DOM.
+      const changeEvent = new Event("tab-changed", { bubbles: true, composed: true });
+      changeEvent.data = { target: add };
+      
+      this.dispatchEvent(changeEvent);
     };
 
+    // bubbles and composed will ensure this can be caught outside of the parent element's shadow DOM.
+    const createEvent = new Event("tab-created", { bubbles: true, composed: true });
+    createEvent.data = { target: add };
+    
+    this.dispatchEvent(createEvent);
 
     this.changeActive(add);
     
