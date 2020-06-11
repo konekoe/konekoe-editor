@@ -1,4 +1,5 @@
-import "./ActionButton.js";
+import "../utils/ActionButton.js";
+import "../utils/Modal.js";
 import Tab from "./Tab.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -22,6 +23,12 @@ wrapperTemplate.innerHTML = `
     <action-button id="addTabButton" secondary="true" color="cobalt">
       +
     </action-button>
+
+    <pop-up-modal>
+      <h1>Please give a name for the file</h1>
+      <input id="tabNameInput" type="text">
+      </input>
+    </pop-up-modal>
   </div>
 `;
 

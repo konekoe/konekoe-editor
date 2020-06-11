@@ -65,7 +65,6 @@ class CodeEditor extends HTMLElement {
   }
 
   addEditor({ data }) {
-    console.log("ADD");
     const session = new ace.EditSession("");
     
     session.setMode("ace/mode/javascript");
@@ -75,12 +74,10 @@ class CodeEditor extends HTMLElement {
   }
 
   changeEditor({ data }) {
-    console.log("CHANGE");
     this._editor.setSession(this._sessions[data.target.id]);
   }
 
   removeEditor({ data }) {
-    console.log("REMOVE");
     this._editor.setSession(this._sessions.default);
     delete this._sessions[data.target.id];
   }

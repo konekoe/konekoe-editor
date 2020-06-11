@@ -1,4 +1,4 @@
-import "./ActionButton.js";
+import "../utils/ActionButton.js";
 import "./TabBar.js";
 
 const wrapperTemplate = document.createElement("template");
