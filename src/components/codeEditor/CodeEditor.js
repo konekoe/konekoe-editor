@@ -55,10 +55,10 @@ class CodeEditor extends HTMLElement {
     this._editor = ace.edit(this._container);
     // Set style and default mode.
     this._editor.setTheme("ace/theme/cobalt");
-    this._editor.session.setMode("ace/mode/javascript");
-    this._editor.setValue("text here");
+    this._editor.setValue("");
 
     this._sessions.default = this._editor.session;
+    this._editor.setReadOnly(true);
 
     // Finally attach to shadow root.
     this._editor.renderer.attachToShadowRoot();
@@ -69,17 +69,23 @@ class CodeEditor extends HTMLElement {
     
     session.setMode("ace/mode/javascript");
     
-    this._editor.setSession(session);
     this._sessions[data.target.id] = session;
+    this.setSession(data.target.id);
   }
 
   changeEditor({ data }) {
-    this._editor.setSession(this._sessions[data.target.id]);
+    this.setSession(data.target.id);
   }
 
   removeEditor({ data }) {
-    this._editor.setSession(this._sessions.default);
+    this.setSession("default");
     delete this._sessions[data.target.id];
+  }
+
+  setSession(id) {
+    this._editor.setReadOnly(id === "default");
+    
+    this._editor.setSession(this._sessions[id]);
   }
 }
 
