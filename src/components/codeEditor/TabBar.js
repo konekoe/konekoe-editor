@@ -23,13 +23,15 @@ wrapperTemplate.innerHTML = `
     <action-button id="addTabButton" secondary="true" color="cobalt">
       +
     </action-button>
+  </div>
 
-    <pop-up-modal>
+  <pop-up-modal>
+    <div slot="content">
       <h1>Please give a name for the file</h1>
       <input id="tabNameInput" type="text">
       </input>
-    </pop-up-modal>
-  </div>
+    </div>
+  </pop-up-modal>
 `;
 
 class TabBar extends HTMLElement {
@@ -40,12 +42,26 @@ class TabBar extends HTMLElement {
     this._tabs = [];
 
     this.onAdd = this.onAdd.bind(this);
+    this.createNewTab = this.createNewTab.bind(this);
+
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this._container = node.getElementById("wrapper"); // This elements content will be placed here.
 
-    // Set click handlers 
+    this._addModal = node.querySelector("pop-up-modal");
+    this._tabNameInput = node.getElementById("tabNameInput");
+    
+    // Set event handlers 
     node.getElementById("addTabButton").onclick = this.onAdd;
+
+    this._addModal.addEventListener("accept", () => {
+      this.createNewTab(this._tabNameInput.value);
+      this._tabNameInput.value = "";
+    });
+
+    this._addModal.addEventListener("cancel", () => {
+      this._tabNameInput.value = "";
+    });
 
     this._shadow.appendChild(node);
   }
@@ -58,8 +74,8 @@ class TabBar extends HTMLElement {
     target.setActive(true);
   }
 
-  onAdd() {
-    const add = new Tab("test", (event) => {
+  createNewTab(name) {
+    const add = new Tab(name, (event) => {
       event.stopPropagation();
       this._container.removeChild(add); 
       
@@ -88,6 +104,10 @@ class TabBar extends HTMLElement {
     
     this._container.appendChild(add);
     this._tabs.concat(add);
+  }
+
+  onAdd() {
+    this._addModal.show();
   }
 }
 

@@ -1,12 +1,11 @@
 import "./ActionButton.js";
-import ActionButton from "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
     #wrapper {
       position: absolute;
-      display: grid;
+      display: none;
       grid-template-columns: [left] 20% [center-left] 53% [center-right] 34% [right];
       grid-template-rows: [top] 10% [middle-top] 66% [middle-bottom] 33% [bottom];
       left: 0;
@@ -54,7 +53,9 @@ wrapperTemplate.innerHTML = `
 
     <div id="container">
 
-      <div id="content">
+      <div  id="content">
+        <slot name="content">
+        </slot>
       </div>
 
       <div id="btnWrapper">
@@ -73,7 +74,7 @@ wrapperTemplate.innerHTML = `
 
 class Modal extends HTMLElement {
 
-  constructor(acceptCb, cancelCb) {
+  constructor() {
     super();
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     
@@ -83,9 +84,16 @@ class Modal extends HTMLElement {
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this._container = node.getElementById("wrapper");
 
-    node.querySelectorAll("action-button").forEach(btn => { btn.onclick = this.close });
+    node.getElementById("acceptBtn").onclick = () => {
+      this.close();
+      this.dispatchEvent(new Event("accept"));
+    };
 
-    node.getElementById("content").innerHTML = this.innerHTML;
+    node.getElementById("cancelBtn").onclick = () => {
+      this.close();
+      this.dispatchEvent(new Event("cancel"));
+    };
+
     
     this._shadow.appendChild(node);
   }

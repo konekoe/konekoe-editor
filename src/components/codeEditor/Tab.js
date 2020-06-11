@@ -83,7 +83,7 @@ class Tab extends HTMLElement {
 
     node.querySelector("action-button").onclick = this._remove;
 
-    node.getElementById("container").innerHTML = name || this.innerHTML;
+    node.getElementById("container").innerHTML = name || this._id;
 
     this._shadow.appendChild(node);
   }
