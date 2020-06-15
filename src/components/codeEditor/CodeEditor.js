@@ -32,6 +32,22 @@ class CodeEditor extends HTMLElement {
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.
     this._editor;
+    this._config;
+
+    if (this.hasAttribute("config")) {
+      try {
+        const temp = JSON.parse(this.getAttribute("config"));
+        
+        if (temp && typeof temp[Symbol.iterator] === 'function') 
+          this._config = temp;
+
+      }
+      catch (err) {
+        throw Error("Malformed JSON data.");
+      }
+    } 
+
+
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     
@@ -60,14 +76,16 @@ class CodeEditor extends HTMLElement {
     this._sessions.default = this._editor.session;
     this._editor.setReadOnly(true);
 
-    this._actionBar.tabContainer.createNewTab("test");
-
     // Finally attach to shadow root.
     this._editor.renderer.attachToShadowRoot();
+
+    if (this._config) {
+      this._config.map(item => this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item.name), ...item } }));
+    }
   }
 
   addEditor({ data }) {
-    const session = new ace.EditSession("");
+    const session = new ace.EditSession(data.value || "");
     
      // Exctract file extension
      // If no name is given use "" indicating a text file

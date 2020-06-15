@@ -42,7 +42,7 @@ class TabBar extends HTMLElement {
     this._tabs = [];
 
     this.onAdd = this.onAdd.bind(this);
-    this.createNewTab = this.createNewTab.bind(this);
+    this.createTab = this.createTab.bind(this);
 
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
@@ -55,7 +55,14 @@ class TabBar extends HTMLElement {
     node.getElementById("addTabButton").onclick = this.onAdd;
 
     this._addModal.addEventListener("accept", () => {
-      this.createNewTab(this._tabNameInput.value);
+      const add = this.createTab(this._tabNameInput.value);
+
+      // bubbles and composed will ensure this can be caught outside of the parent element's shadow DOM.
+      const createEvent = new Event("tab-created", { bubbles: true, composed: true });
+      createEvent.data = { target: add };
+      
+      this.dispatchEvent(createEvent);
+
       this._tabNameInput.value = "";
     });
 
@@ -74,7 +81,7 @@ class TabBar extends HTMLElement {
     target.setActive(true);
   }
 
-  createNewTab(name) {
+  createTab(name) {
     const add = new Tab(name, (event) => {
       event.stopPropagation();
       this._container.removeChild(add); 
@@ -94,16 +101,13 @@ class TabBar extends HTMLElement {
       this.dispatchEvent(changeEvent);
     };
 
-    // bubbles and composed will ensure this can be caught outside of the parent element's shadow DOM.
-    const createEvent = new Event("tab-created", { bubbles: true, composed: true });
-    createEvent.data = { target: add };
-    
-    this.dispatchEvent(createEvent);
-
     this.changeActive(add);
-    
+      
     this._container.appendChild(add);
     this._tabs.concat(add);
+
+
+    return add;
   }
 
   onAdd() {
