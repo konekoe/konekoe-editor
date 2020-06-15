@@ -1,5 +1,5 @@
 import * as ace from "ace-builds/src-min-noconflict/ace";
-
+import * as aceModes from "ace-builds/src-min-noconflict/ext-modelist.js";
 import "ace-builds/webpack-resolver";
 import "./ActionBar.js";
 
@@ -35,16 +35,16 @@ class CodeEditor extends HTMLElement {
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     
-    const actionBar = node.getElementById("actionBar");
+    this._actionBar = node.getElementById("actionBar");
 
     this.addEditor = this.addEditor.bind(this);
     this.changeEditor = this.changeEditor.bind(this);
     this.removeEditor = this.removeEditor.bind(this);
 
     // Handle action bar events
-    actionBar.addEventListener("tab-created", this.addEditor, false);
-    actionBar.addEventListener("tab-changed", this.changeEditor, false);
-    actionBar.addEventListener("tab-removed", this.removeEditor, false);
+    this._actionBar.addEventListener("tab-created", this.addEditor, false);
+    this._actionBar.addEventListener("tab-changed", this.changeEditor, false);
+    this._actionBar.addEventListener("tab-removed", this.removeEditor, false);
 
     this._container = node.getElementById("editor"); // This elements content will be placed here.
     this._shadow.appendChild(node);
@@ -60,6 +60,8 @@ class CodeEditor extends HTMLElement {
     this._sessions.default = this._editor.session;
     this._editor.setReadOnly(true);
 
+    this._actionBar.tabContainer.createNewTab("test");
+
     // Finally attach to shadow root.
     this._editor.renderer.attachToShadowRoot();
   }
@@ -67,7 +69,12 @@ class CodeEditor extends HTMLElement {
   addEditor({ data }) {
     const session = new ace.EditSession("");
     
-    session.setMode("ace/mode/javascript");
+     // Exctract file extension
+     // If no name is given use "" indicating a text file
+     // If the name does not contain a file extension use ""
+    let modeName = (data.target.name) ? (data.target.name.match(/\.[0-9a-z]+$/i) || [""])[0] : "";
+
+    session.setMode(aceModes.getModeForPath(modeName).mode);
     
     this._sessions[data.target.id] = session;
     this.setSession(data.target.id);

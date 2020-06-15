@@ -65,6 +65,10 @@ class Tab extends HTMLElement {
     return this._id;
   }
 
+  get name() {
+    return this._name;
+  }
+
 
   constructor(name, removeCb) {
     super();
@@ -72,6 +76,7 @@ class Tab extends HTMLElement {
     this._active = false;
     this._remove = removeCb;
     this._id = createUUID();
+    this._name = name || this._id;
 
     this.setActive = this.setActive.bind(this);
 
@@ -83,7 +88,7 @@ class Tab extends HTMLElement {
 
     node.querySelector("action-button").onclick = this._remove;
 
-    node.getElementById("container").innerHTML = name || this._id;
+    node.getElementById("container").innerHTML = this._name;
 
     this._shadow.appendChild(node);
   }

@@ -33,12 +33,17 @@ wrapperTemplate.innerHTML = `
 `;
 
 class ActionBar extends HTMLElement {
+  get tabContainer() {
+    return this._tabContainer;
+  }
+
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
-    this.container = node.getElementById("wrapper"); // This elements content will be placed here.
+    this._tabContainer = node.getElementById("tabContainer");
+    this._container = node.getElementById("wrapper"); // This elements content will be placed here.
 
     // Set click handlers 
     node.getElementById("runButton").onclick = this.onRun;
