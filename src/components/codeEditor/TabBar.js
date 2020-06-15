@@ -81,8 +81,8 @@ class TabBar extends HTMLElement {
     target.setActive(true);
   }
 
-  createTab(name) {
-    const add = new Tab(name, (event) => {
+  createTab(options) {
+    const add = new Tab(options, (event) => {
       event.stopPropagation();
       this._container.removeChild(add); 
       

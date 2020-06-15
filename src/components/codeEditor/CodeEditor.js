@@ -80,7 +80,10 @@ class CodeEditor extends HTMLElement {
     this._editor.renderer.attachToShadowRoot();
 
     if (this._config) {
-      this._config.map(item => this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item.name), ...item } }));
+      this._config.map(item => {
+        item.noDelete = item.noDelete === "true";
+        this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item), ...item } });
+      });
     }
   }
 

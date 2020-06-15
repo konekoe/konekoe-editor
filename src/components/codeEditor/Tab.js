@@ -70,13 +70,13 @@ class Tab extends HTMLElement {
   }
 
 
-  constructor(name, removeCb) {
+  constructor(options, removeCb) {
     super();
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     this._active = false;
     this._remove = removeCb;
     this._id = createUUID();
-    this._name = name || this._id;
+    this._name = options.name || this._id;
 
     this.setActive = this.setActive.bind(this);
 
@@ -86,7 +86,13 @@ class Tab extends HTMLElement {
     this._container = node.getElementById("wrapper");
     this._container.classList.add("codeTab");
 
-    node.querySelector("action-button").onclick = this._remove;
+    const removeButton = node.querySelector("action-button");
+    if (options.noDelete) {
+      removeButton.remove();
+    }
+    else {
+      removeButton.onclick = this._remove;
+    }
 
     node.getElementById("container").innerHTML = this._name;
 
