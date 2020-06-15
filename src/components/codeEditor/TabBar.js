@@ -43,6 +43,7 @@ class TabBar extends HTMLElement {
 
     this.onAdd = this.onAdd.bind(this);
     this.createTab = this.createTab.bind(this);
+    this.removeAddButton = this.removeAddButton.bind(this);
 
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
@@ -52,7 +53,8 @@ class TabBar extends HTMLElement {
     this._tabNameInput = node.getElementById("tabNameInput");
     
     // Set event handlers 
-    node.getElementById("addTabButton").onclick = this.onAdd;
+    this._addButton = node.getElementById("addTabButton");
+    this._addButton.onclick = this.onAdd;
 
     this._addModal.addEventListener("accept", () => {
       const add = this.createTab(this._tabNameInput.value);
@@ -112,6 +114,10 @@ class TabBar extends HTMLElement {
 
   onAdd() {
     this._addModal.show();
+  }
+
+  removeAddButton() {
+    this._addButton.remove();
   }
 }
 

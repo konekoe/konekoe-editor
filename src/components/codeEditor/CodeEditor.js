@@ -38,7 +38,7 @@ class CodeEditor extends HTMLElement {
       try {
         const temp = JSON.parse(this.getAttribute("config"));
         
-        if (temp && typeof temp[Symbol.iterator] === 'function') 
+        if (temp && typeof temp === "object") 
           this._config = temp;
 
       }
@@ -80,10 +80,14 @@ class CodeEditor extends HTMLElement {
     this._editor.renderer.attachToShadowRoot();
 
     if (this._config) {
-      this._config.map(item => {
-        item.noDelete = item.noDelete === "true";
-        this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item), ...item } });
-      });
+      if (this._config.tabs)
+        this._config.tabs.map(item => {
+          item.noDelete = item.noDelete === "true";
+          this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item), ...item } });
+        });
+
+      if (this._config.tabCreation === "false")
+        this._actionBar.tabContainer.removeAddButton();
     }
   }
 
