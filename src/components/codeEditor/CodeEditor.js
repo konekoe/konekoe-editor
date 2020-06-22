@@ -32,7 +32,7 @@ class CodeEditor extends HTMLElement {
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.
-    this._messageHandler = new HttpMessageHandler("http://localhost:3001/");
+    this._messageHandler = new HttpMessageHandler((this.hasAttribute("message-end-point")) ? this.getAttribute("message-end-point") : "http://localhost:3001/");
     this._editor;
     this._config;
 
@@ -134,7 +134,7 @@ class CodeEditor extends HTMLElement {
       return acc;
     }, {});
 
-    this._messageHandler.sendMessage(data, "submissions");
+    this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
   }
 }
 
