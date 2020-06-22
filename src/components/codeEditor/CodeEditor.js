@@ -1,5 +1,6 @@
 import * as ace from "ace-builds/src-min-noconflict/ace";
 import * as aceModes from "ace-builds/src-min-noconflict/ext-modelist.js";
+import HttpMessageHandler from "../utils/HttpMessageHandler.js";
 import "ace-builds/webpack-resolver";
 import "./ActionBar.js";
 
@@ -31,6 +32,7 @@ class CodeEditor extends HTMLElement {
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.
+    this._messageHandler = new HttpMessageHandler("http://localhost:3001/");
     this._editor;
     this._config;
 
@@ -56,11 +58,13 @@ class CodeEditor extends HTMLElement {
     this.addEditor = this.addEditor.bind(this);
     this.changeEditor = this.changeEditor.bind(this);
     this.removeEditor = this.removeEditor.bind(this);
+    this.sendCode = this.sendCode.bind(this);
 
     // Handle action bar events
     this._actionBar.addEventListener("tab-created", this.addEditor, false);
     this._actionBar.addEventListener("tab-changed", this.changeEditor, false);
     this._actionBar.addEventListener("tab-removed", this.removeEditor, false);
+    this._actionBar.addEventListener("run", this.sendCode, false);
 
     this._container = node.getElementById("editor"); // This elements content will be placed here.
     this._shadow.appendChild(node);
@@ -100,6 +104,8 @@ class CodeEditor extends HTMLElement {
     let modeName = (data.target.name) ? (data.target.name.match(/\.[0-9a-z]+$/i) || [""])[0] : "";
 
     session.setMode(aceModes.getModeForPath(modeName).mode);
+
+    session.filename = data.target.name;
     
     this._sessions[data.target.id] = session;
     this.setSession(data.target.id);
@@ -118,6 +124,17 @@ class CodeEditor extends HTMLElement {
     this._editor.setReadOnly(id === "default");
     
     this._editor.setSession(this._sessions[id]);
+  }
+
+  sendCode() {
+    const data = Object.values(this._sessions)
+    .filter(session => session.filename) // Remove sessions without a filename, such as the default session
+    .reduce((acc, curr) => {
+      acc[curr.filename] = curr.getDocument().getValue();
+      return acc;
+    }, {});
+
+    this._messageHandler.sendMessage(data, "submissions");
   }
 }
 

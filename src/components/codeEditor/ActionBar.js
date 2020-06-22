@@ -54,7 +54,9 @@ class ActionBar extends HTMLElement {
 
 
   onRun() {
-    console.log("RUN");
+    const runEvent = new Event("run", { bubbles: true, composed: true });
+    
+    this.dispatchEvent(runEvent);
   }
 
 
