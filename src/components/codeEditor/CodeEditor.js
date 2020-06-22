@@ -1,6 +1,7 @@
 import * as ace from "ace-builds/src-min-noconflict/ace";
 import * as aceModes from "ace-builds/src-min-noconflict/ext-modelist.js";
 import HttpMessageHandler from "../utils/HttpMessageHandler.js";
+import "../utils/WaitOverlay.js";
 import "ace-builds/webpack-resolver";
 import "./ActionBar.js";
 
@@ -8,10 +9,11 @@ const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
   :host{
-      display: flex;
-      min-height: 1rem;
-      height: 100%;
-      flex-direction: column;
+    position: relative;
+    display: flex;
+    min-height: 1rem;
+    height: 100%;
+    flex-direction: column;
   }
   #editor{
     flex: 1;
@@ -21,6 +23,9 @@ wrapperTemplate.innerHTML = `
   
   <action-bar id="actionBar">
   </action-bar>
+
+  <wait-overlay id="waitOverlay">
+  </wait-overlay>
 
   <div id="editor">
   </div>
@@ -54,6 +59,7 @@ class CodeEditor extends HTMLElement {
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     
     this._actionBar = node.getElementById("actionBar");
+    this._waitOverlay = node.getElementById("waitOverlay");
 
     this.addEditor = this.addEditor.bind(this);
     this.changeEditor = this.changeEditor.bind(this);
@@ -93,6 +99,7 @@ class CodeEditor extends HTMLElement {
       if (this._config.tabCreation === "false")
         this._actionBar.tabContainer.removeAddButton();
     }
+
   }
 
   addEditor({ data }) {
@@ -126,15 +133,19 @@ class CodeEditor extends HTMLElement {
     this._editor.setSession(this._sessions[id]);
   }
 
-  sendCode() {
+  async sendCode() {
     const data = Object.values(this._sessions)
     .filter(session => session.filename) // Remove sessions without a filename, such as the default session
     .reduce((acc, curr) => {
       acc[curr.filename] = curr.getDocument().getValue();
       return acc;
     }, {});
+    this._waitOverlay.show();
 
-    this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
+    // 
+    await this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
+
+    this._waitOverlay.close();
   }
 }
 
