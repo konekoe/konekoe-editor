@@ -23,6 +23,7 @@
     "@webcomponents/webcomponentsjs": "^2.4.3",
     "babel-loader": "^8.1.0",
     "jasmine": "^3.5.0",
+    "json-server": "^0.16.1",
     "karma": "^5.0.2",
     "karma-chrome-launcher": "^3.1.0",
     "karma-edge-launcher": "^0.4.2",
