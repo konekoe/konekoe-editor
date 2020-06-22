@@ -142,9 +142,14 @@ class CodeEditor extends HTMLElement {
     }, {});
     this._waitOverlay.show();
 
-    // 
-    await this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
-
+    // TODO: more robust error handling.
+    try {
+      await this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
+    }
+    catch (err) {
+      alert(err.message);
+    }
+    
     this._waitOverlay.close();
   }
 }
