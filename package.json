@@ -16,13 +16,16 @@
     "file-loader": "^6.0.0",
     "insane": "^2.6.2",
     "marked": "^1.0.0",
-    "xterm": "^4.7.0"
+    "xterm": "^4.7.0",
+    "xterm-addon-attach": "^0.6.0",
+    "xterm-addon-fit": "^0.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
     "@webcomponents/webcomponentsjs": "^2.4.3",
     "babel-loader": "^8.1.0",
+    "css-loader": "^3.6.0",
     "jasmine": "^3.5.0",
     "json-server": "^0.16.1",
     "karma": "^5.0.2",
@@ -35,6 +38,7 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "^4.0.2",
     "requirejs": "^2.3.6",
+    "style-loader": "^1.2.1",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.11.0"

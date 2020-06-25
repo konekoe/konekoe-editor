@@ -1,5 +1,6 @@
 import "./components/codeEditor/CodeEditor.js";
 import "./components/infoBox/InfoBox.js";
+import "./components/codeTerminal/CodeTerminal.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `

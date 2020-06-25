@@ -7,11 +7,15 @@ module.exports = {
         test: /\.(js)$/,
         exclude: /node_modules/,
         use: ['babel-loader']
-      }
+      },
+      {
+        test: /\.css$/i,
+        use: ['css-loader'],
+      },
     ]
   },
   resolve: {
-    extensions: ['*', '.js']
+    extensions: ['*', '.js', "css"]
   },
   output: {
     path: __dirname + '/dist',
