@@ -1,5 +1,5 @@
-import "../utils/ActionButton.js";
-import "../utils/Modal.js";
+import "./ActionButton.js";
+import "./Modal.js";
 import Tab from "./Tab.js";
 
 const wrapperTemplate = document.createElement("template");

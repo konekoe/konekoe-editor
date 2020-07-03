@@ -1,5 +1,5 @@
 import "../utils/ActionButton.js";
-import "./TabBar.js";
+import "../utils/TabBar.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `

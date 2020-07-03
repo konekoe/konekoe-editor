@@ -1,4 +1,4 @@
-import "../utils/ActionButton.js";
+import "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
