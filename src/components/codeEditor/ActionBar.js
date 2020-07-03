@@ -1,3 +1,4 @@
+import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import "../utils/ActionButton.js";
 import "../utils/TabBar.js";
 
@@ -34,7 +35,7 @@ wrapperTemplate.innerHTML = `
   </nav>
 `;
 
-class ActionBar extends HTMLElement {
+class ActionBar extends ErrorHandlingHTMLElement {
   get tabContainer() {
     return this._tabContainer;
   }

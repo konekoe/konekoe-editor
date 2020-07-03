@@ -1,6 +1,7 @@
 import "./ActionButton.js";
 import "./Modal.js";
 import Tab from "./Tab.js";
+import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -34,7 +35,7 @@ wrapperTemplate.innerHTML = `
   </pop-up-modal>
 `;
 
-class TabBar extends HTMLElement {
+class TabBar extends ErrorHandlingHTMLElement {
   constructor() {
     super();
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.

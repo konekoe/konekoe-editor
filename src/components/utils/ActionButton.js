@@ -1,3 +1,5 @@
+import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
+
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
@@ -122,7 +124,7 @@ const blockStyling = (block) => (block) ? `
   ` : "";
 
 
-class ActionButton extends HTMLElement {
+class ActionButton extends ErrorHandlingHTMLElement {
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.

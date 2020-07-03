@@ -1,3 +1,4 @@
+import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
 import "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -72,7 +73,7 @@ wrapperTemplate.innerHTML = `
 `;
 
 
-class Modal extends HTMLElement {
+class Modal extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();

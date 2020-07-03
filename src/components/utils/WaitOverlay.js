@@ -1,3 +1,5 @@
+import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
+
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
@@ -24,7 +26,7 @@ wrapperTemplate.innerHTML = `
 `;
 
 
-class WaitOverlay extends HTMLElement {
+class WaitOverlay extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();

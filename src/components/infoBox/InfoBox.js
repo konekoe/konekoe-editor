@@ -1,5 +1,6 @@
 import * as marked from "marked/marked.min.js";
 import * as insane from "insane/insane.js";
+import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -24,7 +25,7 @@ wrapperTemplate.innerHTML = `
   </article>
 `;
 
-class InfoBox extends HTMLElement {
+class InfoBox extends ErrorHandlingHTMLElement {
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.

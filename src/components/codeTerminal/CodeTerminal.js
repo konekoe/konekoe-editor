@@ -1,7 +1,6 @@
 import { Terminal }  from "xterm/lib/xterm.js";
 import { FitAddon } from "xterm-addon-fit";
-import { AttachAddon } from "xterm-addon-attach";
-
+import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import styles from "xterm/css/xterm.css";
 
 
@@ -46,16 +45,24 @@ wrapperTemplate.innerHTML = `
   </div>
 `;
 
-class CodeTerminal extends HTMLElement {
+class CodeTerminal extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     
+    this._terminal = {};
+    this._fitAddon = {};
+
+    if (!this.hasAttribute("target"))
+      throw Error("No websocket");
+    
+    
+
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
 
-    const socket = new WebSocket('ws://localhost:4000');
+    const socket = new WebSocket();
 
     socket.onmessage = ({ data }) => {
       this._terminal.write(data);
@@ -73,13 +80,6 @@ class CodeTerminal extends HTMLElement {
   }
 
 
-  connectedCallback() {
-    const terminalWrapper = this._shadow.getElementById("terminal");
-
-    this._terminal.open(terminalWrapper);
-
-    setTimeout(() => this._fitAddon.fit(), 0); // Hack to make this call occur once the page has loaded.
-  }
 
 
 }

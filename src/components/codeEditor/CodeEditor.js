@@ -1,6 +1,7 @@
 import * as ace from "ace-builds/src-min-noconflict/ace";
 import * as aceModes from "ace-builds/src-min-noconflict/ext-modelist.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
+import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import "../utils/WaitOverlay.js";
 import "ace-builds/webpack-resolver";
 import "./ActionBar.js";
@@ -31,7 +32,7 @@ wrapperTemplate.innerHTML = `
   </div>
 `;
 
-class CodeEditor extends HTMLElement {
+class CodeEditor extends ErrorHandlingHTMLElement {
   constructor() {
     super();
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.

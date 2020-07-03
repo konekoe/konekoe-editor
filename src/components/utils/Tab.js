@@ -1,3 +1,4 @@
+import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
 import "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -59,7 +60,7 @@ function createUUID(){
   return uuid;
 }
 
-class Tab extends HTMLElement {
+class Tab extends ErrorHandlingHTMLElement {
 
   get id() {
     return this._id;
