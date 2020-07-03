@@ -1,5 +1,6 @@
 import { Terminal }  from "xterm/lib/xterm.js";
 import { FitAddon } from "xterm-addon-fit";
+import { CriticalError, MinorError } from "../../utils/errors/";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import styles from "xterm/css/xterm.css";
 
@@ -49,16 +50,12 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
-    this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
-    
-    this._terminal = {};
-    this._fitAddon = {};
 
     if (!this.hasAttribute("target"))
-      throw Error("No websocket");
-    
-    
+      throw new MinorError("No websocket");
 
+    this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
+    
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
 

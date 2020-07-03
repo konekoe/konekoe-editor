@@ -35,6 +35,7 @@ wrapperTemplate.innerHTML = `
 class CodeEditor extends ErrorHandlingHTMLElement {
   constructor() {
     super();
+    
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.

@@ -1,4 +1,3 @@
-import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
 import "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -73,7 +72,7 @@ wrapperTemplate.innerHTML = `
 `;
 
 
-class Modal extends ErrorHandlingHTMLElement {
+class Modal extends HTMLElement {
 
   constructor() {
     super();
@@ -97,6 +96,11 @@ class Modal extends ErrorHandlingHTMLElement {
 
     
     this._shadow.appendChild(node);
+  }
+
+  connectedCallback() {
+    if (this.hasAttribute("show"))
+      this.show();
   }
 
   close() {

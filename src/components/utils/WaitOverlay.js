@@ -1,5 +1,3 @@
-import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
-
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
@@ -26,7 +24,7 @@ wrapperTemplate.innerHTML = `
 `;
 
 
-class WaitOverlay extends ErrorHandlingHTMLElement {
+class WaitOverlay extends HTMLElement {
 
   constructor() {
     super();
@@ -35,6 +33,7 @@ class WaitOverlay extends ErrorHandlingHTMLElement {
 
     this.close = this.close.bind(this);
     this.show = this.show.bind(this);
+
     this.animateSpinner = this.animateSpinner.bind(this);
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
@@ -42,6 +41,11 @@ class WaitOverlay extends ErrorHandlingHTMLElement {
     this._spinner = node.getElementById("spinner");
     
     this._shadow.appendChild(node);
+  }
+
+  connectedCallback() {
+    if (this.hasAttribute("show"))
+      this.show();
   }
 
   animateSpinner() {
