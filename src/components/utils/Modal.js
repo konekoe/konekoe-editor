@@ -33,18 +33,12 @@ wrapperTemplate.innerHTML = `
     }
 
     #btnWrapper {
-      display: grid;
-      grid-template-columns: [left] 50% [center] 49% [right];
+      display: flex;
+      flex-direction: row;
     }
 
-    #acceptBtn {
-      grid-column-start: left;
-      grid-column-end: center;
-    }
-
-    #cancelBtn {
-      grid-column-start: center;
-      grid-column-end: rigth;
+    #acceptBtn, #cancelBtn {
+      width: 100%;
     }
 
   </style>
@@ -74,9 +68,18 @@ wrapperTemplate.innerHTML = `
 
 class Modal extends HTMLElement {
 
-  constructor() {
+  constructor(inputVars = {}) {
     super();
+
+    // Input variables have to be converted to attributes as when the element is created programmatically before
+    // the whole application has mounted, the contructor will be called twice.
+    for (let key in inputVars) {
+      this.setAttribute(key, inputVars[key]);
+    }
+
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
+
+    this._inputVars = inputVars;
     
     this.close = this.close.bind(this);
     this.show = this.show.bind(this);
@@ -84,12 +87,15 @@ class Modal extends HTMLElement {
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this._container = node.getElementById("wrapper");
 
-    node.getElementById("acceptBtn").onclick = () => {
+    this._acceptBtn = node.getElementById("acceptBtn"); 
+    this._cancelBtn = node.getElementById("cancelBtn");
+
+    this._acceptBtn.onclick = () => {
       this.close();
       this.dispatchEvent(new Event("accept"));
     };
 
-    node.getElementById("cancelBtn").onclick = () => {
+    this._cancelBtn.onclick = () => {
       this.close();
       this.dispatchEvent(new Event("cancel"));
     };
@@ -101,6 +107,20 @@ class Modal extends HTMLElement {
   connectedCallback() {
     if (this.hasAttribute("show"))
       this.show();
+
+    ["accept", "cancel"].forEach(term => {
+      if (this.hasAttribute(term)) {
+        const btnTxt = this.getAttribute(term);
+  
+        if (btnTxt) {
+          this[`_${ term }Btn`].innerHTML = btnTxt;
+        }
+        else {
+          this[`_${ term }Btn`].style.display = "none";
+        }
+      }
+    });
+    
   }
 
   close() {
