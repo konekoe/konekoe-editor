@@ -27,11 +27,17 @@ wrapperTemplate.innerHTML = `
 
   #terminal {
     box-sizing: border-box;
-    background-color: black;
     width: 100%;
     height: 100%;
+    background-color: black;
+    overflow-wrap: break-word;
+    scrollbar-color: #555555 #011e3a;
   }
-
+  
+  .terminal {
+    padding: 0.5rem 0rem 0rem 0.5rem;
+  }
+  
   </style>
 
   <div id="wrapper">
@@ -51,10 +57,15 @@ class CodeTerminal extends HTMLElement {
 
     const socket = new WebSocket('ws://localhost:4000');
 
-    this._attachAddon = new AttachAddon(socket);
+    socket.onmessage = ({ data }) => {
+      this._terminal.write(data);
+    };
+
+    this._terminal.onKey(({ key }) => {
+      socket.send(key);
+    });
 
     this._terminal.loadAddon(this._fitAddon);
-    this._terminal.loadAddon(this._attachAddon);
    
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     

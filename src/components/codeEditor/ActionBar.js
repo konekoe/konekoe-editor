@@ -24,9 +24,11 @@ wrapperTemplate.innerHTML = `
   
   <nav id="wrapper">
     <tab-bar id="tabContainer" ></tab-bar>
-
-    <action-button id="runButton" color="cobalt">
-      Run
+    <action-button color="cobalt">
+      Save
+    </action-button>
+    <action-button id="runButton" secondary color="red">
+      Submit
     </action-button>
 
   </nav>
