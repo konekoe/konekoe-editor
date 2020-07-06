@@ -1,6 +1,6 @@
-import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
-import "../utils/ActionButton.js";
-import "../utils/TabBar.js";
+import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
+import "./ActionButton.js";
+import "./TabBar.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `

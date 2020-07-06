@@ -67,12 +67,19 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
       socket = new WebSocket(this.getAttribute("target"));
     }
     catch (err) {
-      throw new CriticalError(`Could not connect to ${ this.getAttribute("target") }`);
+      throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
     }
 
     socket.onmessage = ({ data }) => {
+
       this._terminal.write(data);
     };
+
+    socket.onerror = function (event) {
+      event.preventDefault();
+      
+      throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
+    }
 
     this._terminal.onKey(({ key }) => {
       socket.send(key);

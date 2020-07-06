@@ -4,7 +4,7 @@ import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver";
-import "./ActionBar.js";
+import "../utils/ActionBar.js";
 import { CriticalError } from "../../utils/errors/index.js";
 
 const wrapperTemplate = document.createElement("template");
