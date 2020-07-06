@@ -2,7 +2,7 @@ import * as ace from "ace-builds/src-min-noconflict/ace";
 import * as aceModes from "ace-builds/src-min-noconflict/ext-modelist.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
-import "../utils/WaitOverlay.js";
+import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver";
 import "./ActionBar.js";
 
@@ -25,8 +25,8 @@ wrapperTemplate.innerHTML = `
   <action-bar id="actionBar">
   </action-bar>
 
-  <wait-overlay id="waitOverlay">
-  </wait-overlay>
+  <message-overlay id="messageOverlay">
+  </message-overlay>
 
   <div id="editor">
   </div>
@@ -61,7 +61,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     
     this._actionBar = node.getElementById("actionBar");
-    this._waitOverlay = node.getElementById("waitOverlay");
+    this._messageOverlay = node.getElementById("messageOverlay");
 
     this.addEditor = this.addEditor.bind(this);
     this.changeEditor = this.changeEditor.bind(this);
@@ -142,7 +142,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
       acc[curr.filename] = curr.getDocument().getValue();
       return acc;
     }, {});
-    this._waitOverlay.show();
+    this._messageOverlay.show();
 
     // TODO: more robust error handling.
     try {
@@ -152,7 +152,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
       alert(err.message);
     }
     
-    this._waitOverlay.close();
+    this._messageOverlay.close();
   }
 }
 

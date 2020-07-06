@@ -1,4 +1,4 @@
-import "../components/utils/WaitOverlay.js";
+import "../components/utils/MessageOverlay.js";
 import Modal from "../components/utils/Modal.js";
 
 // Input: error object

@@ -24,7 +24,7 @@ wrapperTemplate.innerHTML = `
 `;
 
 
-class WaitOverlay extends HTMLElement {
+class MessageOverlay extends HTMLElement {
 
   constructor() {
     super();
@@ -70,6 +70,6 @@ class WaitOverlay extends HTMLElement {
 
 }
 
-customElements.define("wait-overlay", WaitOverlay);
+customElements.define("message-overlay", MessageOverlay);
 
-export default WaitOverlay;
+export default MessageOverlay;
