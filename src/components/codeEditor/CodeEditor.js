@@ -26,6 +26,7 @@ wrapperTemplate.innerHTML = `
   </action-bar>
 
   <message-overlay id="messageOverlay">
+    <h1 slot="content">Please wait</h1>
   </message-overlay>
 
   <div id="editor">

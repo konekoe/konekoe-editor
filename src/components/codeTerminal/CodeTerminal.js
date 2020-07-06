@@ -52,14 +52,22 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     super();
 
     if (!this.hasAttribute("target"))
-      throw new MinorError("No websocket");
+      throw new CriticalError("Please provide a target URL for the terminal!");
 
+    let socket = {};
+
+    try {
+      socket = new WebSocket(this.getAttribute("target"));
+    }
+    catch (err) {
+      throw new CriticalError(`Could not connect to ${ this.getAttribute("target") }`);
+    }
+  
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     
+
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
-
-    const socket = new WebSocket();
 
     socket.onmessage = ({ data }) => {
       this._terminal.write(data);
@@ -76,8 +84,13 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     this._shadow.appendChild(node);
   }
 
+  connectedCallback() {
+    const terminalWrapper = this._shadow.getElementById("terminal");
 
+    this._terminal.open(terminalWrapper);
 
+    setTimeout(() => this._fitAddon.fit(), 0); // Hack to make this call occur once the page has loaded.
+  }
 
 }
 

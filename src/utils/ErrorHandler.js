@@ -1,4 +1,4 @@
-import "../components/utils/MessageOverlay.js";
+import MessageOverlay from "../components/utils/MessageOverlay.js";
 import Modal from "../components/utils/Modal.js";
 
 // Input: error object
@@ -7,7 +7,10 @@ import Modal from "../components/utils/Modal.js";
 function ErrorHandler(err) {
   switch (err.name) {
     case "CriticalError":
-      return `<wait-overlay show>${ err.message }</wait-overlay>`;
+      const errorOverlay = new MessageOverlay({ show: true, coverScreen: true });
+      errorOverlay.innerHTML = `<h1 slot="content" style="color: red;">Error: ${ err.message }</h1>`;
+      
+      return errorOverlay.outerHTML;
     
     case "MinorError":
         const errorModal = new Modal({ show: true, cancel: "", accept: "OK" });
