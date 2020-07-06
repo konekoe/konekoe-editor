@@ -1,5 +1,4 @@
 import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
-import "./ActionButton.js";
 import "./TabBar.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -25,13 +24,8 @@ wrapperTemplate.innerHTML = `
   
   <nav id="wrapper">
     <tab-bar id="tabContainer" ></tab-bar>
-    <action-button color="cobalt">
-      Save
-    </action-button>
-    <action-button id="runButton" secondary color="red">
-      Submit
-    </action-button>
-
+    <slot name="content">
+    </slot>
   </nav>
 `;
 
@@ -48,18 +42,12 @@ class ActionBar extends ErrorHandlingHTMLElement {
     this._tabContainer = node.getElementById("tabContainer");
     this._container = node.getElementById("wrapper"); // This elements content will be placed here.
 
-    // Set click handlers 
-    node.getElementById("runButton").onclick = this.onRun;
-    
-
     this.shadow.appendChild(node);
   }
 
-
-  onRun() {
-    const runEvent = new Event("run", { bubbles: true, composed: true });
-    
-    this.dispatchEvent(runEvent);
+  connectedCallback() {
+    if (this.hasAttribute("noAdd"))
+      this._tabContainer.removeAddButton();
   }
 
 

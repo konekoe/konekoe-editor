@@ -78,7 +78,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     socket.onerror = function (event) {
       event.preventDefault();
       
-      throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
+      throw new MinorError(`Could not connect to ${ event.target.url }`);
     }
 
     this._terminal.onKey(({ key }) => {

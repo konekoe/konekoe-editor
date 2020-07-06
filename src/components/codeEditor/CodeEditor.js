@@ -2,10 +2,11 @@ import * as ace from "ace-builds/src-min-noconflict/ace";
 import * as aceModes from "ace-builds/src-min-noconflict/ext-modelist.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
+import { CriticalError, MinorError } from "../../utils/errors/index.js";
+import "../utils/ActionButton.js";
 import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver";
 import "../utils/ActionBar.js";
-import { CriticalError } from "../../utils/errors/index.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -24,6 +25,12 @@ wrapperTemplate.innerHTML = `
   </style>
   
   <action-bar id="actionBar">
+    <action-button slot="content" color="cobalt">
+      Save
+    </action-button>
+    <action-button slot="content" id="runButton" secondary color="red">
+      Submit
+    </action-button>
   </action-bar>
 
   <message-overlay id="messageOverlay">
@@ -60,8 +67,6 @@ class CodeEditor extends ErrorHandlingHTMLElement {
       }
     } 
 
-
-
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     
     this._actionBar = node.getElementById("actionBar");
@@ -76,7 +81,10 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._actionBar.addEventListener("tab-created", this.addEditor, false);
     this._actionBar.addEventListener("tab-changed", this.changeEditor, false);
     this._actionBar.addEventListener("tab-removed", this.removeEditor, false);
-    this._actionBar.addEventListener("run", this.sendCode, false);
+    
+    // Set click handlers 
+    node.getElementById("runButton").onclick = this.sendCode;
+        
 
     this._container = node.getElementById("editor"); // This elements content will be placed here.
     this._shadow.appendChild(node);
@@ -151,12 +159,13 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     // TODO: more robust error handling.
     try {
       await this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
+      this._messageOverlay.close();
     }
     catch (err) {
-      alert(err.message);
+      this._messageOverlay.close();
+      throw new MinorError(err.message);
     }
     
-    this._messageOverlay.close();
   }
 }
 

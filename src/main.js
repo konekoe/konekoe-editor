@@ -1,13 +1,21 @@
+import ErrorHandlingHTMLElement from "./components/utils/ErrorHandlingHTMLElement.js";
+import { CriticalError } from "./utils/errors/index.js";
 import "./components/codeEditor/CodeEditor.js";
 import "./components/infoBox/InfoBox.js";
 import "./components/codeTerminal/CodeTerminal.js";
+import "./components/utils/ActionBar.js"
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
-    :host{
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #container {
       display: grid;
-      min-height: 1rem;
+      height: 100%;
       grid-template-columns: [left] 33% [center-left] 33% [center-right] 33% [right];
       grid-template-rows: [top] 33% [middle-top] 33% [middle-bottom] 33% [bottom];
       column-gap: 0.1rem;
@@ -16,12 +24,16 @@ wrapperTemplate.innerHTML = `
       color: white;
     }
   </style>
-  <slot name="default">
+
+  <action-bar noAdd id="actionBar">
+  </action-bar>
+  
+  <slot id="container" name="default">
     <code-editor id="default"></code-editor>
   </slot>
 `;
 
-class EditorContainer extends HTMLElement {
+class EditorContainer extends ErrorHandlingHTMLElement {
   static get defaultStyling() {
     return `
     #default {
@@ -73,7 +85,7 @@ class EditorContainer extends HTMLElement {
       this._shadow.appendChild(style);
     }
     catch (err) {
-      this._shadow.innerHTML = `<h1>Error: ${ err.message }</h1>`;
+      throw new CriticalError(err.message);
     }
 
     
