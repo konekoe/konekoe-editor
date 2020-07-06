@@ -5,6 +5,7 @@ import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver";
 import "./ActionBar.js";
+import { CriticalError } from "../../utils/errors/index.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -31,6 +32,8 @@ wrapperTemplate.innerHTML = `
 
   <div id="editor">
   </div>
+  <slot name="error">
+  </slot>
 `;
 
 class CodeEditor extends ErrorHandlingHTMLElement {
@@ -53,7 +56,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
       }
       catch (err) {
-        throw Error("Malformed JSON data.");
+        throw new CriticalError("Malformed JSON data.");
       }
     } 
 

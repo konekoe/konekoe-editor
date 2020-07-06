@@ -44,6 +44,8 @@ wrapperTemplate.innerHTML = `
     <div id="terminal">
     </div>
   </div>
+  <slot name="error">
+  </slot>
 `;
 
 class CodeTerminal extends ErrorHandlingHTMLElement {
@@ -53,6 +55,11 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
     if (!this.hasAttribute("target"))
       throw new CriticalError("Please provide a target URL for the terminal!");
+  
+    this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
+
+    this._terminal = new Terminal();
+    this._fitAddon = new FitAddon();
 
     let socket = {};
 
@@ -62,12 +69,6 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     catch (err) {
       throw new CriticalError(`Could not connect to ${ this.getAttribute("target") }`);
     }
-  
-    this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
-    
-
-    this._terminal = new Terminal();
-    this._fitAddon = new FitAddon();
 
     socket.onmessage = ({ data }) => {
       this._terminal.write(data);
@@ -78,7 +79,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     });
 
     this._terminal.loadAddon(this._fitAddon);
-   
+
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     
     this._shadow.appendChild(node);
