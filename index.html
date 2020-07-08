@@ -59,15 +59,24 @@
             start-col="left" 
             end-col="right" 
             start-row="top" 
-            end-row="bottom"
+            end-row="middle-top"
             >
 # Another test
 
-### It's working!
 
-* test.js
+Send an HTTP POST message to examos.aalto.fi:4123. The body of the message should be a JSON object containing your
+student id and the message: "I am student". Use keys studentID and message in the body.
         
 </info-box>
+
+            <code-terminal
+            start-col="left" 
+            end-col="right" 
+            start-row="middle-top" 
+            end-row="bottom"
+            target="ws://localhost:4000/"
+            > 
+            </code-terminal>
         </div>
     </konekoe-editor>
 <script src="./bundle.js" type="text/javascript" charset="utf-8"></script>

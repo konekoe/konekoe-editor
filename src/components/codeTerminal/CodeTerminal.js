@@ -49,6 +49,7 @@ wrapperTemplate.innerHTML = `
 `;
 
 class CodeTerminal extends ErrorHandlingHTMLElement {
+  static get observedAttributes() { return ["style"]; }
 
   constructor() {
     super();
@@ -98,6 +99,20 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     this._terminal.open(terminalWrapper);
 
     setTimeout(() => this._fitAddon.fit(), 0); // Hack to make this call occur once the page has loaded.
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!newValue) {
+      setTimeout(() => {
+        const terminalWrapper = this._shadow.getElementById("terminal");
+        this._terminal.reset();
+        this._terminal.open(terminalWrapper);
+        this._fitAddon.fit();
+      }, 0); // Hack to make this call occur once the page has loaded.
+    }
+    else {
+      
+    }
   }
 
 }
