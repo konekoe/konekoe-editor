@@ -89,11 +89,16 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   connectedCallback() {
 
+    Array.from(this.childNodes).filter(child => child.classList && !child.classList.contains(SESSION_CLASS_NAME)).forEach(child => { 
+      child.slot = "content";
+      child.style.display = "none";
+      child.classList.add("default");
+    });
+
     // Filter session wrapper classes.
     const sessions = Array.from(this.childNodes).filter(child => child.classList && child.classList.contains(SESSION_CLASS_NAME));
 
     // Lift session elements outside of wrappers and add them to the _sessions map.
-    
     let flag = true;
 
     for (let session of sessions) {
@@ -117,6 +122,8 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       throw new CriticalError(err.message);
     }
 
+    this.setSession(this._activeSession);
+
     if (this._activeSession === "default")
       this._actionBar.style.display = "none";
 
@@ -137,7 +144,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     children.forEach(child => {
       if (child.nodeName !== "#text") {
         child.slot = "content";
-        child.style.display = (flag) ? null : "none";
+        child.style.display = "none";
         child.classList.add(sessionId);
       }
     });
