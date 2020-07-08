@@ -18,32 +18,33 @@
 <body>
 
     <konekoe-editor>
-        <code-editor
-        start-col="center-left"
-        end-col="right"
-        start-row="top"
-        message-end-point="http://localhost:4001/"
-        end-row="middle-bottom"
-        config='{"tabs": [{ "name": "test.js", "value": "function test() {\n //CODE HERE \n}", "noDelete": "true" }], "tabCreation": "false"}'
-        >
-        </code-editor>
-        
-        <code-terminal
-        start-col="center-left" 
-        end-col="right" 
-        start-row="middle-bottom" 
-        end-row="bottom"
-        target="ws://localhost:4000/"
-        > 
-        </code-terminal>
+        <div class="editorSession" name="1.1 Test">
+            <code-editor
+            start-col="center-left"
+            end-col="right"
+            start-row="top"
+            message-end-point="http://localhost:4001/"
+            end-row="middle-bottom"
+            config='{"tabs": [{ "name": "test.js", "value": "function test() {\n //CODE HERE \n}", "noDelete": "true" }, { "name": "test.css", "value": "function test() {\n //CODE HERE \n}", "noDelete": "true" }], "tabCreation": "false"}'
+            >
+            </code-editor>
+            
+            <code-terminal
+            start-col="center-left" 
+            end-col="right" 
+            start-row="middle-bottom" 
+            end-row="bottom"
+            target="ws://localhost:4000/"
+            > 
+            </code-terminal>
 
-        
-        <info-box
-        start-col="left" 
-        end-col="center-left" 
-        start-row="top" 
-        end-row="bottom"
-        >
+            
+            <info-box
+            start-col="left" 
+            end-col="center-left" 
+            start-row="top" 
+            end-row="bottom"
+            >
 # Test instructions
 
 ### Create the following files:
@@ -51,8 +52,20 @@
 * test.js
         
 </info-box>
+        </div>
 
+        <div class="editorSession" name="1.2 Another">
+            <info-box
+            start-col="left" 
+            end-col="right" 
+            start-row="top" 
+            end-row="bottom"
+            >
+# Another test
 
+### It's working!        
+</info-box>
+        </div>
     </konekoe-editor>
 <script src="./bundle.js" type="text/javascript" charset="utf-8"></script>
 </body>

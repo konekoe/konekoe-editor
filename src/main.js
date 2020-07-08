@@ -1,9 +1,11 @@
 import ErrorHandlingHTMLElement from "./components/utils/ErrorHandlingHTMLElement.js";
-import { CriticalError } from "./utils/errors/index.js";
+import { CriticalError, MinorError } from "./utils/errors/index.js";
 import "./components/codeEditor/CodeEditor.js";
 import "./components/infoBox/InfoBox.js";
 import "./components/codeTerminal/CodeTerminal.js";
 import "./components/utils/ActionBar.js"
+
+const SESSION_CLASS_NAME = "editorSession";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -28,8 +30,8 @@ wrapperTemplate.innerHTML = `
   <action-bar noAdd id="actionBar">
   </action-bar>
   
-  <slot id="container" name="default">
-    <code-editor id="default"></code-editor>
+  <slot id="container" name="content">
+    <code-editor></code-editor>
   </slot>
 `;
 
@@ -65,13 +67,40 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
+
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
 
-    const content = wrapperTemplate.content.cloneNode(true);
-    
-    this._shadow.appendChild(content);
+    this._activeSession = "default";
 
+    this._changeSession = this._changeSession.bind(this);
+    this._addSession = this._addSession.bind(this);
+    this.setSession = this.setSession.bind(this);
+
+    const node = wrapperTemplate.content.cloneNode(true);
+    
+    this._actionBar = node.getElementById("actionBar");
+    this._container = node.getElementById("container");
+
+    this._actionBar.addEventListener("tab-changed", this._changeSession, false);
+
+    this._shadow.appendChild(node);
+  }
+
+  connectedCallback() {
+
+    // Filter session wrapper classes.
+    const sessions = Array.from(this.childNodes).filter(child => child.classList && child.classList.contains(SESSION_CLASS_NAME));
+
+    // Lift session elements outside of wrappers and add them to the _sessions map.
+    
+    let flag = true;
+
+    for (let session of sessions) {
+      flag = this._addSession(session, flag);
+    }
+
+    // Create stylings for child elements.
     try {
       const style = document.createElement("style");
 
@@ -88,7 +117,56 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       throw new CriticalError(err.message);
     }
 
+    if (this._activeSession === "default")
+      this._actionBar.style.display = "none";
+
+  }
+
+  _addSession(session, flag) {
+    let children = session.childNodes;
+  
+    let sessionId = "";
+    try {  
+      sessionId = this._actionBar.tabContainer.createTab({ name: session.getAttribute("name"), noDelete: true, setActive: flag }).id;
+    }
+    catch (err) {
+      this.dispatchEvent(new ErrorEvent("custom-error", { error: new MinorError("Missing name attribute.") }));
+      return flag;
+    }
+
+    children.forEach(child => {
+      if (child.nodeName !== "#text") {
+        child.slot = "content";
+        child.style.display = (flag) ? null : "none";
+        child.classList.add(sessionId);
+      }
+    });
+
+    // Make the first session active.
+    if (flag) {
+      flag = false;
+      this._activeSession = sessionId;
+    }
+
+    session.outerHTML = session.innerHTML;  
+
+    return flag;
+  }
+
+  _changeSession({ data }) {
+    this.setSession(data.target.id);
+  }
+
+  setSession(id) {
+    for (let element of document.getElementsByClassName(this._activeSession)) {
+      element.style.display = "none";
+    }
     
+    this._activeSession = id;
+
+    for (let element of document.getElementsByClassName(this._activeSession)) {
+      element.style.display = null;
+    }
   }
 
   _childNodesToShadow(style) {
@@ -102,11 +180,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
         style.innerHTML += this._generateComponentStyle(node);
     }
-
-    // Add child nodes to template slot.
-    // Note: This step could be skipped by using the default unnamed slot. However, the default slot can't have fallback content.
-    // Note: Raw text should be ignored.
-    this.childNodes.forEach(node => { (node.nodeName !== "#text") ? node.slot = "default" : null });
   }
 
   // If element has styling attributes (startCol, endCol, startRow, endRow) determine a styling based on them

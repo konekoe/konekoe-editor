@@ -15,6 +15,7 @@ wrapperTemplate.innerHTML = `
   #wrapper {
     display: flex;
     flex-direction: row;
+    color: white;
     background-color: #00162a;
   }
 
@@ -58,7 +59,7 @@ class TabBar extends ErrorHandlingHTMLElement {
     this._addButton.onclick = this.onAdd;
 
     this._addModal.addEventListener("accept", () => {
-      const add = this.createTab(this._tabNameInput.value);
+      const add = this.createTab({ name: this._tabNameInput.value, setActive: true });
 
       // bubbles and composed will ensure this can be caught outside of the parent element's shadow DOM.
       const createEvent = new Event("tab-created", { bubbles: true, composed: true });
@@ -104,7 +105,9 @@ class TabBar extends ErrorHandlingHTMLElement {
       this.dispatchEvent(changeEvent);
     };
 
-    this.changeActive(add);
+    
+    if (options.setActive)
+      this.changeActive(add);
       
     this._container.appendChild(add);
     this._tabs.concat(add);
