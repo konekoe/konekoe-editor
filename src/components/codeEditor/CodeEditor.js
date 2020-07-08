@@ -105,8 +105,9 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
     if (this._config) {
       if (this._config.tabs)
-        this._config.tabs.map(item => {
+        this._config.tabs.map((item, index) => {
           item.noDelete = item.noDelete === "true";
+          item.setActive = index === 0;
           this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item), ...item } });
         });
 
@@ -129,7 +130,9 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     session.filename = data.target.name;
     
     this._sessions[data.target.id] = session;
-    this.setSession(data.target.id);
+    
+    if (data.setActive)
+      this.setSession(data.target.id);
   }
 
   changeEditor({ data }) {
