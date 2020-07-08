@@ -1,12 +1,13 @@
-import * as ace from "ace-builds/src-min-noconflict/ace";
-import * as aceModes from "ace-builds/src-min-noconflict/ext-modelist.js";
+import * as ace from "ace-builds/src-noconflict/ace";
+import * as aceModes from "ace-builds/src-noconflict/ext-modelist.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import { CriticalError, MinorError } from "../../utils/errors/index.js";
 import "../utils/ActionButton.js";
 import "../utils/MessageOverlay.js";
-import "ace-builds/webpack-resolver";
+import "ace-builds/webpack-resolver.js";
 import "../utils/ActionBar.js";
+import "./aceStyleImport.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
