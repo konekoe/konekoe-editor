@@ -33,12 +33,12 @@ class HttpMessageHandler {
     this.address = address;
   }
 
-  async sendMessage(data, path="") {
-   return postData(`${ this.address }${ path }`, data); 
+  async sendMessage(data, path="", fullURL=false) {
+   return postData((fullURL) ? fullURL : `${ this.address }${ path }`, data); 
   }
 
-  async getMessage(path) {
-    return getData(`${ this.address }${ path }`);
+  async getMessage(path, fullURL=false) {
+    return getData((fullURL) ? fullURL : `${ this.address }${ path }`);
   }
 }
 
