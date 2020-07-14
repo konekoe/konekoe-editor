@@ -17,13 +17,15 @@
 </head>
 <body>
 
-    <konekoe-editor>
+    <konekoe-editor
+    config='http://localhost:4001/'
+    >
         <div class="editorSession" name="1.1 Test">
             <code-editor
             start-col="center-left"
             end-col="right"
             start-row="top"
-            message-end-point="http://localhost:4001/"
+            message-target="http://localhost:4001/"
             end-row="middle-bottom"
             config='{"tabs": [{ "name": "test.js", "value": "function test() {\n //CODE HERE \n}", "noDelete": "true" }, { "name": "test.css", "value": "function test() {\n //CODE HERE \n}", "noDelete": "true" }], "tabCreation": "false"}'
             >
@@ -60,6 +62,7 @@
             end-col="right" 
             start-row="top" 
             end-row="middle-top"
+            content="http://localhost:4001/test2Desc"
             >
 # Another test
 
