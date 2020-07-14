@@ -1,5 +1,6 @@
 import * as marked from "marked/marked.min.js";
 import * as insane from "insane/insane.js";
+import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -28,21 +29,32 @@ wrapperTemplate.innerHTML = `
 class InfoBox extends ErrorHandlingHTMLElement {
   constructor() {
     super();
-    this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
+    this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
-    this.container = node.getElementById("wrapper");
+    this._container = node.getElementById("wrapper");
+
+    this._shadow.appendChild(node);
+  }
+  async connectedCallback() {
+    let content = this.innerHTML.trim();
+    if (this.hasAttribute("content")) {
+      try {
+        content = await (new HttpMessageHandler(this.getAttribute("content"))).getMessage("");
+      }
+      catch (err) {
+        // TODO: Emit error events. 
+        console.log(err.message); 
+      }
+    }
 
     // Parse with marked.
-    const unsafeHTML = marked(this.innerHTML.trim());
+    const unsafeHTML = marked(content);
 
     // Sanitize with insane.
     const sanitized = insane(unsafeHTML);
 
-    this.container.innerHTML = sanitized;
-    this.shadow.appendChild(node);
-  }
-  connectedCallback() {
+    this._container.innerHTML = sanitized;
   }
 }
 

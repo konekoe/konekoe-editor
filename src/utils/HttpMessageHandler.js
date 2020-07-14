@@ -17,6 +17,17 @@ async function postData(url, data = {}) {
   return response.json(); // parses JSON response into native JavaScript objects
 }
 
+async function getData(url) {
+  // Default options are marked with *
+  const response = await fetch(url, {
+    method: 'GET', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, *cors, same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+  });
+  return response.text(); // parses JSON response into native JavaScript objects
+}
+
 class HttpMessageHandler {
   constructor(address) {
     this.address = address;
@@ -24,6 +35,10 @@ class HttpMessageHandler {
 
   async sendMessage(data, path="") {
    return postData(`${ this.address }${ path }`, data); 
+  }
+
+  async getMessage(path) {
+    return getData(`${ this.address }${ path }`);
   }
 }
 
