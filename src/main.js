@@ -1,4 +1,6 @@
+import YAML from "yaml";
 import ErrorHandlingHTMLElement from "./components/utils/ErrorHandlingHTMLElement.js";
+import HttpMessageHandler from "./utils/HttpMessageHandler.js";
 import { CriticalError, MinorError } from "./utils/errors/index.js";
 import "./components/codeEditor/CodeEditor.js";
 import "./components/infoBox/InfoBox.js";
@@ -6,6 +8,8 @@ import "./components/codeTerminal/CodeTerminal.js";
 import "./components/utils/ActionBar.js"
 
 const SESSION_CLASS_NAME = "editorSession";
+
+const URL_REGEX = /^(http|https):\/\/[^ "]+$/; // https://stackoverflow.com/questions/1410311/regular-expression-for-url-validation-in-javascript/15734347
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -70,11 +74,13 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
+    this._httpHandler = new HttpMessageHandler("");
 
     this._activeSession = "default";
 
     this._changeSession = this._changeSession.bind(this);
     this._addSession = this._addSession.bind(this);
+    this._configToHTML = this._configToHTML.bind(this);
     this.setSession = this.setSession.bind(this);
 
     const node = wrapperTemplate.content.cloneNode(true);
@@ -87,8 +93,9 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     this._shadow.appendChild(node);
   }
 
-  connectedCallback() {
+  async connectedCallback() {
 
+    // Parse fallback/default content.
     Array.from(this.childNodes).filter(child => child.classList && !child.classList.contains(SESSION_CLASS_NAME)).forEach(child => { 
       child.slot = "content";
       child.style.display = "none";
@@ -96,14 +103,40 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     });
 
     // Filter session wrapper classes.
-    const sessions = Array.from(this.childNodes).filter(child => child.classList && child.classList.contains(SESSION_CLASS_NAME));
+    let sessions = Array.from(this.childNodes).filter(child => child.classList && child.classList.contains(SESSION_CLASS_NAME));
 
-    // Lift session elements outside of wrappers and add them to the _sessions map.
+    console.log(this.childNodes);
+    // If a config was passed parse it and replace sessions with the result.
+    if (this.hasAttribute("config")) {
+      let config = this.getAttribute("config");
+
+      if (URL_REGEX.test(config)) {
+        try {
+          config = await this._httpHandler.getMessage(config);
+        }
+        catch (err) {
+          throw new CriticalError(err.message);
+        }
+      }
+
+      try {
+        sessions = this._configToHTML(YAML.parse(config));
+      }
+      catch (err) {
+        this.dispatchEvent(new ErrorEvent("error", { error: new MinorError(err.message) }));
+      }
+    }
+
+
+
     let flag = true;
-
+    
     for (let session of sessions) {
       flag = this._addSession(session, flag);
     }
+
+
+    console.log(sessions);
 
     // Create stylings for child elements.
     try {
@@ -129,7 +162,54 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   }
 
+
+  // TODO: if the commented out error lines are uncommented, the elements won't become visible.
+  _configToHTML(config) {
+    let result = [];
+    
+    for (let session of config) {
+      let sessionNode = document.createElement("div");
+      sessionNode.classList.add(SESSION_CLASS_NAME);
+
+      if (!session.name) {
+        //this.dispatchEvent(new ErrorEvent("error", { error: new MinorError("Missing name attribute.") }));
+        continue;
+      }
+
+      const parseElements = (elementName, field) => {
+        if (session[field]) {
+          session[field].map(element => {
+            let node = document.createElement(elementName);
+    
+            for (let key in element) {
+              node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);
+            }
+    
+            sessionNode.appendChild(node);
+          });
+        }
+      }
+      
+      sessionNode.setAttribute("name", session.name);
+
+      try {
+        parseElements("code-editor", "editors");
+        parseElements("code-terminal", "terminals");
+        parseElements("info-box", "infoBoxes");
+      }
+      catch (err) {
+        //this.dispatchEvent(new ErrorEvent("error", { error: new MinorError(err.message) }));
+        continue;
+      }
+
+      result.push(this.appendChild(sessionNode));   
+    }
+
+    return result;
+  }
+
   _addSession(session, flag) {
+    
     let children = session.childNodes;
   
     let sessionId = "";
@@ -180,6 +260,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
     // Create stylings for each child.
     for (let node of this.childNodes) {
+
       if (node.nodeName === "#text")
         continue;
 

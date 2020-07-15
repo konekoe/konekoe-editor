@@ -9,6 +9,11 @@ class ErrorHandlingHTMLElement extends HTMLElement {
       return true;
     };
 
+    this.addEventListener("error", (event) => {
+      this.innerHTML += ErrorHandler(event.error);   
+      return true;
+    });
+
 
   }
 }

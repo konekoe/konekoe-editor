@@ -9,6 +9,8 @@ import "ace-builds/webpack-resolver.js";
 import "../utils/ActionBar.js";
 import "./aceStyleImport.js";
 
+const URL_REGEX = /^(http|https):\/\/[^ "]+$/; // https://stackoverflow.com/questions/1410311/regular-expression-for-url-validation-in-javascript/15734347
+
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
   <style>
@@ -51,7 +53,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.
-    this._messageHandler = new HttpMessageHandler((this.hasAttribute("message-end-point")) ? this.getAttribute("message-end-point") : "http://localhost:3001/");
+    this._messageHandler = new HttpMessageHandler((this.hasAttribute("message-target")) ? this.getAttribute("message-target") : "http://localhost:3001/");
     this._editor;
     this._config;
 
@@ -106,9 +108,20 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
     if (this._config) {
       if (this._config.tabs)
-        this._config.tabs.map((item, index) => {
+        this._config.tabs.map(async (item, index) => {
           item.noDelete = item.noDelete === "true";
           item.setActive = index === 0;
+          
+          if (URL_REGEX.test(item.value)) {
+            try {
+              item.value = await this._messageHandler.getMessage("", item.value);
+            }
+            catch (err) {
+              this.dispatchEvent(new ErrorEvent("error", { error: new MinorError(err.message) }))
+            }
+          }
+            
+
           this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item), ...item } });
         });
 
