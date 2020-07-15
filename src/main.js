@@ -104,7 +104,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     // Filter session wrapper classes.
     let sessions = Array.from(this.childNodes).filter(child => child.classList && child.classList.contains(SESSION_CLASS_NAME));
 
-    console.log(this.childNodes);
     // If a config was passed parse it and replace sessions with the result.
     if (this.hasAttribute("config")) {
       let config = this.getAttribute("config");
@@ -134,8 +133,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       flag = this._addSession(session, flag);
     }
 
-
-    console.log(sessions);
 
     // Create stylings for child elements.
     try {

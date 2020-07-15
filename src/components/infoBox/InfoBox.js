@@ -2,7 +2,7 @@ import * as marked from "marked/marked.min.js";
 import * as insane from "insane/insane.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
-import { URL_REGEX } from "./utils/functions.js";
+import { URL_REGEX } from "../../utils/functions.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
@@ -41,7 +41,10 @@ class InfoBox extends ErrorHandlingHTMLElement {
     let content = this.innerHTML.trim();
     if (this.hasAttribute("content")) {
       try {
-        content = await (new HttpMessageHandler(this.getAttribute("content"))).getMessage("");
+        if (URL_REGEX.test(this.getAttribute("content")))
+          content = await (new HttpMessageHandler(this.getAttribute("content"))).getMessage("");
+        else
+          content = this.getAttribute("content");
       }
       catch (err) {
         this.dispatchEvent(new ErrorEvent("error", { error: err })); 

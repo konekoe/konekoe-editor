@@ -3,7 +3,7 @@ import * as aceModes from "ace-builds/src-noconflict/ext-modelist.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import { CriticalError, MinorError } from "../../utils/errors/index.js";
-import { URL_REGEX } from "./utils/functions.js";
+import { URL_REGEX } from "../../utils/functions.js";
 import "../utils/ActionButton.js";
 import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver.js";
