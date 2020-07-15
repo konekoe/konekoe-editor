@@ -3,13 +3,13 @@ import * as aceModes from "ace-builds/src-noconflict/ext-modelist.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import { CriticalError, MinorError } from "../../utils/errors/index.js";
+import { URL_REGEX } from "./utils/functions.js";
 import "../utils/ActionButton.js";
 import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver.js";
 import "../utils/ActionBar.js";
 import "./aceStyleImport.js";
 
-const URL_REGEX = /^(http|https):\/\/[^ "]+$/; // https://stackoverflow.com/questions/1410311/regular-expression-for-url-validation-in-javascript/15734347
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `

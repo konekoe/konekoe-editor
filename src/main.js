@@ -2,14 +2,13 @@ import YAML from "yaml";
 import ErrorHandlingHTMLElement from "./components/utils/ErrorHandlingHTMLElement.js";
 import HttpMessageHandler from "./utils/HttpMessageHandler.js";
 import { CriticalError, MinorError } from "./utils/errors/index.js";
+import { URL_REGEX } from "./utils/functions.js";
 import "./components/codeEditor/CodeEditor.js";
 import "./components/infoBox/InfoBox.js";
 import "./components/codeTerminal/CodeTerminal.js";
 import "./components/utils/ActionBar.js"
 
 const SESSION_CLASS_NAME = "editorSession";
-
-const URL_REGEX = /^(http|https):\/\/[^ "]+$/; // https://stackoverflow.com/questions/1410311/regular-expression-for-url-validation-in-javascript/15734347
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
