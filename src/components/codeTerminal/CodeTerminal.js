@@ -105,7 +105,8 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     if (!newValue) {
       setTimeout(() => {
         const terminalWrapper = this._shadow.getElementById("terminal");
-        this._terminal.reset();
+        terminalWrapper.innerHTML = "";
+        
         this._terminal.open(terminalWrapper);
         this._fitAddon.fit();
       }, 0); // Hack to make this call occur once the page has loaded.
