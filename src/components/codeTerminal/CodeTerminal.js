@@ -79,13 +79,6 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
       throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
     }
 
-    const onMessage = ({ data }) => {
-      this._terminal.write(data);
-    };
-
-
-    socket.onmessage = 
-
     socket.onerror = function (event) {
       event.preventDefault();
       
@@ -101,7 +94,9 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
 
     socket.onopen = () => {
-      socket.onmessage = onMessage;
+      socket.onmessage = ({ data }) => {
+        this._terminal.write(data);
+      };
 
       this._terminal.clear();
       
