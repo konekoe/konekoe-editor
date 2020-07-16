@@ -64,28 +64,6 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
     let socket = {};
 
-    try {
-      socket = new WebSocket(this.getAttribute("target"));
-    }
-    catch (err) {
-      throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
-    }
-
-    socket.onmessage = ({ data }) => {
-
-      this._terminal.write(data);
-    };
-
-    socket.onerror = function (event) {
-      event.preventDefault();
-      
-      throw new MinorError(`Could not connect to ${ event.target.url }`);
-    }
-
-    this._terminal.onKey(({ key }) => {
-      socket.send(key);
-    });
-
     this._terminal.loadAddon(this._fitAddon);
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
@@ -94,6 +72,45 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
   }
 
   connectedCallback() {
+    try {
+      socket = new WebSocket(this.getAttribute("target"));
+    }
+    catch (err) {
+      throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
+    }
+
+    const onMessage = ({ data }) => {
+      this._terminal.write(data);
+    };
+
+
+    socket.onmessage = 
+
+    socket.onerror = function (event) {
+      event.preventDefault();
+      
+      throw new MinorError(`Could not connect to ${ event.target.url }`);
+    };
+
+    socket.onclose = () => {
+      this._terminal.write("Connection closed.");
+      
+      socket.onmessage = null;
+      this._terminal.onKey(() => null);
+    };
+
+
+    socket.onopen = () => {
+      socket.onmessage = onMessage;
+
+      this._terminal.clear();
+      
+      this._terminal.onKey(({ key }) => {
+        socket.send(key);
+      });
+    };
+
+    
     const terminalWrapper = this._shadow.getElementById("terminal");
 
     this._terminal.open(terminalWrapper);
