@@ -48,6 +48,8 @@ wrapperTemplate.innerHTML = `
   </slot>
 `;
 
+let socket = {};
+
 class CodeTerminal extends ErrorHandlingHTMLElement {
   static get observedAttributes() { return ["style"]; }
 
@@ -56,13 +58,13 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
     if (!this.hasAttribute("target"))
       throw new CriticalError("Please provide a target URL for the terminal!");
-  
+
+    this._target = this.getAttribute("target");  
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
+    this._webSocketConnect = this._webSocketConnect.bind(this);
 
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
-
-    let socket = {};
 
     this._terminal.loadAddon(this._fitAddon);
 
@@ -72,17 +74,42 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
   }
 
   connectedCallback() {
-    try {
-      socket = new WebSocket(this.getAttribute("target"));
-    }
-    catch (err) {
-      throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
-    }
+    this._webSocketConnect();
 
-    socket.onerror = function (event) {
-      event.preventDefault();
+    const terminalWrapper = this._shadow.getElementById("terminal");
+
+    this._terminal.open(terminalWrapper);
+
+    setTimeout(() => this._fitAddon.fit(), 0); // Hack to make this call occur once the page has loaded.
+  }
+
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!newValue) {
+      setTimeout(() => {
+        const terminalWrapper = this._shadow.getElementById("terminal");
+        terminalWrapper.innerHTML = "";
+        
+        this._terminal.open(terminalWrapper);
+        this._fitAddon.fit();
+      }, 0); // Hack to make this call occur once the page has loaded.
+    }
+    else {
       
-      throw new MinorError(`Could not connect to ${ event.target.url }`);
+    }
+  }
+
+  _webSocketConnect() {
+    this._terminal.clear();
+    this._terminal.write("connecting...\n");
+
+
+    socket = new WebSocket(this._target);
+
+    socket.onerror = (event) => {
+      event.preventDefault();
+
+      this._terminal.write("Could not connect! Trying again in 5 seconds.\n");
     };
 
     socket.onclose = () => {
@@ -104,28 +131,6 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
         socket.send(key);
       });
     };
-
-    
-    const terminalWrapper = this._shadow.getElementById("terminal");
-
-    this._terminal.open(terminalWrapper);
-
-    setTimeout(() => this._fitAddon.fit(), 0); // Hack to make this call occur once the page has loaded.
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (!newValue) {
-      setTimeout(() => {
-        const terminalWrapper = this._shadow.getElementById("terminal");
-        terminalWrapper.innerHTML = "";
-        
-        this._terminal.open(terminalWrapper);
-        this._fitAddon.fit();
-      }, 0); // Hack to make this call occur once the page has loaded.
-    }
-    else {
-      
-    }
   }
 
 }
