@@ -7,7 +7,7 @@
     "start": "webpack-dev-server --config ./webpack.config.js --mode development",
     "postinstall" : "npm run build",
     "test": "./node_modules/karma/bin/karma start",
-    "build": "NODE_ENV=production node node_modules/.bin/webpack --config ./webpack.config.js && cp ./index.html ./dist/index.html"
+    "build": "webpack --config ./webpack.config.js && cp ./index.html ./dist/index.html"
   },
   "author": "",
   "license": "ISC",
