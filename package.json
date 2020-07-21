@@ -20,9 +20,7 @@
     "xterm": "^4.7.0",
     "xterm-addon-attach": "^0.6.0",
     "xterm-addon-fit": "^0.4.0",
-    "yaml": "^1.10.0"
-  },
-  "devDependencies": {
+    "yaml": "^1.10.0",
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
     "@webcomponents/webcomponentsjs": "^2.4.3",
