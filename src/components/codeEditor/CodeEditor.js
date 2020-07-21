@@ -8,7 +8,6 @@ import "../utils/ActionButton.js";
 import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver.js";
 import "../utils/ActionBar.js";
-import "./aceStyleImport.js";
 
 
 const wrapperTemplate = document.createElement("template");

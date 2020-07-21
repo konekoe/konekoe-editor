@@ -19,9 +19,9 @@ module.exports = {
   },
   output: {
     path: __dirname + '/dist',
-    chunkFilename: '[name].bundle.js',
+    chunkFilename: '[name].konekoe-editor.js',
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: 'konekoe-editor.js'
   },
   devServer: {
     contentBase: './'
