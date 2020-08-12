@@ -1,6 +1,7 @@
 import YAML from "yaml";
 import ErrorHandlingHTMLElement from "./components/utils/ErrorHandlingHTMLElement.js";
 import HttpMessageHandler from "./utils/HttpMessageHandler.js";
+import WebSocketMessageHandler from "./utils/WebSocketMessageHandler.js";
 import { CriticalError, MinorError } from "./utils/errors/index.js";
 import { URL_REGEX } from "./utils/functions.js";
 import "./components/codeEditor/CodeEditor.js";
@@ -74,6 +75,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
     this._httpHandler = new HttpMessageHandler("");
+    this._messageTarget = this.getAttribute("message-target");
 
     this._activeSession = "default";
 
@@ -125,14 +127,23 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       }
     }
 
+    if (!this._messageTarget) {
+      throw new CriticalError("No message target found.");
+    }
 
+    this._webSocketHandler = new WebSocketMessageHandler("ws://" + this._messageTarget, "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleGFtQ29kZSI6IldRRkhZWDI5WU4iLCJzdHVkZW50SWQiOiJERVZfYWxha3VrbDEiLCJpYXQiOjE1OTcyMjEzMzcsImV4cCI6MTU5NzI2NDUzNywiYXVkIjoiS29uZWtvZSIsImlzcyI6IktvbmVrb2UgRXhhbVNpdGUiLCJzdWIiOiJLb25la29lIEV4YW0ifQ.G-1zOpytjmPxQUxRvMgsTzO229MbYXayKJDD6uUk37v2kZpUjFsqbX9T58408TbtibkAgyv7GV09oE6k2UuTlg");
 
+    document.onerror = (event) => {
+      this.dispatchEvent(event);
+    };
+
+    sessions = this._configToHTML(await this._webSocketHandler.open());
+    
     let flag = true;
     
     for (let session of sessions) {
       flag = this._addSession(session, flag);
     }
-
 
     // Create stylings for child elements.
     try {
@@ -163,7 +174,9 @@ class EditorContainer extends ErrorHandlingHTMLElement {
   _configToHTML(config) {
     let result = [];
     
-    for (let session of config) {
+    this._messageTarget = config["message-target"] || this._messageTarget;
+
+    for (let session of config.exercises) {
       let sessionNode = document.createElement("div");
       sessionNode.classList.add(SESSION_CLASS_NAME);
 
@@ -187,6 +200,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       }
       
       sessionNode.setAttribute("name", session.name);
+      sessionNode.id = session.id;
 
       try {
         parseElements("code-editor", "editors");
@@ -205,12 +219,11 @@ class EditorContainer extends ErrorHandlingHTMLElement {
   }
 
   _addSession(session, flag) {
-    
     let children = session.childNodes;
   
     let sessionId = "";
     try {  
-      sessionId = this._actionBar.tabContainer.createTab({ name: session.getAttribute("name"), noDelete: true, setActive: flag }).id;
+      sessionId = this._actionBar.tabContainer.createTab({ name: session.getAttribute("name"), noDelete: true, setActive: flag, id: session.id }).id;
     }
     catch (err) {
       this.dispatchEvent(new ErrorEvent("custom-error", { error: new MinorError("Missing name attribute.") }));

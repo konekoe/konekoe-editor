@@ -18,59 +18,8 @@
 <body>
 
     <konekoe-editor
-    config='http://localhost:4001/'
+    message-target="localhost:4000"
     >
-        <div class="editorSession" name="1.1">
-            <code-editor
-            start-col="center-left"
-            end-col="right"
-            start-row="top"
-            message-target="http://localhost:4001/"
-            end-row="middle-bottom"
-            config='{"tabs": [{ "name": "main.c", "value": "void main() {\n}\n", "noDelete": "true" }], "tabCreation": "false"}'
-            >
-            </code-editor>
-            
-            
-            <info-box
-            start-col="left" 
-            end-col="center-left" 
-            start-row="top" 
-            end-row="bottom"
-            >
-# Test instructions
-
-### Create the following files:
-
-* test.js
-        
-</info-box>
-        </div>
-
-        <div class="editorSession" name="1.2 Another">
-            <info-box
-            start-col="left" 
-            end-col="right" 
-            start-row="top" 
-            end-row="middle-top"
-            >
-# Another test
-
-
-Send an HTTP POST message to examos.aalto.fi:4123. The body of the message should be a JSON object containing your
-student id and the message: "I am student". Use keys studentID and message in the body.
-        
-</info-box>
-
-            <code-terminal
-            start-col="left" 
-            end-col="right" 
-            start-row="middle-top" 
-            end-row="bottom"
-            target="ws://localhost:4000/"
-            > 
-            </code-terminal>
-        </div>
     </konekoe-editor>
 <script src="./konekoe-editor.js" type="text/javascript" charset="utf-8"></script>
 </body>

@@ -53,37 +53,14 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
-
-    if (!this.hasAttribute("target"))
-      throw new CriticalError("Please provide a target URL for the terminal!");
   
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
 
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
 
-    let socket = {};
-
-    try {
-      socket = new WebSocket(this.getAttribute("target"));
-    }
-    catch (err) {
-      throw new MinorError(`Could not connect to ${ this.getAttribute("target") }`);
-    }
-
-    socket.onmessage = ({ data }) => {
-
-      this._terminal.write(data);
-    };
-
-    socket.onerror = function (event) {
-      event.preventDefault();
-      
-      throw new MinorError(`Could not connect to ${ event.target.url }`);
-    }
-
     this._terminal.onKey(({ key }) => {
-      socket.send(key);
+      // TODO: Dispatch event to be caught by websocket handler.
     });
 
     this._terminal.loadAddon(this._fitAddon);

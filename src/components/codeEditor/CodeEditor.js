@@ -1,6 +1,5 @@
 import * as ace from "ace-builds/src-noconflict/ace";
 import * as aceModes from "ace-builds/src-noconflict/ext-modelist.js";
-import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import { CriticalError, MinorError } from "../../utils/errors/index.js";
 import { URL_REGEX } from "../../utils/functions.js";
@@ -52,7 +51,6 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.
-    this._messageHandler = new HttpMessageHandler((this.hasAttribute("message-target")) ? this.getAttribute("message-target") : "http://localhost:3001/");
     this._editor;
     this._config;
 
@@ -172,15 +170,8 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     }, {});
     this._messageOverlay.show();
 
-    // TODO: more robust error handling.
-    try {
-      await this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
-      this._messageOverlay.close();
-    }
-    catch (err) {
-      this._messageOverlay.close();
-      throw new MinorError(err.message);
-    }
+    // TODO: dispatch message event with data.
+    
     
   }
 }
