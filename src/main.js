@@ -138,7 +138,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     };
 
     sessions = this._configToHTML(await this._webSocketHandler.open());
-    
+
     let flag = true;
     
     for (let session of sessions) {
@@ -193,6 +193,10 @@ class EditorContainer extends ErrorHandlingHTMLElement {
             for (let key in element) {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);
             }
+
+            // TODO: Add Redux state handling making this redundant.
+            if (elementName === "code-editor")
+              node.setAttribute("data-session-id", session.id);
     
             sessionNode.appendChild(node);
           });

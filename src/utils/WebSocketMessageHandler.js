@@ -27,11 +27,12 @@ class WebSocketMessageHandler {
       }
     };
 
-    document.addEventListener("terminal-data", ({ detail }) => {
+    document.addEventListener("terminal_data", ({ detail }) => {
       this._sendMessage("terminal_data", detail);
     });
 
-    document.addEventListener("code-submission", ({ detail }) => {
+    document.addEventListener("code_submission", ({ detail }) => {
+      console.log(detail);
       this._sendMessage("code_data", detail);
     });
   }

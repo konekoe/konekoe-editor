@@ -26,9 +26,6 @@ wrapperTemplate.innerHTML = `
   </style>
   
   <action-bar id="actionBar">
-    <action-button slot="content" color="cobalt">
-      Save
-    </action-button>
     <action-button slot="content" id="runButton" secondary color="red">
       Submit
     </action-button>
@@ -76,6 +73,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this.changeEditor = this.changeEditor.bind(this);
     this.removeEditor = this.removeEditor.bind(this);
     this.sendCode = this.sendCode.bind(this);
+    this._handleSubmissionResult = this._handleSubmissionResult.bind(this);
 
     // Handle action bar events
     this._actionBar.addEventListener("tab-created", this.addEditor, false);
@@ -161,8 +159,14 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._editor.setSession(this._sessions[id]);
   }
 
+  _handleSubmissionResult() {
+    this._messageOverlay.close();
+
+    document.removeEventListener("code_submission", this._handleSubmissionResult);
+  }
+
   async sendCode() {
-    const data = Object.values(this._sessions)
+    const files = Object.values(this._sessions)
     .filter(session => session.filename) // Remove sessions without a filename, such as the default session
     .reduce((acc, curr) => {
       acc[curr.filename] = curr.getDocument().getValue();
@@ -170,9 +174,10 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     }, {});
     this._messageOverlay.show();
 
-    // TODO: dispatch message event with data.
-    
-    
+    document.addEventListener("code_submission", this._handleSubmissionResult);
+
+    // TODO: Add redux making id field redundant.
+    document.dispatchEvent(new CustomEvent("code_submission", { detail: { id: this.dataset.sessionId, files } }));
   }
 }
 
