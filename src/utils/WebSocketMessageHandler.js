@@ -6,6 +6,7 @@ class WebSocketMessageHandler {
     this._token = token;
 
     this.open = this.open.bind(this);
+    this._sendMessage = this._sendMessage.bind(this);
 
     this._socket.onmessage = ({ data }) => {
       try {
@@ -26,6 +27,13 @@ class WebSocketMessageHandler {
       }
     };
 
+    document.addEventListener("terminal-data", ({ detail }) => {
+      this._sendMessage("terminal_data", detail);
+    });
+
+    document.addEventListener("code-submission", ({ detail }) => {
+      this._sendMessage("code_data", detail);
+    });
   }
 
   async open() {
@@ -41,8 +49,8 @@ class WebSocketMessageHandler {
     });
   }
 
-  async sendMessage(data, path="", fullURL=false) {
-   // TODO;
+  async _sendMessage(type, payload) {
+   this._socket.send(JSON.stringify({ type, payload }))
   }
 
   

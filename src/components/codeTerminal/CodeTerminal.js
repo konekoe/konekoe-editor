@@ -60,7 +60,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     this._fitAddon = new FitAddon();
 
     this._terminal.onKey(({ key }) => {
-      // TODO: Dispatch event to be caught by websocket handler.
+      document.dispatchEvent(new CustomEvent("terminal-data", { detail: key }));
     });
 
     this._terminal.loadAddon(this._fitAddon);
