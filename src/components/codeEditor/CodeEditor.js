@@ -44,6 +44,7 @@ wrapperTemplate.innerHTML = `
 class CodeEditor extends ErrorHandlingHTMLElement {
   constructor() {
     super();
+    super.displayError.bind(this);
     
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
@@ -60,7 +61,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
       }
       catch (err) {
-        throw new CriticalError("Malformed JSON data.");
+        super.displayError(new CriticalError("Malformed JSON data."));
       }
     } 
 
@@ -159,10 +160,20 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._editor.setSession(this._sessions[id]);
   }
 
-  _handleSubmissionResult() {
-    this._messageOverlay.close();
+  _handleSubmissionResult({ detail }) {
+    try {
+      this._messageOverlay.close();
 
-    document.removeEventListener("code_submission", this._handleSubmissionResult);
+      if (detail.error)
+        throw new MinorError(detail.error.message);
+      
+      // TODO: Display points received from submission.
+      
+      document.removeEventListener("code_submission", this._handleSubmissionResult);
+    }
+    catch (err) {
+      super.displayError(err);
+    }
   }
 
   async sendCode() {

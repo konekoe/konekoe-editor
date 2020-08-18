@@ -71,6 +71,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
+    super.displayError.bind(this);
 
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
@@ -79,7 +80,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     this._token = this.dataset.authToken
 
     this.removeAttribute("data-auth-token");
-    this.removeAttribute("data-message-target");
 
     this._activeSession = "default";
 
@@ -139,7 +139,12 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
     this._webSocketHandler = new WebSocketMessageHandler("ws://" + this._messageTarget, this._token);
 
-    sessions = this._configToHTML(await this._webSocketHandler.open());
+    const openResult = await this._webSocketHandler.open();
+
+    if (openResult.error)
+      throw new CriticalError(openResult.error.message);
+
+    sessions = this._configToHTML(openResult.payload);
 
     let flag = true;
     
@@ -233,7 +238,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       sessionId = this._actionBar.tabContainer.createTab({ name: session.getAttribute("name"), noDelete: true, setActive: flag, id: session.id }).id;
     }
     catch (err) {
-      this.dispatchEvent(new ErrorEvent("custom-error", { error: new MinorError("Missing name attribute.") }));
+      super.displayError(new MinorError("Missing name attribute."));
       return flag;
     }
 

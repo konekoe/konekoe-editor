@@ -53,7 +53,8 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
-  
+    super.displayError.bind(this);
+
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
 
     this._terminal = new Terminal();
@@ -64,7 +65,10 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     });
 
     document.addEventListener("terminal_input", ({ detail }) => {
-      this._terminal.write(detail.data);
+      if (detail.error)
+        return super.displayError(Error(detail.error.message));
+
+      this._terminal.write(detail.payload.data);
     });
 
     this._terminal.loadAddon(this._fitAddon);

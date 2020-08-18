@@ -1,5 +1,3 @@
-import { MinorError } from "./errors/index.js";
-
 class WebSocketMessageHandler {
   constructor(address, token) {
     this._socket = new WebSocket(address);
@@ -13,13 +11,9 @@ class WebSocketMessageHandler {
         const msgObj = JSON.parse(data);
 
         if (!msgObj.type)
-          throw Error("");
-
-        if (msgObj.error) {
-          throw new MinorError(msgObj.error.message);
-        }
-
-        document.dispatchEvent(new CustomEvent(msgObj.type, { detail: msgObj.payload }));
+          throw Error("Invalid message.");
+        
+        document.dispatchEvent(new CustomEvent(msgObj.type, { detail: { error: msgObj.error, payload: msgObj.payload } }));
       }
       catch (err) {
         document.dispatchEvent(new ErrorEvent("MessageError", { error: new Error("Malformed message data") }));
@@ -43,6 +37,8 @@ class WebSocketMessageHandler {
   
       document.addEventListener("server_connect", ({ detail }) => {
         // TODO: If an error occurs this open() will never resolve.
+        document.removeEventListener("server_connect", this);
+
         resolve(detail);
       });  
     });
