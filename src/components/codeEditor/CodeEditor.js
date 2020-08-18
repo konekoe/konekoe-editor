@@ -177,7 +177,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     document.addEventListener("code_submission", this._handleSubmissionResult);
 
     // TODO: Add redux making id field redundant.
-    document.dispatchEvent(new CustomEvent("code_submission", { detail: { id: this.dataset.sessionId, files } }));
+    document.dispatchEvent(new CustomEvent("submission", { detail: { id: this.dataset.sessionId, files } }));
   }
 }
 

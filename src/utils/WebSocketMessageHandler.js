@@ -16,8 +16,7 @@ class WebSocketMessageHandler {
           throw Error("");
 
         if (msgObj.error) {
-          document.dispatchEvent(new ErrorEvent("MessageError", { error: new Error(msgObj.error) }));
-          return;
+          throw new MinorError(msgObj.error.message);
         }
 
         document.dispatchEvent(new CustomEvent(msgObj.type, { detail: msgObj.payload }));
@@ -31,9 +30,8 @@ class WebSocketMessageHandler {
       this._sendMessage("terminal_data", detail);
     });
 
-    document.addEventListener("code_submission", ({ detail }) => {
-      console.log(detail);
-      this._sendMessage("code_data", detail);
+    document.addEventListener("submission", ({ detail }) => {
+      this._sendMessage("code_submission", detail);
     });
   }
 

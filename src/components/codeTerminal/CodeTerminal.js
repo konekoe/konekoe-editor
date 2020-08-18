@@ -63,6 +63,10 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
       document.dispatchEvent(new CustomEvent("terminal_data", { detail: key }));
     });
 
+    document.addEventListener("terminal_input", ({ detail }) => {
+      this._terminal.write(detail.data);
+    });
+
     this._terminal.loadAddon(this._fitAddon);
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.

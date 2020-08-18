@@ -5,6 +5,7 @@ class ErrorHandlingHTMLElement extends HTMLElement {
     super();
 
     onerror = (msg, url, lineNo, columnNo, error) => {
+      
       this.innerHTML += ErrorHandler(error);   
       return true;
     };

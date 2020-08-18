@@ -75,7 +75,8 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
     this._httpHandler = new HttpMessageHandler("");
-    this._messageTarget = this.getAttribute("message-target");
+    this._messageTarget = this.dataset.messageTarget;
+    this._token = this.dataset.authToken
 
     this._activeSession = "default";
 
@@ -131,11 +132,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       throw new CriticalError("No message target found.");
     }
 
-    this._webSocketHandler = new WebSocketMessageHandler("ws://" + this._messageTarget, "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleGFtQ29kZSI6IldRRkhZWDI5WU4iLCJzdHVkZW50SWQiOiJERVZfYWxha3VrbDEiLCJpYXQiOjE1OTcyMjEzMzcsImV4cCI6MTU5NzI2NDUzNywiYXVkIjoiS29uZWtvZSIsImlzcyI6IktvbmVrb2UgRXhhbVNpdGUiLCJzdWIiOiJLb25la29lIEV4YW0ifQ.G-1zOpytjmPxQUxRvMgsTzO229MbYXayKJDD6uUk37v2kZpUjFsqbX9T58408TbtibkAgyv7GV09oE6k2UuTlg");
-
-    document.onerror = (event) => {
-      this.dispatchEvent(event);
-    };
+    this._webSocketHandler = new WebSocketMessageHandler("ws://" + this._messageTarget, this._token);
 
     sessions = this._configToHTML(await this._webSocketHandler.open());
 
@@ -175,6 +172,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     let result = [];
     
     this._messageTarget = config["message-target"] || this._messageTarget;
+    this._token = config["auth-token"] || this._token;
 
     for (let session of config.exercises) {
       let sessionNode = document.createElement("div");
