@@ -79,6 +79,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     this._token = this.dataset.authToken
 
     this.removeAttribute("data-auth-token");
+    this.removeAttribute("data-message-target");
 
     this._activeSession = "default";
 
