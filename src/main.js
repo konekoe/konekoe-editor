@@ -78,6 +78,8 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     this._messageTarget = this.dataset.messageTarget;
     this._token = this.dataset.authToken
 
+    this.removeAttribute("data-auth-token");
+
     this._activeSession = "default";
 
     this._changeSession = this._changeSession.bind(this);
@@ -131,6 +133,8 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     if (!this._messageTarget) {
       throw new CriticalError("No message target found.");
     }
+
+
 
     this._webSocketHandler = new WebSocketMessageHandler("ws://" + this._messageTarget, this._token);
 
