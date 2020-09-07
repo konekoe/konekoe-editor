@@ -76,7 +76,7 @@ class Tab extends ErrorHandlingHTMLElement {
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     this._active = false;
     this._remove = removeCb;
-    this._id = createUUID();
+    this._id = options.id || createUUID();
     this._name = options.name || this._id;
 
     this.setActive = this.setActive.bind(this);

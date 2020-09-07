@@ -1,6 +1,7 @@
 import YAML from "yaml";
 import ErrorHandlingHTMLElement from "./components/utils/ErrorHandlingHTMLElement.js";
 import HttpMessageHandler from "./utils/HttpMessageHandler.js";
+import WebSocketMessageHandler from "./utils/WebSocketMessageHandler.js";
 import { CriticalError, MinorError } from "./utils/errors/index.js";
 import { URL_REGEX } from "./utils/functions.js";
 import "./components/codeEditor/CodeEditor.js";
@@ -70,10 +71,15 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
+    super.displayError.bind(this);
 
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
     this._httpHandler = new HttpMessageHandler("");
+    this._messageTarget = this.dataset.messageTarget;
+    this._token = this.dataset.authToken
+
+    this.removeAttribute("data-auth-token");
 
     this._activeSession = "default";
 
@@ -125,14 +131,26 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       }
     }
 
+    if (!this._messageTarget) {
+      throw new CriticalError("No message target found.");
+    }
 
+
+
+    this._webSocketHandler = new WebSocketMessageHandler("ws://" + this._messageTarget, this._token);
+
+    const openResult = await this._webSocketHandler.open();
+
+    if (openResult.error)
+      throw new CriticalError(openResult.error.message);
+
+    sessions = this._configToHTML(openResult.payload);
 
     let flag = true;
     
     for (let session of sessions) {
       flag = this._addSession(session, flag);
     }
-
 
     // Create stylings for child elements.
     try {
@@ -163,7 +181,10 @@ class EditorContainer extends ErrorHandlingHTMLElement {
   _configToHTML(config) {
     let result = [];
     
-    for (let session of config) {
+    this._messageTarget = config["message-target"] || this._messageTarget;
+    this._token = config["auth-token"] || this._token;
+
+    for (let session of config.exercises) {
       let sessionNode = document.createElement("div");
       sessionNode.classList.add(SESSION_CLASS_NAME);
 
@@ -180,6 +201,10 @@ class EditorContainer extends ErrorHandlingHTMLElement {
             for (let key in element) {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);
             }
+
+            // TODO: Add Redux state handling making this redundant.
+            if (elementName === "code-editor")
+              node.setAttribute("data-session-id", session.id);
     
             sessionNode.appendChild(node);
           });
@@ -187,6 +212,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       }
       
       sessionNode.setAttribute("name", session.name);
+      sessionNode.id = session.id;
 
       try {
         parseElements("code-editor", "editors");
@@ -205,15 +231,14 @@ class EditorContainer extends ErrorHandlingHTMLElement {
   }
 
   _addSession(session, flag) {
-    
     let children = session.childNodes;
   
     let sessionId = "";
     try {  
-      sessionId = this._actionBar.tabContainer.createTab({ name: session.getAttribute("name"), noDelete: true, setActive: flag }).id;
+      sessionId = this._actionBar.tabContainer.createTab({ name: session.getAttribute("name"), noDelete: true, setActive: flag, id: session.id }).id;
     }
     catch (err) {
-      this.dispatchEvent(new ErrorEvent("custom-error", { error: new MinorError("Missing name attribute.") }));
+      super.displayError(new MinorError("Missing name attribute."));
       return flag;
     }
 

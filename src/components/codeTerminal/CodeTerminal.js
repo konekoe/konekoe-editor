@@ -55,17 +55,35 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
+    super.displayError.bind(this);
 
+<<<<<<< HEAD
     if (!this.hasAttribute("target"))
       throw new CriticalError("Please provide a target URL for the terminal!");
 
     this._target = this.getAttribute("target");  
+=======
+>>>>>>> master
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     this._webSocketConnect = this._webSocketConnect.bind(this);
 
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
 
+<<<<<<< HEAD
+=======
+    this._terminal.onKey(({ key }) => {
+      document.dispatchEvent(new CustomEvent("terminal_input", { detail: key }));
+    });
+
+    document.addEventListener("terminal_output", ({ detail }) => {
+      if (detail.error)
+        return super.displayError(Error(detail.error.message));
+
+      this._terminal.write(detail.payload.data);
+    });
+
+>>>>>>> master
     this._terminal.loadAddon(this._fitAddon);
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.

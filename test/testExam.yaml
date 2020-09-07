@@ -1,17 +1,18 @@
-- name: 1.1 Hassunhauskat osoittimet
-  editors:
-    - start-col: center-left
+message-target: "https://localhost:5000"
+exercises:
+  - name: 1.1 Hassunhauskat osoittimet
+    editors:
+      start-col: center-left
       end-col: right
       start-row: top
-      message-target: http://localhost:4001/
       end-row: bottom
       config: 
         tabs: 
           - { name: test.js, value: "function test() {\n //CODE HERE \n}", noDelete: true }
           - { name: test.css, value: "RULES HERE", noDelete: true }
         tabCreation: false
-  infoBoxes:
-    - content: |
+    infoBoxes:
+      content: |
         # Tässä kuuluisi olla osoitintesti mutta ei olekaan.
 
         ### Create the following files:
@@ -22,27 +23,29 @@
       start-row: top
       end-row: bottom
 
-- name: "Tehtävä 6.1: Laiva on lastattu (10 pts)"
-  editors:
-    - start-col: center-left
+  - name: "Tehtävä 6.1: Laiva on lastattu (10 pts)"
+    editors:
+      start-col: center-left
       end-col: right
       start-row: top
-      message-target: http://localhost:4001/
       end-row: middle-bottom
       config: 
         tabs: 
           - { name: main.c, value: http://localhost:4001/test2Main, noDelete: true }
         tabCreation: false
-  infoBoxes:
-    - content: http://localhost:4001/test2Desc
+    infoBoxes:
+      content: http://localhost:4001/test2Desc
       start-col: left 
       end-col: center-left 
       start-row: top
       end-row: bottom
-  terminals:
-    - start-col: center-left 
+    terminals:
+      start-col: center-left 
       end-col: right
       start-row: middle-bottom 
       end-row: bottom
+<<<<<<< HEAD
       target: ws://localhost:5001/
+=======
+>>>>>>> master
       

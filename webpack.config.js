@@ -1,6 +1,7 @@
 module.exports = {
   
   entry: './src/main.js',
+  mode: "production",
   module: {
     rules: [
       {
@@ -19,8 +20,9 @@ module.exports = {
   },
   output: {
     path: __dirname + '/dist',
+    chunkFilename: '[name].konekoe-editor.js',
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: 'konekoe-editor.js'
   },
   devServer: {
     contentBase: './'

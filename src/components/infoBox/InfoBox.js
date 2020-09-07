@@ -30,6 +30,8 @@ wrapperTemplate.innerHTML = `
 class InfoBox extends ErrorHandlingHTMLElement {
   constructor() {
     super();
+    super.displayError.bind(this);
+
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
@@ -47,7 +49,7 @@ class InfoBox extends ErrorHandlingHTMLElement {
           content = this.getAttribute("content");
       }
       catch (err) {
-        this.dispatchEvent(new ErrorEvent("error", { error: err })); 
+        super.displayError(err); 
       }
     }
 

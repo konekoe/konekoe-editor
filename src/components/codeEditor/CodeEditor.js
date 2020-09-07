@@ -1,6 +1,5 @@
 import * as ace from "ace-builds/src-noconflict/ace";
 import * as aceModes from "ace-builds/src-noconflict/ext-modelist.js";
-import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import { CriticalError, MinorError } from "../../utils/errors/index.js";
 import { URL_REGEX } from "../../utils/functions.js";
@@ -8,7 +7,6 @@ import "../utils/ActionButton.js";
 import "../utils/MessageOverlay.js";
 import "ace-builds/webpack-resolver.js";
 import "../utils/ActionBar.js";
-import "./aceStyleImport.js";
 
 
 const wrapperTemplate = document.createElement("template");
@@ -28,9 +26,6 @@ wrapperTemplate.innerHTML = `
   </style>
   
   <action-bar id="actionBar">
-    <action-button slot="content" color="cobalt">
-      Save
-    </action-button>
     <action-button slot="content" id="runButton" secondary color="red">
       Submit
     </action-button>
@@ -49,11 +44,11 @@ wrapperTemplate.innerHTML = `
 class CodeEditor extends ErrorHandlingHTMLElement {
   constructor() {
     super();
+    super.displayError.bind(this);
     
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.
-    this._messageHandler = new HttpMessageHandler((this.hasAttribute("message-target")) ? this.getAttribute("message-target") : "http://localhost:3001/");
     this._editor;
     this._config;
 
@@ -66,7 +61,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
       }
       catch (err) {
-        throw new CriticalError("Malformed JSON data.");
+        super.displayError(new CriticalError("Malformed JSON data."));
       }
     } 
 
@@ -79,6 +74,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this.changeEditor = this.changeEditor.bind(this);
     this.removeEditor = this.removeEditor.bind(this);
     this.sendCode = this.sendCode.bind(this);
+    this._handleSubmissionResult = this._handleSubmissionResult.bind(this);
 
     // Handle action bar events
     this._actionBar.addEventListener("tab-created", this.addEditor, false);
@@ -164,8 +160,24 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._editor.setSession(this._sessions[id]);
   }
 
+  _handleSubmissionResult({ detail }) {
+    try {
+      this._messageOverlay.close();
+
+      if (detail.error)
+        throw new MinorError(detail.error.message);
+      
+      // TODO: Display points received from submission.
+      
+      document.removeEventListener("code_submission", this._handleSubmissionResult);
+    }
+    catch (err) {
+      super.displayError(err);
+    }
+  }
+
   async sendCode() {
-    const data = Object.values(this._sessions)
+    const files = Object.values(this._sessions)
     .filter(session => session.filename) // Remove sessions without a filename, such as the default session
     .reduce((acc, curr) => {
       acc[curr.filename] = curr.getDocument().getValue();
@@ -173,16 +185,10 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     }, {});
     this._messageOverlay.show();
 
-    // TODO: more robust error handling.
-    try {
-      await this._messageHandler.sendMessage(data, (this.hasAttribute("submission-path")) ? this.getAttribute("submission-path") : "");
-      this._messageOverlay.close();
-    }
-    catch (err) {
-      this._messageOverlay.close();
-      throw new MinorError(err.message);
-    }
-    
+    document.addEventListener("code_submission", this._handleSubmissionResult);
+
+    // TODO: Add redux making id field redundant.
+    document.dispatchEvent(new CustomEvent("submission", { detail: { id: this.dataset.sessionId, files } }));
   }
 }
 
