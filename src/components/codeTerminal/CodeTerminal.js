@@ -61,10 +61,10 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     this._fitAddon = new FitAddon();
 
     this._terminal.onKey(({ key }) => {
-      document.dispatchEvent(new CustomEvent("terminal_data", { detail: key }));
+      document.dispatchEvent(new CustomEvent("terminal_input", { detail: key }));
     });
 
-    document.addEventListener("terminal_input", ({ detail }) => {
+    document.addEventListener("terminal_output", ({ detail }) => {
       if (detail.error)
         return super.displayError(Error(detail.error.message));
 

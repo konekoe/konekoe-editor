@@ -20,8 +20,8 @@ class WebSocketMessageHandler {
       }
     };
 
-    document.addEventListener("terminal_data", ({ detail }) => {
-      this._sendMessage("terminal_data", detail);
+    document.addEventListener("terminal_input", ({ detail }) => {
+      this._sendMessage("terminal_input", detail);
     });
 
     document.addEventListener("submission", ({ detail }) => {
