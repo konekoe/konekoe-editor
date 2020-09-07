@@ -44,8 +44,4 @@ exercises:
       end-col: right
       start-row: middle-bottom 
       end-row: bottom
-<<<<<<< HEAD
-      target: ws://localhost:5001/
-=======
->>>>>>> master
       
