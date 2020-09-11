@@ -137,7 +137,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
 
 
-    this._webSocketHandler = new WebSocketMessageHandler("ws://" + this._messageTarget, this._token);
+    this._webSocketHandler = new WebSocketMessageHandler("wss://" + this._messageTarget, this._token);
 
     const openResult = await this._webSocketHandler.open();
 

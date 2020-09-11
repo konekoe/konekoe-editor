@@ -1,5 +1,6 @@
 class WebSocketMessageHandler {
   constructor(address, token) {
+
     this._socket = new WebSocket(address);
     this._token = token;
 
