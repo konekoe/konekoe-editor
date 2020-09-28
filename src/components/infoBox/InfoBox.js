@@ -12,13 +12,17 @@ wrapperTemplate.innerHTML = `
       height: 100%;
       flex-direction: column;
   }
-  #wrapper {
+  #wrapper{
     flex: 1;
     height: 100%;
     padding: 0.5rem;
     overflow-y: scroll;
     overflow-wrap: break-word;
     background-color: #002240;
+  }
+
+  :host {
+    scrollbar-color: #555555 #011e3a;
   }
 
   :host ::-webkit-scrollbar {
