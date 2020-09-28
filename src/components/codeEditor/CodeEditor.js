@@ -23,6 +23,18 @@ wrapperTemplate.innerHTML = `
     flex: 1;
     height: 100%;
   }
+
+  #editor {
+    scrollbar-color: #555555 #011e3a;
+  }
+
+  #editor ::-webkit-scrollbar {
+    background-color: #011e3a;
+  }
+
+  #editor ::-webkit-scrollbar-thumb {
+    background: #555555; 
+  }
   </style>
   
   <action-bar id="actionBar">
@@ -35,7 +47,7 @@ wrapperTemplate.innerHTML = `
     <h1 slot="content">Please wait</h1>
   </message-overlay>
 
-  <div id="editor">
+  <div id="editor" part="konekoe-scrollable">
   </div>
   <slot name="error">
   </slot>

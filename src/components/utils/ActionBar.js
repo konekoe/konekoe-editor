@@ -20,6 +20,18 @@ wrapperTemplate.innerHTML = `
     width: 100%;
   }
 
+  #wrapper {
+    scrollbar-color: #555555 #011e3a;
+  }
+
+  #wrapper ::-webkit-scrollbar {
+    background-color: #011e3a;
+  }
+
+  #wrapper ::-webkit-scrollbar-thumb {
+    background: #555555; 
+  }
+
   </style>
   
   <nav id="wrapper">

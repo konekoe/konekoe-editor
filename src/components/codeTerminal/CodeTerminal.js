@@ -33,6 +33,14 @@ wrapperTemplate.innerHTML = `
     overflow-wrap: break-word;
     scrollbar-color: #555555 #011e3a;
   }
+
+  #terminal ::-webkit-scrollbar {
+    background-color: #011e3a;
+  }
+
+  #terminal ::-webkit-scrollbar-thumb {
+    background: #555555; 
+  }
   
   .terminal {
     padding: 0.5rem 0rem 0rem 0.5rem;
@@ -41,14 +49,12 @@ wrapperTemplate.innerHTML = `
   </style>
 
   <div id="wrapper">
-    <div id="terminal">
+    <div id="terminal" part="konekoe-scrollable">
     </div>
   </div>
   <slot name="error">
   </slot>
 `;
-
-let socket = {};
 
 class CodeTerminal extends ErrorHandlingHTMLElement {
   static get observedAttributes() { return ["style"]; }
@@ -87,8 +93,6 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     const terminalWrapper = this._shadow.getElementById("terminal");
 
     this._terminal.open(terminalWrapper);
-
-    setTimeout(() => this._fitAddon.fit(), 0); // Hack to make this call occur once the page has loaded.
   }
 
 
@@ -109,36 +113,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
 
   _webSocketConnect() {
     this._terminal.clear();
-    this._terminal.write("connecting...\n");
-
-
-    socket = new WebSocket(this._target);
-
-    socket.onerror = (event) => {
-      event.preventDefault();
-
-      this._terminal.write("Could not connect! Trying again in 5 seconds.\n");
-    };
-
-    socket.onclose = () => {
-      this._terminal.write("Connection closed.");
-      
-      socket.onmessage = null;
-      this._terminal.onKey(() => null);
-    };
-
-
-    socket.onopen = () => {
-      socket.onmessage = ({ data }) => {
-        this._terminal.write(data);
-      };
-
-      this._terminal.clear();
-      
-      this._terminal.onKey(({ key }) => {
-        socket.send(key);
-      });
-    };
+    this._terminal.write("Submission results will be shown here.");
   }
 
 }

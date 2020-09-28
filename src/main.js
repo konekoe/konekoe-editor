@@ -19,6 +19,7 @@ wrapperTemplate.innerHTML = `
       flex-direction: column;
       height: 100vh;
     }
+
     #container {
       display: grid;
       height: 100%;
@@ -29,13 +30,16 @@ wrapperTemplate.innerHTML = `
       background-color: #555555;
       color: white;
     }
+
   </style>
 
   <action-bar noAdd id="actionBar">
   </action-bar>
   
   <slot id="container" name="content">
-    <code-editor></code-editor>
+    <h1>
+      Please wait
+    </h1>
   </slot>
 `;
 
@@ -201,6 +205,8 @@ class EditorContainer extends ErrorHandlingHTMLElement {
             for (let key in element) {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);
             }
+
+            node.setAttribute("exportparts", "konekoe-scrollable");
 
             // TODO: Add Redux state handling making this redundant.
             if (elementName === "code-editor")
