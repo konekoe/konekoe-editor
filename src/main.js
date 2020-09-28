@@ -20,6 +20,13 @@ wrapperTemplate.innerHTML = `
       height: 100vh;
     }
 
+    :host::theme(konekoe-scrollable) {
+      scrollbar-color: #555555 #011e3a;
+      background-color: red;
+      
+    }
+
+
     #container {
       display: grid;
       height: 100%;
@@ -205,8 +212,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
             for (let key in element) {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);
             }
-
-            node.setAttribute("exportparts", "konekoe-scrollable");
 
             // TODO: Add Redux state handling making this redundant.
             if (elementName === "code-editor")
