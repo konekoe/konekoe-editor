@@ -117,7 +117,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     if (this._config) {
       if (this._config.tabs)
         this._config.tabs.map(async (item, index) => {
-          item.noDelete = item.noDelete === "true";
+          item.noDelete = item.noDelete;
           item.setActive = index === 0;
           
           if (URL_REGEX.test(item.value)) {
@@ -133,7 +133,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
           this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item), ...item } });
         });
 
-      if (this._config.tabCreation === "false")
+      if (!this._config.tabCreation)
         this._actionBar.tabContainer.removeAddButton();
     }
 
