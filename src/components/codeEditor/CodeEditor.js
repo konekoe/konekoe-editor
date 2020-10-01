@@ -87,6 +87,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this.removeEditor = this.removeEditor.bind(this);
     this.sendCode = this.sendCode.bind(this);
     this._handleSubmissionResult = this._handleSubmissionResult.bind(this);
+    this._setUndoManager = this._setUndoManager.bind(this);
 
     // Handle action bar events
     this._actionBar.addEventListener("tab-created", this.addEditor, false);
@@ -110,6 +111,8 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
     this._sessions.default = this._editor.session;
     this._editor.setReadOnly(true);
+    this._setUndoManager();
+
 
     // Finally attach to shadow root.
     this._editor.renderer.attachToShadowRoot();
@@ -141,7 +144,6 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
   addEditor({ data }) {
     const session = new ace.EditSession(data.value || "");
-    
      // Exctract file extension
      // If no name is given use "" indicating a text file
      // If the name does not contain a file extension use ""
@@ -152,6 +154,8 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     session.filename = data.target.name;
     
     this._sessions[data.target.id] = session;
+
+    session.setUndoManager(new ace.UndoManager());
     
     if (data.setActive)
       this.setSession(data.target.id);
@@ -170,6 +174,11 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._editor.setReadOnly(id === "default");
     
     this._editor.setSession(this._sessions[id]);
+    this._setUndoManager();
+  }
+
+  _setUndoManager() {
+    this._undoManager = this._editor.getSession().getUndoManager();
   }
 
   _handleSubmissionResult({ detail }) {
