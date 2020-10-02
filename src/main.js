@@ -223,6 +223,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       }
       
       sessionNode.setAttribute("name", session.name);
+      
       sessionNode.id = session.id;
 
       try {

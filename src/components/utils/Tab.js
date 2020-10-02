@@ -127,7 +127,6 @@ class Tab extends ErrorHandlingHTMLElement {
         if (detail.payload && detail.payload.id !== this._id)
           return;
 
-        console.log(detail.payload);
         this._points = `${ detail.payload.points }/${ detail.payload.max_points }`
         pointsElement.innerHTML = this._points;
 
