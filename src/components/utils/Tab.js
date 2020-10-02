@@ -16,7 +16,9 @@ wrapperTemplate.innerHTML = `
     }
 
     .codeTab {
-      display: inline-block;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
       padding: 0.5rem 1.0rem 0.5rem 0.5rem;
       border: 1px solid transparent;
       border-right: 1px solid #555555;
@@ -36,6 +38,20 @@ wrapperTemplate.innerHTML = `
       border-right: 1px solid #555555;
       cursor: default;
     }
+
+    .codeTabItem {
+      display: inline-block;
+      flex: 1 1 auto;
+      position: relative;
+      text-align: center;
+    }
+    
+    .codeTabItem + .codeTabItem {
+        padding-left: 0.5rem;
+        margin-left: 0.5rem;
+        border-left: solid 1px white;
+    }
+
   </style>
   
   <div id="wrapper">
@@ -78,11 +94,10 @@ class Tab extends ErrorHandlingHTMLElement {
     this._remove = removeCb;
     this._id = options.id || createUUID();
     this._name = options.name || this._id;
+    this._points = options.points;
 
     this.setActive = this.setActive.bind(this);
-
     
-
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this._container = node.getElementById("wrapper");
     this._container.classList.add("codeTab");
@@ -95,7 +110,29 @@ class Tab extends ErrorHandlingHTMLElement {
       removeButton.onclick = this._remove;
     }
 
-    node.getElementById("container").innerHTML = this._name;
+    const nameElement = document.createElement("span");
+    nameElement.classList.add("codeTabItem");
+    nameElement.innerHTML = this._name;
+
+    node.getElementById("container").appendChild(nameElement);
+
+    if (this._points) {
+      const pointsElement = document.createElement("span");
+      pointsElement.classList.add("codeTabItem");
+      pointsElement.innerHTML = this._points;
+
+      node.getElementById("container").appendChild(pointsElement);
+
+      document.addEventListener("code_submission", ({ detail }) => {
+        if (detail.payload && detail.payload.id !== this._id)
+          return;
+
+        console.log(detail.payload);
+        this._points = `${ detail.payload.points }/${ detail.payload.max_points }`
+        pointsElement.innerHTML = this._points;
+
+      });
+    }
 
     this._shadow.appendChild(node);
   }

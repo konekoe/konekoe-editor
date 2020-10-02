@@ -183,6 +183,9 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
   _handleSubmissionResult({ detail }) {
     try {
+      if (detail.payload && detail.payload.id !== this.dataset.sessionId)
+        return;
+
       this._messageOverlay.close();
 
       if (detail.error)

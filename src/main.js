@@ -246,7 +246,17 @@ class EditorContainer extends ErrorHandlingHTMLElement {
   
     let sessionId = "";
     try {  
-      sessionId = this._actionBar.tabContainer.createTab({ name: session.getAttribute("name"), noDelete: true, setActive: flag, id: session.id }).id;
+      const newTab = this._actionBar.tabContainer.createTab({
+        name: session.getAttribute("name"),
+        noDelete: true,
+        setActive: flag,
+        id: session.id,
+        points: "no points yet"
+      });
+
+
+
+      sessionId = newTab.id;
     }
     catch (err) {
       super.displayError(new MinorError("Missing name attribute."));
