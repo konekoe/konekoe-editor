@@ -21,7 +21,7 @@ class WebSocketMessageHandler {
       }
     };
 
-    document.addEventListener("terminal_input", ({ detail }) => {
+    document.addEventListener("terminal_write", ({ detail }) => {
       this._sendMessage("terminal_input", detail);
     });
 

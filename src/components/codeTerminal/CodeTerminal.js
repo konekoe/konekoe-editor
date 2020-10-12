@@ -70,7 +70,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     this._fitAddon = new FitAddon();
 
     this._terminal.onKey(({ key }) => {
-      document.dispatchEvent(new CustomEvent("terminal_input", { detail: key }));
+      document.dispatchEvent(new CustomEvent("terminal_write", { detail: key }));
     });
 
     document.addEventListener("terminal_output", ({ detail }) => {
