@@ -221,8 +221,9 @@ class EditorContainer extends ErrorHandlingHTMLElement {
           });
         }
       }
-      
+
       sessionNode.setAttribute("name", session.name);
+      sessionNode.setAttribute("points", session.points);
       
       sessionNode.id = session.id;
 
@@ -244,7 +245,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   _addSession(session, flag) {
     let children = session.childNodes;
-  
+
     let sessionId = "";
     try {  
       const newTab = this._actionBar.tabContainer.createTab({
@@ -252,7 +253,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
         noDelete: true,
         setActive: flag,
         id: session.id,
-        points: "no points yet"
+        points: session.getAttribute("points") || "no points yet"
       });
 
 

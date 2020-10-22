@@ -116,7 +116,7 @@ class Tab extends ErrorHandlingHTMLElement {
 
     node.getElementById("container").appendChild(nameElement);
 
-    if (this._points) {
+    if (this._points !== undefined) {
       const pointsElement = document.createElement("span");
       pointsElement.classList.add("codeTabItem");
       pointsElement.innerHTML = this._points;
