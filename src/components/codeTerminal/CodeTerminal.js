@@ -1,6 +1,7 @@
 import { Terminal }  from "xterm/lib/xterm.js";
 import { FitAddon } from "xterm-addon-fit";
 import { CriticalError, MinorError } from "../../utils/errors/";
+import "../utils/ActionButton.js";
 import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
 import styles from "xterm/css/xterm.css";
 
@@ -23,6 +24,7 @@ wrapperTemplate.innerHTML = `
   #wrapper {
     width: 100%;
     height: 100%;
+    background-color: black;
   }
 
   #terminal {
@@ -49,6 +51,9 @@ wrapperTemplate.innerHTML = `
   </style>
 
   <div id="wrapper">
+    <action-button id="clearButton" secondary="true" color="white">
+     Clear
+    </action-button>
     <div id="terminal" part="konekoe-scrollable">
     </div>
   </div>
@@ -83,6 +88,10 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     this._terminal.loadAddon(this._fitAddon);
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
+
+    node.getElementById("clearButton").onclick = () => {
+      this._terminal.clear();
+    };
     
     this._shadow.appendChild(node);
   }
