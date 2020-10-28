@@ -189,7 +189,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
       this._messageOverlay.close();
 
       if (detail.error)
-        throw new MinorError(detail.error.message);
+        throw new MinorError(detail.error.message, detail.error.name);
       
       // TODO: Display points received from submission.
       
