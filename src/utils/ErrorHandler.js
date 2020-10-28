@@ -16,10 +16,10 @@ function ErrorHandler(err) {
         const errorModal = new Modal({ show: true, cancel: "", accept: "OK", coverScreen: true, slot: "error" });
         errorModal.innerHTML = `
         <h1 slot="content">
-        Error: ${ err.message }
+        Error: ${ err.name }
         </h1>
         <p>
-          ${ err.reason }
+          ${ err.message }
         </p>
         `;
         return `${ errorModal.outerHTML }`;
