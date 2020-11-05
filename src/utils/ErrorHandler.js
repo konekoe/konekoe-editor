@@ -15,12 +15,14 @@ function ErrorHandler(err) {
     case "MinorError":
         const errorModal = new Modal({ show: true, cancel: "", accept: "OK", coverScreen: true, slot: "error" });
         errorModal.innerHTML = `
-        <h1 slot="content">
-        Error: ${ err.title }
-        </h1>
-        <p>
-          ${ err.message }
-        </p>
+        <div slot="content">
+          <h1>
+          Error: ${ err.title }
+          </h1>
+          <p>
+            ${ err.message }
+          </p>
+        </div>
         `;
         return `${ errorModal.outerHTML }`;
 

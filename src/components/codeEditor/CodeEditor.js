@@ -190,9 +190,7 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
       if (detail.error)
         throw new MinorError(detail.error.message, detail.error.name);
-      
-      // TODO: Display points received from submission.
-      
+            
       document.removeEventListener("code_submission", this._handleSubmissionResult);
     }
     catch (err) {
