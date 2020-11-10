@@ -1,6 +1,6 @@
 import * as ace from "ace-builds/src-noconflict/ace";
 import * as aceModes from "ace-builds/src-noconflict/ext-modelist.js";
-import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
+import ErrorHandlingHTMLElement from "../utils/state/ErrorHandlingHTMLElement.js";
 import { CriticalError, MinorError } from "../../utils/errors/index.js";
 import { URL_REGEX } from "../../utils/functions.js";
 import "../utils/ActionButton.js";
@@ -54,8 +54,8 @@ wrapperTemplate.innerHTML = `
 `;
 
 class CodeEditor extends ErrorHandlingHTMLElement {
-  constructor() {
-    super();
+  constructor(state) {
+    super(state);
     super.displayError.bind(this);
     
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.

@@ -1,12 +1,13 @@
 import YAML from "yaml";
-import ErrorHandlingHTMLElement from "./components/utils/ErrorHandlingHTMLElement.js";
 import HttpMessageHandler from "./utils/HttpMessageHandler.js";
 import WebSocketMessageHandler from "./utils/WebSocketMessageHandler.js";
 import { CriticalError, MinorError } from "./utils/errors/index.js";
 import { URL_REGEX } from "./utils/functions.js";
-import "./components/codeEditor/CodeEditor.js";
-import "./components/infoBox/InfoBox.js";
-import "./components/codeTerminal/CodeTerminal.js";
+import { topErrorSelector } from "./components/utils/state/errorSlice.js";
+import store from "./store/store.js";
+import CodeEditor from "./components/codeEditor/CodeEditor.js";
+import InfoBox from "./components/infoBox/InfoBox.js";
+import CodeTerminal from "./components/codeTerminal/CodeTerminal.js";
 import "./components/utils/ActionBar.js"
 
 const SESSION_CLASS_NAME = "editorSession";
@@ -48,9 +49,12 @@ wrapperTemplate.innerHTML = `
       Please wait
     </h1>
   </slot>
+
+  <div id="errorContainer">
+  </div>
 `;
 
-class EditorContainer extends ErrorHandlingHTMLElement {
+class EditorContainer extends HTMLElement {
   static get defaultStyling() {
     return `
     #default {
@@ -82,7 +86,11 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   constructor() {
     super();
-    super.displayError.bind(this);
+    this._state = store;
+
+    this._state.subscribe(() => {
+      
+    });
 
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
@@ -196,9 +204,13 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     this._token = config["auth-token"] || this._token;
 
     for (let session of config.exercises) {
-      let sessionNode = document.createElement("div");
-      sessionNode.classList.add(SESSION_CLASS_NAME);
-
+      let sessionObj = { 
+        id: session.id,
+        name: session.name,
+        points: session.points,
+        children: []
+      };
+      
       if (!session.name) {
         //this.dispatchEvent(new ErrorEvent("error", { error: new MinorError("Missing name attribute.") }));
         continue;
@@ -207,7 +219,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       const parseElements = (elementName, field) => {
         if (session[field]) {
           session[field].map(element => {
-            let node = document.createElement(elementName);
+            let node = new elementName(this._state);
     
             for (let key in element) {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);
@@ -216,49 +228,41 @@ class EditorContainer extends ErrorHandlingHTMLElement {
             // TODO: Add Redux state handling making this redundant.
             if (elementName === "code-editor")
               node.setAttribute("data-session-id", session.id);
-    
-            sessionNode.appendChild(node);
+            
+            sessionObj.children.push(this.appendChild(node));
           });
         }
       }
 
-      sessionNode.setAttribute("name", session.name);
-      sessionNode.setAttribute("points", session.points);
-      
-      sessionNode.id = session.id;
-
       try {
-        parseElements("code-editor", "editors");
-        parseElements("code-terminal", "terminals");
-        parseElements("info-box", "infoBoxes");
+        parseElements(CodeEditor, "editors");
+        parseElements(CodeTerminal, "terminals");
+        parseElements(InfoBox, "infoBoxes");
       }
       catch (err) {
         //this.dispatchEvent(new ErrorEvent("error", { error: new MinorError(err.message) }));
         continue;
       }
 
-      result.push(this.appendChild(sessionNode));   
+      result.push(sessionObj);
+   
     }
 
     return result;
   }
 
   _addSession(session, flag) {
-    let children = session.childNodes;
+    let children = session.children;
 
-    let sessionId = "";
     try {  
-      const newTab = this._actionBar.tabContainer.createTab({
-        name: session.getAttribute("name"),
+      this._actionBar.tabContainer.createTab({
+        name: session.name,
         noDelete: true,
         setActive: flag,
         id: session.id,
-        points: session.getAttribute("points") || "no points yet"
+        points: session.points || "no points yet"
       });
 
-
-
-      sessionId = newTab.id;
     }
     catch (err) {
       super.displayError(new MinorError("Missing name attribute."));
@@ -266,20 +270,18 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     }
 
     children.forEach(child => {
-      if (child.nodeName !== "#text") {
-        child.slot = "content";
-        child.style.display = "none";
-        child.classList.add(sessionId);
-      }
+      
+      child.slot = "content";
+      child.style.display = "none";
+      child.classList.add(session.id);
     });
 
     // Make the first session active.
     if (flag) {
       flag = false;
-      this._activeSession = sessionId;
+      this._activeSession = session.id;
     }
 
-    session.outerHTML = session.innerHTML;  
 
     return flag;
   }

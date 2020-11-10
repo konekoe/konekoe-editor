@@ -1,7 +1,7 @@
 import * as marked from "marked/marked.min.js";
 import * as insane from "insane/insane.js";
 import HttpMessageHandler from "../../utils/HttpMessageHandler.js";
-import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
+import ErrorHandlingHTMLElement from "../utils/state/ErrorHandlingHTMLElement.js";
 import { URL_REGEX } from "../../utils/functions.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -39,8 +39,8 @@ wrapperTemplate.innerHTML = `
 `;
 
 class InfoBox extends ErrorHandlingHTMLElement {
-  constructor() {
-    super();
+  constructor(state) {
+    super(state);
     super.displayError.bind(this);
 
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.

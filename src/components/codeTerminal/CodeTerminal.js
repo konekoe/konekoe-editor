@@ -2,7 +2,7 @@ import { Terminal }  from "xterm/lib/xterm.js";
 import { FitAddon } from "xterm-addon-fit";
 import { CriticalError, MinorError } from "../../utils/errors/";
 import "../utils/ActionButton.js";
-import ErrorHandlingHTMLElement from "../utils/ErrorHandlingHTMLElement.js";
+import ErrorHandlingHTMLElement from "../utils/state/ErrorHandlingHTMLElement.js";
 import styles from "xterm/css/xterm.css";
 
 
@@ -64,13 +64,13 @@ wrapperTemplate.innerHTML = `
 class CodeTerminal extends ErrorHandlingHTMLElement {
   static get observedAttributes() { return ["style"]; }
 
-  constructor() {
-    super();
+  constructor(state) {
+    super(state);
     super.displayError.bind(this);
 
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     this._webSocketConnect = this._webSocketConnect.bind(this);
-
+    
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
 
@@ -90,7 +90,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
 
     node.getElementById("clearButton").onclick = () => {
-      this._terminal.clear();
+      this.displayError({ name: "Error", msg: "test" });
     };
     
     this._shadow.appendChild(node);

@@ -1,4 +1,4 @@
-import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
+import ErrorHandlingHTMLElement from "./state/ErrorHandlingHTMLElement.js";
 import "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");

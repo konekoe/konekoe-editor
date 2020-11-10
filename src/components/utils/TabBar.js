@@ -1,7 +1,7 @@
 import "./ActionButton.js";
 import "./Modal.js";
 import Tab from "./Tab.js";
-import ErrorHandlingHTMLElement from "./ErrorHandlingHTMLElement.js";
+import ErrorHandlingHTMLElement from "./state/ErrorHandlingHTMLElement.js";
 
 const wrapperTemplate = document.createElement("template");
 wrapperTemplate.innerHTML = `
