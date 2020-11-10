@@ -3,7 +3,7 @@ import HttpMessageHandler from "./utils/HttpMessageHandler.js";
 import WebSocketMessageHandler from "./utils/WebSocketMessageHandler.js";
 import { CriticalError, MinorError } from "./utils/errors/index.js";
 import { URL_REGEX } from "./utils/functions.js";
-import { topErrorSelector } from "./components/utils/state/errorSlice.js";
+import ErrorHandler from "./utils/ErrorHandler.js";
 import store from "./store/store.js";
 import CodeEditor from "./components/codeEditor/CodeEditor.js";
 import InfoBox from "./components/infoBox/InfoBox.js";
@@ -88,10 +88,6 @@ class EditorContainer extends HTMLElement {
     super();
     this._store = store;
 
-    this._store.subscribe(() => {
-      
-    });
-
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
     this._httpHandler = new HttpMessageHandler("");
@@ -108,6 +104,8 @@ class EditorContainer extends HTMLElement {
     this.setSession = this.setSession.bind(this);
 
     const node = wrapperTemplate.content.cloneNode(true);
+
+    this._errorHandler = new ErrorHandler(node.getElementById("errorContainer"), this._store);
     
     this._actionBar = node.getElementById("actionBar");
     this._container = node.getElementById("container");
