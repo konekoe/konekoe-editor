@@ -64,8 +64,8 @@ wrapperTemplate.innerHTML = `
 class CodeTerminal extends ErrorHandlingHTMLElement {
   static get observedAttributes() { return ["style"]; }
 
-  constructor(state) {
-    super(state);
+  constructor(store) {
+    super(store);
     super.displayError.bind(this);
 
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.

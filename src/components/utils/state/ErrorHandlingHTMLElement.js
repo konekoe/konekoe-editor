@@ -2,12 +2,12 @@ import StateHandlingHTMLElement from "./StateHandlingHTMLElement.js";
 import { push } from "./errorSlice.js";
 
 class ErrorHandlingHTMLElement extends StateHandlingHTMLElement {
-  constructor(state) {
-    super(state);
+  constructor(store) {
+    super(store);
   }
 
   displayError(error) {
-    this._state.dispatch(push(error));
+    this._store.dispatch(push(error));
   };
 
 }

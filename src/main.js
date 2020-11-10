@@ -86,9 +86,9 @@ class EditorContainer extends HTMLElement {
 
   constructor() {
     super();
-    this._state = store;
+    this._store = store;
 
-    this._state.subscribe(() => {
+    this._store.subscribe(() => {
       
     });
 
@@ -219,7 +219,7 @@ class EditorContainer extends HTMLElement {
       const parseElements = (elementName, field) => {
         if (session[field]) {
           session[field].map(element => {
-            let node = new elementName(this._state);
+            let node = new elementName(this._store);
     
             for (let key in element) {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);

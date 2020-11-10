@@ -54,8 +54,8 @@ wrapperTemplate.innerHTML = `
 `;
 
 class CodeEditor extends ErrorHandlingHTMLElement {
-  constructor(state) {
-    super(state);
+  constructor(store) {
+    super(store);
     super.displayError.bind(this);
     
     this._shadow = this.attachShadow({ mode: "open" }); // Create a shadow root for this element.

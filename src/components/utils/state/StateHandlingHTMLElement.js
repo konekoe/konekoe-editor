@@ -2,27 +2,27 @@ class StateHandlingHTMLElement extends HTMLElement {
   constructor(state) {
     super();
 
-    this._state = state;
+    this._store = state;
 
-    if (this._state) {
-      this._stateSubscriptionHandler = this._stateSubscriptionHandler.bind(this);
+    if (this._store) {
+      this._storeSubscriptionHandler = this._storeSubscriptionHandler.bind(this);
 
-      this._state.subscribe(this._stateSubscriptionHandler);
+      this._store.subscribe(this._storeSubscriptionHandler);
     }
   }
 
   set state(stateObj) {
-    this._state = stateObj;
+    this._store = stateObj;
 
-    this._stateSubscriptionHandler = this._stateSubscriptionHandler.bind(this);
-    this._state.subscribe(this._stateSubscriptionHandler)
+    this._storeSubscriptionHandler = this._storeSubscriptionHandler.bind(this);
+    this._store.subscribe(this._storeSubscriptionHandler)
   }
 
   get state(){
-    return this._state;
+    return this._store;
   }
 
-  _stateSubscriptionHandler() {
+  _storeSubscriptionHandler() {
 
   }
 
