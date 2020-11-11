@@ -3,6 +3,7 @@ import HttpMessageHandler from "./utils/HttpMessageHandler.js";
 import WebSocketMessageHandler from "./utils/WebSocketMessageHandler.js";
 import { CriticalError, MinorError } from "./utils/errors/index.js";
 import { URL_REGEX } from "./utils/functions.js";
+import ErrorHandlingHTMLElement from "./components/utils/state/ErrorHandlingHTMLElement.js";
 import ErrorHandler from "./utils/ErrorHandler.js";
 import store from "./store/store.js";
 import CodeEditor from "./components/codeEditor/CodeEditor.js";
@@ -54,7 +55,7 @@ wrapperTemplate.innerHTML = `
   </div>
 `;
 
-class EditorContainer extends HTMLElement {
+class EditorContainer extends ErrorHandlingHTMLElement {
   static get defaultStyling() {
     return `
     #default {
@@ -85,8 +86,8 @@ class EditorContainer extends HTMLElement {
   }
 
   constructor() {
-    super();
-    this._store = store;
+    super(store);
+    super.displayError.bind(this);
 
     // Create a shadow root for this element.
     this._shadow = this.attachShadow({mode: "open"});
@@ -136,7 +137,7 @@ class EditorContainer extends HTMLElement {
           config = await this._httpHandler.getMessage(config);
         }
         catch (err) {
-          throw new CriticalError(err.message);
+          return this.displayError(new CriticalError(err.message));
         }
       }
 
@@ -144,12 +145,12 @@ class EditorContainer extends HTMLElement {
         sessions = this._configToHTML(YAML.parse(config));
       }
       catch (err) {
-        this.dispatchEvent(new ErrorEvent("error", { error: new MinorError(err.message) }));
+        return this.displayError(new MinorError(err.message));
       }
     }
 
     if (!this._messageTarget) {
-      throw new CriticalError("No message target found.");
+      return this.displayError(new CriticalError("No message target found."));
     }
 
 
@@ -159,7 +160,7 @@ class EditorContainer extends HTMLElement {
     const openResult = await this._webSocketHandler.open();
 
     if (openResult.error)
-      throw new CriticalError(openResult.error.message);
+      return this.displayError(new CriticalError(openResult.error.message));
 
     sessions = this._configToHTML(openResult.payload);
 
@@ -183,7 +184,7 @@ class EditorContainer extends HTMLElement {
       this._shadow.appendChild(style);
     }
     catch (err) {
-      throw new CriticalError(err.message);
+      return this.displayError(new CriticalError(err.message));
     }
 
     this.setSession(this._activeSession);
@@ -263,7 +264,7 @@ class EditorContainer extends HTMLElement {
 
     }
     catch (err) {
-      super.displayError(new MinorError("Missing name attribute."));
+      this.displayError(new MinorError("Missing name attribute."));
       return flag;
     }
 

@@ -1,8 +1,13 @@
+import { push } from "../components/utils/state/errorSlice.js";
+import { MessageError } from "./errors";
+
 class WebSocketMessageHandler {
-  constructor(address, token) {
+  constructor(address, token, store) {
 
     this._socket = new WebSocket(address);
     this._token = token;
+
+    this._store = store;
 
     this.open = this.open.bind(this);
     this._sendMessage = this._sendMessage.bind(this);
@@ -12,12 +17,13 @@ class WebSocketMessageHandler {
         const msgObj = JSON.parse(data);
 
         if (!msgObj.type)
-          throw Error("Invalid message.");
+          return this._store.dispatch(push(new MessageError("Invalid message.")));
         
+          // TODO: Replace with store action.
         document.dispatchEvent(new CustomEvent(msgObj.type, { detail: { error: msgObj.error, payload: msgObj.payload } }));
       }
       catch (err) {
-        document.dispatchEvent(new ErrorEvent("MessageError", { error: new Error("Malformed message data") }));
+        return this._store.dispatch(push(new MessageError("Malformed message data.")));
       }
     };
 

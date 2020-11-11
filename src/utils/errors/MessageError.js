@@ -1,8 +1,8 @@
 import GenericError from "./GenericError.js";
 
-function CriticalError(msg) {
+function MessageError(msg) {
     Object.assign(this, new GenericError(msg));
-    this.name = "CriticalError";
+    this.name = "MessageError";
 };
 
-export default CriticalError;
+export default MessageError;
