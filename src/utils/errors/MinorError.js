@@ -1,9 +1,11 @@
 import GenericError from "./GenericError.js";
 
 function MinorError(msg, title) {
-    Object.assign(this, new GenericError(msg));
-    this.name = "MinorError";
-    this.title = title || this.name;
+    return {
+        ...(new GenericError(msg)),
+        name: "MinorError",
+        title: title || "MinorError"
+    };
 };
 
 export default MinorError;

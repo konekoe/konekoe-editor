@@ -1,8 +1,10 @@
 import GenericError from "./GenericError.js";
 
 function MessageError(msg) {
-    Object.assign(this, new GenericError(msg));
-    this.name = "MessageError";
+    return {
+        ...(new GenericError(msg)),
+        name: "MessageError"
+    };
 };
 
 export default MessageError;
