@@ -11,44 +11,52 @@ import watch from "redux-watch";
 class ErrorHandler {
   constructor(htmlNode, store) {
     const errorModal = new Modal({ cancel: "", accept: "OK", coverScreen: true, slot: "error" });
+    const errorOverlay = new MessageOverlay({ coverScreen: true, slot: "error" });
 
-    htmlNode.appendChild(errorModal);
+    this._store = store;
+    
+    this._modal = htmlNode.appendChild(errorModal);
+    this._overlay = htmlNode.appendChild(errorOverlay);
+
+    this.handleError = this.handleError.bind(this);
     
     const newErrorWatcher = watch(store.getState, "error.queue", (newVal, oldVal) => newVal.length > oldVal.length);
 
-    store.subscribe(newErrorWatcher(
-      (newVal) => {
-        errorModal.show();
-      }
-    ));
+    store.subscribe(newErrorWatcher(this.handleError));
   }
 
-  showError(err) {
+  handleError(errQueue) {
+    const err = errQueue[errQueue.length - 1];
+
     switch (err.name) {
       case "CriticalError":
-        const errorOverlay = new MessageOverlay({ show: true, coverScreen: true, slot: "error" });
-        errorOverlay.innerHTML = `<h1 slot="content" style="color: red;">Error: ${ err.message }</h1>`;
         
-        return errorOverlay.outerHTML;
+        this._overlay.innerHTML = `<h1 slot="content" style="color: red;">Error: ${ err.msg }</h1>`;
+        
+        this._overlay.show();
+        break;
       
-      case "MinorError":
-          const errorModal = 
-          errorModal.innerHTML = `
+      case "MinorError": 
+          this_modal.innerHTML = `
           <div slot="content">
             <h1>
             Error: ${ err.title }
             </h1>
             <p>
-              ${ err.message }
+              ${ err.msg }
             </p>
           </div>
           `;
-          return `${ errorModal.outerHTML }`;
+          this._modal.show();
+          break;
   
       default:
-        console.log(err.message);
-        return "";
+        console.log(err.msg);
+        break;
     }
+
+    // Remove the error from the queue.
+    this._store.dispatch(pop());
   }
 }
 
