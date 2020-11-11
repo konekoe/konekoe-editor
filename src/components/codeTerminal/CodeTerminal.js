@@ -90,7 +90,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
 
     node.getElementById("clearButton").onclick = () => {
-      this.displayError({ name: "Error", msg: "test" });
+      this._terminal.clear();
     };
     
     this._shadow.appendChild(node);
