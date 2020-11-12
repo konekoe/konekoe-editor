@@ -194,8 +194,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
   }
 
-
-  // TODO: if the commented out error lines are uncommented, the elements won't become visible.
   _configToHTML(config) {
     let result = [];
     
@@ -211,7 +209,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       };
       
       if (!session.name) {
-        //this.dispatchEvent(new ErrorEvent("error", { error: new MinorError("Missing name attribute.") }));
+        this.displayError(new MinorError("Missing name attribute."));
         continue;
       }
 
@@ -239,7 +237,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
         parseElements(InfoBox, "infoBoxes");
       }
       catch (err) {
-        //this.dispatchEvent(new ErrorEvent("error", { error: new MinorError(err.message) }));
+        this.displayError(new MinorError(err.message));
         continue;
       }
 
