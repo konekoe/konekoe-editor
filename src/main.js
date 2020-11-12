@@ -225,7 +225,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
             }
 
             // TODO: Add Redux state handling making this redundant.
-            if (elementName === "code-editor")
+            if (elementName === CodeEditor)
               node.setAttribute("data-session-id", session.id);
             
             sessionObj.children.push(this.appendChild(node));
