@@ -37,7 +37,7 @@ class ErrorHandler {
         break;
       
       case "MinorError": 
-          this_modal.innerHTML = `
+          this._modal.innerHTML = `
           <div slot="content">
             <h1>
             Error: ${ err.title }
