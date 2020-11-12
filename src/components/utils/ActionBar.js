@@ -42,10 +42,6 @@ wrapperTemplate.innerHTML = `
 `;
 
 class ActionBar extends ErrorHandlingHTMLElement {
-  get tabContainer() {
-    return this._tabContainer;
-  }
-
   constructor() {
     super();
     this.shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
@@ -55,6 +51,10 @@ class ActionBar extends ErrorHandlingHTMLElement {
     this._container = node.getElementById("wrapper"); // This elements content will be placed here.
 
     this.shadow.appendChild(node);
+  }
+
+  get tabContainer() {
+    return this._tabContainer;
   }
 
   connectedCallback() {

@@ -218,7 +218,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
       const parseElements = (elementName, field) => {
         if (session[field]) {
           session[field].map(element => {
-            let node = new elementName(this._store);
+            let node = new elementName(this._store, session.config);
     
             for (let key in element) {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);

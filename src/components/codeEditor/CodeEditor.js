@@ -54,7 +54,7 @@ wrapperTemplate.innerHTML = `
 `;
 
 class CodeEditor extends ErrorHandlingHTMLElement {
-  constructor(store) {
+  constructor(store, config) {
     super(store);
     super.displayError.bind(this);
     
@@ -62,24 +62,13 @@ class CodeEditor extends ErrorHandlingHTMLElement {
 
     this._sessions = {}; // Map of form ID string => Ace EditSession instance.
     this._editor;
-    this._config;
-
-    if (this.hasAttribute("config")) {
-      try {
-        const temp = JSON.parse(this.getAttribute("config"));
-        
-        if (temp && typeof temp === "object") 
-          this._config = temp;
-
-      }
-      catch (err) {
-        super.displayError(new CriticalError("Malformed JSON data."));
-      }
-    } 
+    this._config = config;
+ 
 
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     
     this._actionBar = node.getElementById("actionBar");
+    this._tabBar = this._actionBar._tabBar;
     this._messageOverlay = node.getElementById("messageOverlay");
 
     this.addEditor = this.addEditor.bind(this);
@@ -113,12 +102,28 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._editor.setReadOnly(true);
     this._setUndoManager();
 
+    if (!this._config && this.hasAttribute("config")) {
+      try {
+        const temp = JSON.parse(this.getAttribute("config"));
+        
+        if (temp && typeof temp === "object") 
+          this._config = temp;
+
+      }
+      catch (err) {
+        return this.displayError(new CriticalError("Malformed JSON data."));
+      }
+    }
 
     // Finally attach to shadow root.
     this._editor.renderer.attachToShadowRoot();
 
     if (this._config) {
-      if (this._config.tabs)
+
+      // NOTE: Due to the way WebComponents are initialized, the ActionBar won't be ready at this point and tabContainer will be null.
+      // This is a hack to get around the issue.
+      setTimeout(() => {
+        if (this._config.tabs)
         this._config.tabs.map(async (item, index) => {
           item.noDelete = item.noDelete;
           item.setActive = index === 0;
@@ -128,16 +133,17 @@ class CodeEditor extends ErrorHandlingHTMLElement {
               item.value = await this._messageHandler.getMessage("", item.value);
             }
             catch (err) {
-              this.dispatchEvent(new ErrorEvent("error", { error: new MinorError(err.message) }))
+              return this.dispatchEvent(new MinorError(err.message));
             }
           }
-            
-
+          
           this.addEditor({ data: { target: this._actionBar.tabContainer.createTab(item), ...item } });
         });
 
       if (!this._config.tabCreation)
         this._actionBar.tabContainer.removeAddButton();
+      });
+      
     }
 
   }
@@ -189,12 +195,12 @@ class CodeEditor extends ErrorHandlingHTMLElement {
       this._messageOverlay.close();
 
       if (detail.error)
-        throw new MinorError(detail.error.message, detail.error.name);
+       return this.displayError(new MinorError(detail.error.message, detail.error.name));
             
       document.removeEventListener("code_submission", this._handleSubmissionResult);
     }
     catch (err) {
-      super.displayError(err);
+      this.displayError(err);
     }
   }
 
