@@ -43,7 +43,7 @@ class ErrorHandler {
             Error: ${ err.title }
             </h1>
             <p>
-              ${ err.msg }
+              ${ (err.title === "GraderError") ? "The grader finished with an error. Check the terminal for feedback." : err.msg }
             </p>
           </div>
           `;
