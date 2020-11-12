@@ -222,9 +222,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
               node.setAttribute(key, (typeof element[key] === "object") ? JSON.stringify(element[key]) : element[key]);
             }
 
-            // TODO: Add Redux state handling making this redundant.
-            if (elementName === CodeEditor)
-              node.setAttribute("data-session-id", session.id);
+            node.setAttribute("data-session-id", session.id);
             
             sessionObj.children.push(this.appendChild(node));
           });

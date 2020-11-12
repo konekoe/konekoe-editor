@@ -1,6 +1,6 @@
 import MessageOverlay from "../components/utils/MessageOverlay.js";
 import Modal from "../components/utils/Modal.js";
-import { topErrorSelector, pop } from "../components/utils/state/errorSlice.js";
+import { pop } from "../components/utils/state/errorSlice.js";
 import watch from "redux-watch";
 
 // Input: error object
