@@ -28,36 +28,38 @@ class ErrorHandler {
   handleError(errQueue) {
     const err = errQueue[errQueue.length - 1];
 
-    switch (err.name) {
-      case "CriticalError":
-        
-        this._overlay.innerHTML = `<h1 slot="content" style="color: red;">Error: ${ err.msg }</h1>`;
-        
-        this._overlay.show();
-        break;
-      
-      case "MinorError": 
-          this._modal.innerHTML = `
-          <div slot="content">
-            <h1>
-            Error: ${ err.title }
-            </h1>
-            <p>
-              ${ (err.title === "GraderError") ? "The grader finished with an error. Check the terminal for feedback." : err.msg }
-            </p>
-          </div>
-          `;
-          this._modal.show();
+    if (err) {
+      switch (err.name) {
+        case "CriticalError":
+          
+          this._overlay.innerHTML = `<h1 slot="content" style="color: red;">Error: ${ err.msg }</h1>`;
+          
+          this._overlay.show();
           break;
-  
-      default:
-        console.log(err.msg);
-        break;
-    }
+        
+        case "MinorError": 
+            this._modal.innerHTML = `
+            <div slot="content">
+              <h1>
+              Error: ${ err.title }
+              </h1>
+              <p>
+                ${ (err.title === "GraderError") ? "The grader finished with an error. Check the terminal for feedback." : err.msg }
+              </p>
+            </div>
+            `;
+            this._modal.show();
+            break;
+    
+        default:
+          console.log(err.msg);
+          break;
+      }
 
-    // Remove the error from the queue.
-    this._store.dispatch(pop());
+      // Remove the error from the queue.
+      this._store.dispatch(pop());
+    }
   }
-}
+};
 
 export default ErrorHandler;

@@ -85,7 +85,7 @@ class TabBar extends ErrorHandlingHTMLElement {
     target.setActive(true);
   }
 
-  createTab(options) {
+  createTab(options, store) {
     const add = new Tab(options, (event) => {
       event.stopPropagation();
       this._container.removeChild(add); 
@@ -94,7 +94,9 @@ class TabBar extends ErrorHandlingHTMLElement {
       removeEvent.data = { target: add };
       
       this.dispatchEvent(removeEvent);
-    });
+    },
+    store
+    );
   
     add.onclick = () => {
       this.changeActive(add);

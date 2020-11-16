@@ -1,6 +1,7 @@
 import * as ace from "ace-builds/src-noconflict/ace";
 import * as aceModes from "ace-builds/src-noconflict/ext-modelist.js";
 import ErrorHandlingHTMLElement from "../utils/state/ErrorHandlingHTMLElement.js";
+import { submit, submissionWatcherFactory } from "../utils/state/submissionsSlice.js";
 import { CriticalError, MinorError } from "../../utils/errors/index.js";
 import { URL_REGEX } from "../../utils/functions.js";
 import "../utils/ActionButton.js";
@@ -75,8 +76,10 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this.changeEditor = this.changeEditor.bind(this);
     this.removeEditor = this.removeEditor.bind(this);
     this.sendCode = this.sendCode.bind(this);
-    this._handleSubmissionResult = this._handleSubmissionResult.bind(this);
+    this._submissionWatcher = this._submissionWatcher.bind(this);
     this._setUndoManager = this._setUndoManager.bind(this);
+
+    this._store.subscribe(submissionWatcherFactory(this._store, "activeSubmissions")(this._submissionWatcher));
 
     // Handle action bar events
     this._actionBar.addEventListener("tab-created", this.addEditor, false);
@@ -187,36 +190,32 @@ class CodeEditor extends ErrorHandlingHTMLElement {
     this._undoManager = this._editor.getSession().getUndoManager();
   }
 
-  _handleSubmissionResult({ detail }) {
+  _submissionWatcher(newState) {
     try {
-      if (detail.payload && detail.payload.id !== this.dataset.sessionId)
-        return;
-
+      if (newState[this.dataset.sessionId])
+      this._messageOverlay.show();
+    else
       this._messageOverlay.close();
-
-      if (detail.error)
-       return this.displayError(new MinorError(detail.error.message, detail.error.name));
-            
-      document.removeEventListener("code_submission", this._handleSubmissionResult);
     }
     catch (err) {
-      this.displayError(err);
+      this.displayError({ msg: err.message });
     }
   }
 
   async sendCode() {
-    const files = Object.values(this._sessions)
+    try {
+      const files = Object.values(this._sessions)
     .filter(session => session.filename) // Remove sessions without a filename, such as the default session
     .reduce((acc, curr) => {
       acc[curr.filename] = curr.getDocument().getValue();
       return acc;
     }, {});
-    this._messageOverlay.show();
 
-    document.addEventListener("code_submission", this._handleSubmissionResult);
-
-    // TODO: Add redux making id field redundant.
-    document.dispatchEvent(new CustomEvent("submission", { detail: { id: this.dataset.sessionId, files } }));
+    this._store.dispatch(submit({ id: this.dataset.sessionId, files }));
+    }
+    catch (err) {
+      this.displayError(new MinorError(err.message));
+    }
   }
 }
 

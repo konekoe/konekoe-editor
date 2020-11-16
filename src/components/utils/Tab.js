@@ -1,4 +1,5 @@
 import ErrorHandlingHTMLElement from "./state/ErrorHandlingHTMLElement.js";
+import { submissionWatcherFactory, maxPointsSelectorFactory } from "./state/submissionsSlice.js";
 import "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -87,22 +88,25 @@ class Tab extends ErrorHandlingHTMLElement {
   }
 
 
-  constructor(options, removeCb) {
-    super();
+  constructor(options, removeCb, store) {
+    super(store);
     this._shadow = this.attachShadow({mode: "open"}); // Create a shadow root for this element.
     this._active = false;
     this._remove = removeCb;
     this._id = options.id || createUUID();
     this._name = options.name || this._id;
     this._points = options.points;
+    this._maxPointsSelector = maxPointsSelectorFactory(this._id);
 
     this.setActive = this.setActive.bind(this);
+    this._submissionWatcher = this._submissionWatcher.bind(this);
     
     const node = wrapperTemplate.content.cloneNode(true); // Clone template node.
     this._container = node.getElementById("wrapper");
     this._container.classList.add("codeTab");
 
     const removeButton = node.querySelector("action-button");
+
     if (options.noDelete) {
       removeButton.remove();
     }
@@ -122,21 +126,21 @@ class Tab extends ErrorHandlingHTMLElement {
       pointsElement.innerHTML = this._points;
 
       node.getElementById("container").appendChild(pointsElement);
-
-      document.addEventListener("code_submission", ({ detail }) => {
-        if (detail.payload && detail.payload.id !== this._id)
-          return;
-
-        if (detail.error)
-          return;
-
-        this._points = `${ detail.payload.points }/${ detail.payload.max_points }`
-        pointsElement.innerHTML = this._points;
-
-      });
+      
+      submissionWatcherFactory(this._store, "points")(this._submissionWatcher);
     }
 
     this._shadow.appendChild(node);
+  }
+
+  _submissionWatcher(newValue, oldValue) {
+    const newPoints = newValue[this._id];
+    const oldPoints = oldValue[this._id];
+
+    if (newPoints > oldPoints) {
+      this._points = `${ newPoints }/${ this._maxPointsSelector() }`
+      pointsElement.innerHTML = this._points;
+    }
   }
 
   setActive(value) {

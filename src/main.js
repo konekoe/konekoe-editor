@@ -235,6 +235,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
         parseElements(InfoBox, "infoBoxes");
       }
       catch (err) {
+        console.log(err);
         this.displayError(new MinorError(err.message));
         continue;
       }
@@ -249,14 +250,16 @@ class EditorContainer extends ErrorHandlingHTMLElement {
   _addSession(session, flag) {
     let children = session.children;
 
-    try {  
+    try {
       this._actionBar.tabContainer.createTab({
         name: session.name,
         noDelete: true,
         setActive: flag,
         id: session.id,
         points: session.points || "no points yet"
-      });
+      },
+      this._store
+      );
 
     }
     catch (err) {

@@ -12,7 +12,8 @@ const submissionsSlice = createSlice({
   },
   reducers: {
     submit: (state, action) => {
-      state.activeSubmissions[action.payload.id] = action.payload.submission;
+      const { id, files } = action.payload;
+      state.activeSubmissions[id] = files;
     },
     resolveSubmission: (state, action) => {
       state.activeSubmissions[action.payload.id] = null;
@@ -23,7 +24,7 @@ const submissionsSlice = createSlice({
 
       if (result) {
         state.points[id] = Math.max(state.points[id], result.points);
-        state.maxPoints[id] = result.maxPoints; // TODO: This part line could be removed if we assumed that max points are received correctly on store init.
+        state.maxPoints[id] = result.maxPoints; // TODO: This line could be removed if we assumed that max points are received correctly on store init.
       }
     }
   }
@@ -37,8 +38,15 @@ export const activeSubmissionSelectorFactory = id => createSelector(
   submissions => submissions[id]
 );
 
+const maxPointsSelector = state => state.getState().submissions.maxPoints;
+
+export const maxPointsSelectorFactory = id => createSelector(
+  maxPointsSelector,
+  maxPointsMap => maxPointsMap[id]
+);
+
 // Watchers are registered are passed a store object by components which use them.
-const submissionWatcher = (id, store, field) => watch(store.getState, `submissions.${ field }.${ id }`);
+export const submissionWatcherFactory = (store, field) => watch(store.getState, `submissions.${ field }`);
 
 
 export const { submit, resolveSubmission } = submissionsSlice.actions
