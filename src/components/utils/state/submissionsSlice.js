@@ -11,11 +11,22 @@ const submissionsSlice = createSlice({
     maxPoints: {}           // Max points per exercise.
   },
   reducers: {
+    init: (state, action) => {
+      const exercises = action.payload;
+
+      exercises.map(ex => {
+        state.points[ex.id] = ex.points;
+        state.maxPoints[ex.id] = ex.maxPoints;
+        state.submissions[ex.id] = ex.submissions;
+      });
+    },
     submit: (state, action) => {
       const { id, files } = action.payload;
       state.activeSubmissions[id] = files;
     },
     resolveSubmission: (state, action) => {
+      console.log(action.payload);
+
       state.activeSubmissions[action.payload.id] = null;
 
 
@@ -49,7 +60,7 @@ export const maxPointsSelectorFactory = id => createSelector(
 export const submissionWatcherFactory = (store, field) => watch(store.getState, `submissions.${ field }`);
 
 
-export const { submit, resolveSubmission } = submissionsSlice.actions
+export const { submit, resolveSubmission, init } = submissionsSlice.actions
 
 export default submissionsSlice.reducer;
 

@@ -155,7 +155,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
 
 
-    this._webSocketHandler = new WebSocketMessageHandler("wss://" + this._messageTarget, this._token);
+    this._webSocketHandler = new WebSocketMessageHandler("wss://" + this._messageTarget, this._token, this._store);
 
     const openResult = await this._webSocketHandler.open();
 
@@ -199,6 +199,8 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     
     this._messageTarget = config["message-target"] || this._messageTarget;
     this._token = config["auth-token"] || this._token;
+
+    console.log(config);
 
     for (let session of config.exercises) {
       let sessionObj = { 

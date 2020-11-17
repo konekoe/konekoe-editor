@@ -1,4 +1,5 @@
 import { push } from "../components/utils/state/errorSlice.js";
+import { resolveSubmission, init, submissionWatcherFactory } from "../components/utils/state/submissionsSlice.js";
 import { MessageError } from "./errors";
 
 class WebSocketMessageHandler {
@@ -19,10 +20,10 @@ class WebSocketMessageHandler {
         if (!msgObj.type)
           return this._store.dispatch(push(new MessageError("Invalid message.")));
         
-          // TODO: Replace with store action.
-        document.dispatchEvent(new CustomEvent(msgObj.type, { detail: { error: msgObj.error, payload: msgObj.payload } }));
+        this._handleMessage(msgObj);
       }
       catch (err) {
+        console.log(err);
         return this._store.dispatch(push(new MessageError("Malformed message data.")));
       }
     };
@@ -31,9 +32,17 @@ class WebSocketMessageHandler {
       this._sendMessage("terminal_input", detail);
     });
 
-    document.addEventListener("submission", ({ detail }) => {
-      this._sendMessage("code_submission", detail);
-    });
+    this._store.subscribe(submissionWatcherFactory(this._store, "activeSubmissions")((newState, oldState) => {
+      // Find a submission. The data must have changed and be a non null object.
+      const submission = Object.entries(newState).find(sub => sub[1] && !oldState[sub[0]]);
+
+      // Check that a submission was found.
+      // This function is triggered when the results of a submission are recorded in which case we don't want to do anything.
+      if (submission) {
+        this._sendMessage("code_submission", { id: submission[0], files: submission[1] });
+      }
+      
+    }));
   }
 
   async open() {
@@ -53,6 +62,35 @@ class WebSocketMessageHandler {
 
   async _sendMessage(type, payload) {
    this._socket.send(JSON.stringify({ type, payload }))
+  }
+
+  _handleMessage(msgObj) {
+    console.log(msgObj);
+    switch (msgObj.type) {
+      case "server_connect":
+        // TODO: Update once server returns all submission instead of just the latest.
+        const result = msgObj.payload.exercises.map(ex => {
+          return {
+            id: ex.id,
+            points: ex.points.split("/")[0],
+            maxPoints: ex.points.split("/")[1],
+            submissions: [ex.editors.reduce((acc, editor) => {
+              // TODO: Add an ID for individual files.
+              for (let file of editor.config.tabs) {
+                acc[file.name] = file.value;
+              }
+
+              return acc;
+            }, {})]
+          }
+        });
+
+        return this._store.dispatch(init(result));
+      case "code_submission":
+        return this._store.dispatch(resolveSubmission(msgObj.payload));
+      default:
+        return this._store.dispatch(push(new MessageError("Invalid message.")));
+    }
   }
 
   
