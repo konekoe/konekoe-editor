@@ -1,6 +1,6 @@
 import { push } from "../components/utils/state/errorSlice.js";
-import { resolveSubmission, init, submissionWatcherFactory } from "../components/utils/state/submissionsSlice.js";
-import { MessageError } from "./errors";
+import { resolveSubmission, submissionInit, submissionWatcherFactory } from "../components/utils/state/submissionsSlice.js";
+import { MessageError, MinorError, CriticalError } from "./errors";
 
 class WebSocketMessageHandler {
   constructor(address, token, store) {
@@ -52,7 +52,6 @@ class WebSocketMessageHandler {
       });
   
       document.addEventListener("server_connect", ({ detail }) => {
-        // TODO: If an error occurs this open() will never resolve.
         document.removeEventListener("server_connect", this);
 
         resolve(detail);
@@ -64,30 +63,17 @@ class WebSocketMessageHandler {
    this._socket.send(JSON.stringify({ type, payload }))
   }
 
-  _handleMessage(msgObj) {
-    console.log(msgObj);
-    switch (msgObj.type) {
+  _handleMessage({type, error, payload}) {
+    console.log(payload);
+    switch (type) {
       case "server_connect":
-        // TODO: Update once server returns all submission instead of just the latest.
-        const result = msgObj.payload.exercises.map(ex => {
-          return {
-            id: ex.id,
-            points: ex.points.split("/")[0],
-            maxPoints: ex.points.split("/")[1],
-            submissions: [ex.editors.reduce((acc, editor) => {
-              // TODO: Add an ID for individual files.
-              for (let file of editor.config.tabs) {
-                acc[file.name] = file.value;
-              }
-
-              return acc;
-            }, {})]
-          }
-        });
-
-        return this._store.dispatch(init(result));
+        if (error)
+          return this._store.dispatch(push(new CriticalError(error.message)));
+        return this._store.dispatch(submissionInit(payload));
       case "code_submission":
-        return this._store.dispatch(resolveSubmission(msgObj.payload));
+        if (error)
+          return this._store.dispatch(push(new MinorError(error.message, error.name)));
+        return this._store.dispatch(resolveSubmission(payload));
       default:
         return this._store.dispatch(push(new MessageError("Invalid message.")));
     }
