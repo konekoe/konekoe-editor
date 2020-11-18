@@ -7,13 +7,14 @@ const submissionsSlice = createSlice({
   initialState: {
     submissions: {},        // Ids for all submissions for all exercises.
     activeSubmissions: {},  // Submissions that are being processed. One per exercise.
+    fetchedSubmissions: {}, // Submissions can be fetched for editing.
     points: {},             // Received points per exercise.
     maxPoints: {}           // Max points per exercise.
   },
   reducers: {
     submissionInit: (state, action) => {
       const exercises = action.payload;
-
+      
       exercises.map(ex => {
         state.points[ex.id] = ex.points;
         state.maxPoints[ex.id] = ex.maxPoints;
@@ -32,8 +33,8 @@ const submissionsSlice = createSlice({
       const { result } = action.payload
 
       if (result) {
-        state.points[id] = Math.max(state.points[id], result.points);
-        state.maxPoints[id] = result.maxPoints; // TODO: This line could be removed if we assumed that max points are received correctly on store init.
+        state.points[id] = Math.max(state.points[id], parseInt(result.points));
+        state.maxPoints[id] = parseInt(result.maxPoints); // TODO: This line could be removed if we assumed that max points are received correctly on store init.
       }
     }
   }

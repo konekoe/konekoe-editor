@@ -64,15 +64,36 @@ class WebSocketMessageHandler {
   }
 
   _handleMessage({type, error, payload}) {
-    console.log(payload);
+    console.log(type, error, payload);
     switch (type) {
       case "server_connect":
         if (error)
           return this._store.dispatch(push(new CriticalError(error.message)));
-        return this._store.dispatch(submissionInit(payload));
+           // TODO: Update once server returns all submission instead of just the latest.
+        const result = payload.exercises.map(ex => {
+          return {
+            id: ex.id,
+            points: parseInt(ex.points.split("/")[0]),
+            maxPoints: parseInt(ex.points.split("/")[1]),
+            submissions: [ex.editors.reduce((acc, editor) => {
+              // TODO: Add an ID for individual files.
+              for (let file of editor.config.tabs) {
+                acc[file.name] = file.value;
+              }
+
+              return acc;
+            }, {})]
+          }
+        });
+
+        this._store.dispatch(submissionInit(result));
+        document.dispatchEvent(new CustomEvent(type, { detail: payload }));
       case "code_submission":
+
+        // Even if an error occurs, resolve submission.
         if (error)
-          return this._store.dispatch(push(new MinorError(error.message, error.name)));
+          this._store.dispatch(push(new MinorError(error.message, error.name)));
+
         return this._store.dispatch(resolveSubmission(payload));
       default:
         return this._store.dispatch(push(new MessageError("Invalid message.")));

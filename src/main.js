@@ -159,10 +159,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
     const openResult = await this._webSocketHandler.open();
 
-    if (openResult.error)
-      return this.displayError(new CriticalError(openResult.error.message));
-
-    sessions = this._configToHTML(openResult.payload);
+    sessions = this._configToHTML(openResult);
 
     let flag = true;
     
