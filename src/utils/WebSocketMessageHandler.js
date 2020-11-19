@@ -1,6 +1,7 @@
 import { push } from "../components/utils/state/errorSlice.js";
 import { resolveSubmission, submissionInit, submissionWatcherFactory } from "../components/utils/state/submissionsSlice.js";
-import { MessageError, MinorError, CriticalError } from "./errors";
+import { addTerminalOutput } from "../components/utils/state/terminalSlice.js";
+import { MessageError, MinorError, CriticalError, GenericError } from "./errors";
 
 class WebSocketMessageHandler {
   constructor(address, token, store) {
@@ -23,7 +24,6 @@ class WebSocketMessageHandler {
         this._handleMessage(msgObj);
       }
       catch (err) {
-        console.log(err);
         return this._store.dispatch(push(new MessageError("Malformed message data.")));
       }
     };
@@ -64,7 +64,6 @@ class WebSocketMessageHandler {
   }
 
   _handleMessage({type, error, payload}) {
-    console.log(type, error, payload);
     switch (type) {
       case "server_connect":
         if (error)
@@ -73,8 +72,8 @@ class WebSocketMessageHandler {
         const result = payload.exercises.map(ex => {
           return {
             id: ex.id,
-            points: parseInt(ex.points.split("/")[0]),
-            maxPoints: parseInt(ex.points.split("/")[1]),
+            points: ex.points.split("/")[0],
+            maxPoints: ex.points.split("/")[1],
             submissions: [ex.editors.reduce((acc, editor) => {
               // TODO: Add an ID for individual files.
               for (let file of editor.config.tabs) {
@@ -88,13 +87,20 @@ class WebSocketMessageHandler {
 
         this._store.dispatch(submissionInit(result));
         document.dispatchEvent(new CustomEvent(type, { detail: payload }));
+      
       case "code_submission":
-
         // Even if an error occurs, resolve submission.
         if (error)
           this._store.dispatch(push(new MinorError(error.message, error.name)));
-
+          
         return this._store.dispatch(resolveSubmission(payload));
+
+      case "terminal_output":
+        if (error)
+          return this._store.dispatch(push(new GenericError(error.message)));
+        
+        return this._store.dispatch(addTerminalOutput(payload));
+
       default:
         return this._store.dispatch(push(new MessageError("Invalid message.")));
     }

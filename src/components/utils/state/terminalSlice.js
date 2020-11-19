@@ -10,8 +10,8 @@ const terminalsSlice = createSlice({
   },
   reducers: {
     addTerminalOutput: (state, action) => {
-      const { id, str } = action.payload;
-      state.output[id] = [str].concat(state.output[id]);
+      const { id, data } = action.payload;
+      state.output[id] = [data].concat(state.output[id] || []);
     },
     consumeTerminalOutput: (state, action) => {
       const { id } = action.payload;
@@ -21,7 +21,7 @@ const terminalsSlice = createSlice({
 });
 
 // Watchers are registered are passed a store object by components which use them.
-export const outputWatcherFactory = (store, id) => watch(store.getState, "terminals.output", (newVal, oldVal) => oldVal[id] && newVal[id].length > oldVal[id].length);
+export const outputWatcherFactory = (store, id) => watch(store.getState, "terminals.output");
 
 
 export const { addTerminalOutput, consumeTerminalOutput } = terminalsSlice.actions

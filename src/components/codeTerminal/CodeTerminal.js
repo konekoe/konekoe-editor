@@ -1,6 +1,6 @@
 import { Terminal }  from "xterm/lib/xterm.js";
 import { FitAddon } from "xterm-addon-fit";
-import { CriticalError, MinorError } from "../../utils/errors/";
+import { consumeTerminalOutput, outputWatcherFactory } from "../utils/state/terminalSlice.js";
 import "../utils/ActionButton.js";
 import ErrorHandlingHTMLElement from "../utils/state/ErrorHandlingHTMLElement.js";
 import styles from "xterm/css/xterm.css";
@@ -74,16 +74,22 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
     this._terminal = new Terminal();
     this._fitAddon = new FitAddon();
 
+    // TODO: Handle writing in terminal.
     this._terminal.onKey(({ key }) => {
-      document.dispatchEvent(new CustomEvent("terminal_write", { detail: key }));
+      //document.dispatchEvent(new CustomEvent("terminal_write", { detail: key }));
     });
 
-    document.addEventListener("terminal_output", ({ detail }) => {
-      if (detail.error)
-        return super.displayError(Error(detail.error.message));
+    this._store.subscribe(outputWatcherFactory(this._store, this.dataset.sessionId)((newState, oldState) => {
+      const id = this.dataset.sessionId;
 
-      this._terminal.write(detail.payload.data);
-    });
+      if (newState[id] && (!oldState[id] || newState[id].length > oldState[id].length)) {
+        const queue = newState[id];
+
+        this._terminal.write(queue[queue.length - 1]);
+
+        this._store.dispatch(consumeTerminalOutput({ id }));
+      }
+    }));
 
     this._terminal.loadAddon(this._fitAddon);
 
@@ -119,6 +125,7 @@ class CodeTerminal extends ErrorHandlingHTMLElement {
       
     }
   }
+
 
   _webSocketConnect() {
     this._terminal.clear();

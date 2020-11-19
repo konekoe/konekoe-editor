@@ -197,8 +197,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
     this._messageTarget = config["message-target"] || this._messageTarget;
     this._token = config["auth-token"] || this._token;
 
-    console.log(config);
-
     for (let session of config.exercises) {
       let sessionObj = { 
         id: session.id,
