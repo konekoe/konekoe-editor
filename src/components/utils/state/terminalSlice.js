@@ -21,7 +21,7 @@ const terminalsSlice = createSlice({
 });
 
 // Watchers are registered are passed a store object by components which use them.
-export const outputWatcherFactory = (store, id) => watch(store.getState, "terminals.output");
+export const outputWatcherFactory = (store) => watch(store.getState, "terminals.output");
 
 
 export const { addTerminalOutput, consumeTerminalOutput } = terminalsSlice.actions
