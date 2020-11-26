@@ -90,8 +90,8 @@ class WebSocketMessageHandler {
       
       case "code_submission":
         // Even if an error occurs, resolve submission.
-        if (error)
-          this._store.dispatch(push(new MinorError(error.message, error.name)));
+        if (payload.error)
+          this._store.dispatch(push(new MinorError(payload.error.message, payload.error.name)));
           
         return this._store.dispatch(resolveSubmission(payload));
 
