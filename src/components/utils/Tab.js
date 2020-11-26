@@ -1,5 +1,5 @@
 import ErrorHandlingHTMLElement from "./state/ErrorHandlingHTMLElement.js";
-import { submissionWatcherFactory, maxPointsSelectorFactory } from "./state/submissionsSlice.js";
+import { submissionWatcherFactory, pointsSelectorFactory } from "./state/submissionsSlice.js";
 import "./ActionButton.js";
 
 const wrapperTemplate = document.createElement("template");
@@ -96,7 +96,8 @@ class Tab extends ErrorHandlingHTMLElement {
     this._id = options.id || createUUID();
     this._name = options.name || this._id;
     this._points = options.points;
-    this._maxPointsSelector = maxPointsSelectorFactory(this._id);
+    
+    this._pointsSelector = pointsSelectorFactory(this._id);
 
     this.setActive = this.setActive.bind(this);
     this._submissionWatcher = this._submissionWatcher.bind(this);
@@ -125,21 +126,29 @@ class Tab extends ErrorHandlingHTMLElement {
       pointsElement.classList.add("codeTabItem");
       pointsElement.innerHTML = this._points;
 
-      node.getElementById("container").appendChild(pointsElement);
+      this._pointsElement = node.getElementById("container").appendChild(pointsElement);
       
-      submissionWatcherFactory(this._store, "points")(this._submissionWatcher);
+      this._store.subscribe(submissionWatcherFactory(this._store, "activeSubmissions")(this._submissionWatcher));
     }
 
     this._shadow.appendChild(node);
   }
 
   _submissionWatcher(newValue, oldValue) {
-    const newPoints = newValue[this._id];
-    const oldPoints = oldValue[this._id];
+    const newSub = newValue[this._id];
+    const oldSub = oldValue[this._id];
 
-    if (newPoints > oldPoints) {
-      this._points = `${ newPoints }/${ this._maxPointsSelector() }`
-      pointsElement.innerHTML = this._points;
+    // Update submission has been consumed.
+    if (!newSub &&  oldSub) {
+      try {
+        const { maxPoints, points } = this._pointsSelector(this._store);
+
+        this._points = `${ points }/${ maxPoints }`
+        this._pointsElement.innerHTML = this._points;
+      }
+      catch (err) {
+        this.displayError({ msg: err.message });
+      }
     }
   }
 

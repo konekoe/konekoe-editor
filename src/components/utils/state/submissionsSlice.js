@@ -16,8 +16,8 @@ const submissionsSlice = createSlice({
       const exercises = action.payload;
       
       exercises.map(ex => {
-        state.points[ex.id] = ex.points;
-        state.maxPoints[ex.id] = ex.maxPoints;
+        state.points[ex.id] = parseInt(ex.points);
+        state.maxPoints[ex.id] = parseInt(ex.maxPoints);
         state.submissions[ex.id] = ex.submissions;
       });
     },
@@ -26,15 +26,18 @@ const submissionsSlice = createSlice({
       state.activeSubmissions[id] = files;
     },
     resolveSubmission: (state, action) => {
-      state.activeSubmissions[action.payload.id] = null;
+      const id = action.payload.id;
 
+      state.activeSubmissions[id] = null;
 
       // Submission might result in an error. This part of the store is not interested in errors.
-      const { result } = action.payload
+      const { error } = action.payload
 
-      if (result) {
+      if (!error) {
+        const result = action.payload;
+
         state.points[id] = Math.max(state.points[id], parseInt(result.points));
-        state.maxPoints[id] = parseInt(result.maxPoints); // TODO: This line could be removed if we assumed that max points are received correctly on store init.
+        state.maxPoints[id] = parseInt(result.max_points); // TODO: This line could be removed if we assumed that max points are received correctly on store init.
       }
     }
   }
@@ -49,10 +52,12 @@ export const activeSubmissionSelectorFactory = id => createSelector(
 );
 
 const maxPointsSelector = state => state.getState().submissions.maxPoints;
+const pointsSelector = state => state.getState().submissions.points;
 
-export const maxPointsSelectorFactory = id => createSelector(
+export const pointsSelectorFactory = (id) => createSelector(
   maxPointsSelector,
-  maxPointsMap => maxPointsMap[id]
+  pointsSelector,
+  (maxPointsMap, pointsMap) => ({ maxPoints: maxPointsMap[id], points: pointsMap[id] })
 );
 
 // Watchers are registered are passed a store object by components which use them.
