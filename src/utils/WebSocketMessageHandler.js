@@ -86,7 +86,7 @@ class WebSocketMessageHandler {
         });
 
         this._store.dispatch(submissionInit(result));
-        document.dispatchEvent(new CustomEvent(type, { detail: payload }));
+        return document.dispatchEvent(new CustomEvent(type, { detail: payload }));
       
       case "code_submission":
         // Even if an error occurs, resolve submission.
