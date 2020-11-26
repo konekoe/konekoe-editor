@@ -232,7 +232,6 @@ class EditorContainer extends ErrorHandlingHTMLElement {
         parseElements(InfoBox, "infoBoxes");
       }
       catch (err) {
-        console.log(err);
         this.displayError(new MinorError(err.message));
         continue;
       }
@@ -260,7 +259,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
 
     }
     catch (err) {
-      this.displayError(new MinorError("Missing name attribute."));
+      this.displayError(new MinorError(err.message));
       return flag;
     }
 
