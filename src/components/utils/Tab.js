@@ -95,7 +95,9 @@ class Tab extends ErrorHandlingHTMLElement {
     this._remove = removeCb;
     this._id = options.id || createUUID();
     this._name = options.name || this._id;
-    this._points = options.points;
+    if (options.points !== undefined)
+      this._points = `${ options.points }/${ options.maxPoints }`;
+
     
     this._pointsSelector = pointsSelectorFactory(this._id);
 

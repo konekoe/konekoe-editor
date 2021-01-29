@@ -72,8 +72,8 @@ class WebSocketMessageHandler {
         const result = payload.exercises.map(ex => {
           return {
             id: ex.id,
-            points: ex.points.split("/")[0],
-            maxPoints: ex.points.split("/")[1],
+            points: ex.points,
+            maxPoints: ex.maxPoints,
             submissions: [ex.editors.reduce((acc, editor) => {
               // TODO: Add an ID for individual files.
               for (let file of editor.config.tabs) {

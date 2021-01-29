@@ -202,6 +202,7 @@ class EditorContainer extends ErrorHandlingHTMLElement {
         id: session.id,
         name: session.name,
         points: session.points,
+        maxPoints: session.maxPoints,
         children: []
       };
       
@@ -252,7 +253,8 @@ class EditorContainer extends ErrorHandlingHTMLElement {
         noDelete: true,
         setActive: flag,
         id: session.id,
-        points: session.points || "no points yet"
+        points: session.points,
+        maxPoints: session.maxPoints
       },
       this._store
       );
