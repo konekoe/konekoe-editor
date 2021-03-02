@@ -1,30 +1,37 @@
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
 module.exports = {
   
-  entry: './src/main.js',
+  entry: "./src/index.tsx",
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "konekoe-editor.js"
+  },
   mode: "production",
+  devtool: "inline-source-map",
+  resolve: {
+    extensions: [".ts", ".tsx", ".js", ".css"]
+  },
+  devServer: {
+    contentBase: "./dist"
+  },
   module: {
     rules: [
       {
-        test: /\.(js)$/,
+        test: /\.(ts|tsx)?$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        use: "ts-loader"
       },
       {
         test: /\.css$/i,
-        use: ['css-loader'],
+        use: "css-loader",
       },
     ]
   },
-  resolve: {
-    extensions: ['*', '.js', "css"]
-  },
-  output: {
-    path: __dirname + '/dist',
-    chunkFilename: '[name].konekoe-editor.js',
-    publicPath: '/',
-    filename: 'konekoe-editor.js'
-  },
-  devServer: {
-    contentBase: './'
-  }
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./index.html"
+    })
+  ]
 };
