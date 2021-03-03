@@ -6,17 +6,17 @@
   "scripts": {
     "start": "npx webpack serve --config ./webpack.config.js --mode development",
     "postinstall": "npm run build",
-    "test": "./node_modules/karma/bin/karma start",
     "build": "webpack --config ./webpack.config.js",
-    "lint": "eslint ./src/**/*.{ts,tsx}"
+    "lint": "eslint ./src/**/*.{ts,tsx}",
+    "test": "jest --verbose"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
+    "@types/marked": "^1.2.2",
     "ace-builds": "^1.4.12",
     "core-js": "^3.6.5",
-    "insane": "^2.6.2",
     "jasmine": "^3.5.0",
     "marked": "^1.0.0",
     "react": "^17.0.1",
@@ -24,6 +24,7 @@
     "react-redux": "^7.2.2",
     "redux": "^4.0.5",
     "redux-watch": "^1.2.0",
+    "sanitize-html": "^2.3.2",
     "uninstall": "0.0.0",
     "xterm": "^4.7.0",
     "xterm-addon-attach": "^0.6.0",
@@ -36,6 +37,7 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "@types/redux": "^3.6.0",
+    "@types/sanitize-html": "^1.27.1",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
     "css-loader": "^5.1.1",

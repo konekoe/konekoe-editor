@@ -13,33 +13,26 @@ describe("<InfoBox />", () => {
     });
 
     it("markdown list is parsed to an HTML list", () => {
-      const content = `
-      * I am Teppo Testaaja
-      * I love testing
-      * This is HTML not Markdown!
-      `;
+      const content = ["- I am Teppo Testaaja", "- This is a test", "- A list in HTML!"].join("\n");
 
       const component = render(<InfoBox content={ content }/>);
       const list = component.container.querySelector("ul");
 
       expect(list).not.toBeNull();
+
+      if (list === null)
+        return;
+
       expect(list.querySelectorAll("li")).toHaveLength(3);
       expect(list.querySelector("li")).toHaveTextContent("I am Teppo Testaaja");
     });
   });
 
   it("script tags should be removed by sanitization", () => {
-    const content = `
-      I am Heikki Hyökkääjä!
+    const content = "<script>alert('Vicious code was run!')</script>";
 
-      Run this code please.
-      
-      <script>
-        alert("Vicious code was run!");
-      </script>
-    `;
     const component = render(<InfoBox content={ content }/>);
-    
+
     expect(component.container.querySelector("script")).toBeNull();
   });
 });

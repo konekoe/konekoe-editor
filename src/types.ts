@@ -39,3 +39,8 @@ export interface TerminalMessage {
   id: string;
   data: string;
 }
+
+export interface InfoBoxProps {
+  content: string;
+}
+

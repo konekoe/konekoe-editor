@@ -7,8 +7,9 @@
     "js"
   ],
   "testMatch": [
-    "**/test/*.tsx"
+    "**/test/*.(ts?|tsx?)"
   ],
+  "setupFilesAfterEnv": ["./src/setupTests.ts"],
   "transform": {
     "^.+\\.(ts?|tsx?)$": "ts-jest"
   }
