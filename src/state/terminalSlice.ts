@@ -11,11 +11,13 @@ const terminalsSlice = createSlice({
   reducers: {
     addTerminalOutput: (state, action: PayloadAction<TerminalMessage>): void => {
       const { id, data } = action.payload;
-      state.output.set(id, [data].concat(state.output.get(id) || []));
+      
+      state.output[id] = [data].concat(state.output[id] || []);
     },
     consumeTerminalOutput: (state, action: PayloadAction<{ id: string }>): void => {
       const { id } = action.payload;
-      state.output.get(id).pop();
+      if (state.output[id])
+        state.output[id].pop();
     },
   }
 });

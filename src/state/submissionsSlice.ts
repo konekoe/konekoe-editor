@@ -1,5 +1,6 @@
-import { createSlice, createSelector } from "@reduxjs/toolkit";
-import watch from "redux-watch";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse } from "../types";
+
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const submissionsSlice = createSlice({
@@ -7,64 +8,65 @@ const submissionsSlice = createSlice({
   initialState: {
     submissions: {},        // Ids for all submissions for all exercises.
     activeSubmissions: {},  // Submissions that are being processed. One per exercise.
-    fetchedSubmissions: {}, // Submissions can be fetched for editing.
     points: {},             // Received points per exercise.
     maxPoints: {}           // Max points per exercise.
-  },
+  } as SubmissionState,
   reducers: {
-    submissionInit: (state, action) => {
+    submissionInit: (state, action: PayloadAction<Exercise[]>) => {
       const exercises = action.payload;
       
       exercises.map(ex => {
-        state.points[ex.id] = parseInt(ex.points);
-        state.maxPoints[ex.id] = parseInt(ex.maxPoints);
+        state.points[ex.id] = ex.points;
+        state.maxPoints[ex.id] = ex.maxPoints;
         state.submissions[ex.id] = ex.submissions;
       });
     },
-    submit: (state, action) => {
-      const { id, files } = action.payload;
-      state.activeSubmissions[id] = files;
+    submit: (state, action: PayloadAction<SubmissionRequest>) => {
+      const { exerciseId, files } = action.payload;
+      state.activeSubmissions[exerciseId] = files;
     },
-    resolveSubmission: (state, action) => {
-      const id = action.payload.id;
+    resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
+      const { exerciseId } = action.payload;
 
-      state.activeSubmissions[id] = null;
+      state.activeSubmissions[exerciseId] = null;
 
       // Submission might result in an error. This part of the store is not interested in errors.
-      const { error } = action.payload
+      const { error } = action.payload;
 
       if (!error) {
         const result = action.payload;
 
-        state.points[id] = Math.max(state.points[id], parseInt(result.points));
-        state.maxPoints[id] = parseInt(result.max_points); // TODO: This line could be removed if we assumed that max points are received correctly on store init.
+        state.points[exerciseId] = Math.max(state.points[exerciseId], result.points);
+        state.maxPoints[exerciseId] = result.maxPoints; // TODO: This line could be removed if we assumed that max points are received correctly on store init.
       }
     }
   }
 });
 
-const activeSubmissionsSelector = state => state.getState().submissions.activeSubmissions;
+/*
+const activeSubmissionsSelector = (store: Store) => store.getState().submissions.activeSubmissions;
 
 // Generates functions for fetching the current active submission for an exercise.
-export const activeSubmissionSelectorFactory = id => createSelector(
+export const activeSubmissionSelectorFactory = (id: string) => createSelector(
   activeSubmissionsSelector,
   submissions => submissions[id]
 );
 
-const maxPointsSelector = state => state.getState().submissions.maxPoints;
-const pointsSelector = state => state.getState().submissions.points;
+const maxPointsSelector = (store: Store) => store.getState().submissions.maxPoints;
+const pointsSelector = (store: Store) => store.getState().submissions.points;
 
-export const pointsSelectorFactory = (id) => createSelector(
+export const pointsSelectorFactory = (id: string) => createSelector(
   maxPointsSelector,
   pointsSelector,
   (maxPointsMap, pointsMap) => ({ maxPoints: maxPointsMap[id], points: pointsMap[id] })
 );
 
 // Watchers are registered are passed a store object by components which use them.
-export const submissionWatcherFactory = (store, field) => watch(store.getState, `submissions.${ field }`);
+export const submissionWatcherFactory = (store: Store, field: string) => watch(store.getState, `submissions.${ field }`);
 
+*/
 
-export const { submit, resolveSubmission, submissionInit } = submissionsSlice.actions
+export const { submit, resolveSubmission, submissionInit } = submissionsSlice.actions;
 
 export default submissionsSlice.reducer;
 
