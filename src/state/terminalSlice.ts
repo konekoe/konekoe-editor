@@ -10,19 +10,26 @@ const terminalsSlice = createSlice({
   } as TerminalState,
   reducers: {
     addTerminalOutput: (state, action: PayloadAction<TerminalMessage>): void => {
-      const { id, data } = action.payload;
+      const { exerciseId, terminalId, data } = action.payload;
       
-      state.output[id] = [data].concat(state.output[id] || []);
+      if (state.output[exerciseId])
+        state.output[exerciseId][terminalId] = (state.output[exerciseId][terminalId] || "") + data;
     },
-    consumeTerminalOutput: (state, action: PayloadAction<{ id: string }>): void => {
-      const { id } = action.payload;
-      if (state.output[id])
-        state.output[id].pop();
+    addTerminalInput: (state, action: PayloadAction<TerminalMessage>): void => {
+      const { exerciseId, terminalId, data } = action.payload;
+      
+      if (state.input[exerciseId])
+        state.input[exerciseId][terminalId] = [data].concat(state.input[exerciseId][terminalId] || []);
+    },
+    consumeTerminalInput: (state, action: PayloadAction<{ exerciseId: string, terminalId: string }>): void => {
+      const { exerciseId, terminalId } = action.payload;
+      if (state.input[exerciseId] && state.input[exerciseId][terminalId])
+        state.input[exerciseId][terminalId].pop();
     },
   }
 });
 
-export const { addTerminalOutput, consumeTerminalOutput } = terminalsSlice.actions;
+export const { addTerminalOutput, consumeTerminalInput } = terminalsSlice.actions;
 
 export default terminalsSlice.reducer;
 
