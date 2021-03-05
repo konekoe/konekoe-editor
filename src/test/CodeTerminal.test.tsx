@@ -25,7 +25,7 @@ describe("<CodeTerminal/>", () => {
     });
 
     store.dispatch = jest.fn();
-  })
+  });
 
 
 
