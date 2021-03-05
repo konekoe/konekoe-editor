@@ -4,8 +4,10 @@ export interface ErrorState {
 
 export type ExerciseDictionary<T> = { [exerciseId: string]: T };
 
+export type TerminalOutputDictionary = ExerciseDictionary<{ [terminalId: string]: string }>;
+
 export interface TerminalState {
-  output: ExerciseDictionary<{ [terminalId: string]: string }>;
+  output: TerminalOutputDictionary;
   input: ExerciseDictionary<{ [terminalId: string]: string[] }>;
 }
 
@@ -46,6 +48,7 @@ export interface InfoBoxProps {
 }
 
 export interface CodeTerminalProps {
+  exerciseId: string;
   terminalId: string;
-  allowInput: boolean;
+  allowInput?: boolean;
 }

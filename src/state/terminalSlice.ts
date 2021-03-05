@@ -15,6 +15,13 @@ const terminalsSlice = createSlice({
       if (state.output[exerciseId])
         state.output[exerciseId][terminalId] = (state.output[exerciseId][terminalId] || "") + data;
     },
+    clearTerminal: (state, action: PayloadAction<Omit<TerminalMessage, "data">>): void => {
+      const { exerciseId, terminalId } = action.payload;
+      
+      if (state.output[exerciseId]) {
+        state.output[exerciseId][terminalId] = "";
+      }
+    },
     addTerminalInput: (state, action: PayloadAction<TerminalMessage>): void => {
       const { exerciseId, terminalId, data } = action.payload;
       
@@ -29,7 +36,7 @@ const terminalsSlice = createSlice({
   }
 });
 
-export const { addTerminalOutput, consumeTerminalInput } = terminalsSlice.actions;
+export const { addTerminalOutput, consumeTerminalInput, clearTerminal } = terminalsSlice.actions;
 
 export default terminalsSlice.reducer;
 
