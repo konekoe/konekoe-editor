@@ -59,11 +59,13 @@ export interface PointsProp {
 }
 
 export interface TabProps {
-  title: string;
+  label: string;
+  id: string;
+  clickHandler: () => void;
   points?: PointsProp;
 }
 
 export interface TabBarProps {
-  tabItems: TabProps[];
-  selectionHandler: (event: Event) => void;
+  tabItems: Omit<TabProps, "clickHandler">[];
+  selectionHandler: (id: string) => void;
 }
