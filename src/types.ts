@@ -52,3 +52,18 @@ export interface CodeTerminalProps {
   terminalId: string;
   allowInput?: boolean;
 }
+
+export interface PointsProp {
+  receivedPoints: number;
+  maxPoints: number;
+}
+
+export interface TabProps {
+  title: string;
+  points?: PointsProp;
+}
+
+export interface TabBarProps {
+  tabItems: TabProps[];
+  selectionHandler: (event: Event) => void;
+}
