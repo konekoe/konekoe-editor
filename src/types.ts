@@ -32,7 +32,7 @@ export interface Exercise {
 
 export interface SubmissionState {
   submissions: ExerciseDictionary<string[]>;                              // Exercise ID to array of submission ids.
-  activeSubmissions: ExerciseDictionary<{ [filename: string]: string }>;  // Submissions made by the user that are being processed.
+  activeSubmissions: ExerciseDictionary<{ [filename: string]: string } | undefined>;  // Submissions made by the user that are being processed.
   points: ExerciseDictionary<number>;                                     // The most points received from a submission per exercise.
   maxPoints: ExerciseDictionary<number>;                                  // The maximum points that can be received for each exercise.
 }
@@ -65,8 +65,10 @@ export interface TabProps {
   points?: PointsProp;
 }
 
+export type TabItem = Omit<TabProps, "clickHandler">;
+
 export interface TabBarProps {
-  tabItems: Omit<TabProps, "clickHandler">[];
+  tabItems: TabItem[];
   selectionHandler: (id: string) => void;
 }
 

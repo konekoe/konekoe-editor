@@ -1,50 +1,60 @@
-import React, { createRef, useLayoutEffect, useEffect } from "react";
+import React, { createRef, useLayoutEffect, useEffect, useState } from "react";
 import { Terminal }  from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { CodeTerminalProps, TerminalOutputDictionary } from "../../types";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../state/store";
 import { clearTerminal } from "../../state/terminalSlice";
+import "xterm/css/xterm.css";
+import { Button } from "@material-ui/core";
+
 
 
 const CodeTerminal: React.FC<CodeTerminalProps> = ({ terminalId, exerciseId }) => {
   const terminalContent: TerminalOutputDictionary = useSelector((state: RootState) => state.terminals.output);
+  const [terminal] = useState<Terminal>(new Terminal());
+  const [fitAddon] = useState<FitAddon>(new FitAddon());
   const dispatch = useDispatch();
   const terminalRef = createRef<HTMLDivElement>();
 
-  // Set up xterm instance.
-  const _terminal = new Terminal();
-  _terminal.loadAddon(new FitAddon());
-  
+
   
   useLayoutEffect(() => {
     if (terminalRef.current) {
-      _terminal.open(terminalRef.current);
+      // Set up xterm instance.
+      terminal.loadAddon(fitAddon);
+      terminal.open(terminalRef.current);
+      fitAddon.fit();
     }
 
-  }, [terminalRef]);
+    return () => {
+      terminal.dispose();
+    }
+
+  }, []);
 
   useEffect(() => {
     if (terminalContent[exerciseId] && terminalContent[exerciseId][terminalId]) {
-      _terminal.write(terminalContent[exerciseId][terminalId]);
+      terminal.write(terminalContent[exerciseId][terminalId]);
     }
   }, [terminalContent]);
 
   const handleClearClick = () => {
     if (terminalRef.current) {
-      _terminal.clear();
+      terminal.reset();
       dispatch(clearTerminal({ exerciseId, terminalId }));
     }
   };
 
   return (
     <div>
-      <button
+      <Button
        className="clear-button"
+       variant="outlined"
        onClick={ handleClearClick }
       >
         Clear
-      </button>
+      </Button>
       <div ref={ terminalRef }>
       </div>
     </div>

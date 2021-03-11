@@ -28,7 +28,7 @@ const submissionsSlice = createSlice({
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
 
-      state.activeSubmissions[exerciseId] = null;
+      state.activeSubmissions[exerciseId] = undefined;
 
       // Submission might result in an error. This part of the store is not interested in errors.
       const { error } = action.payload;
