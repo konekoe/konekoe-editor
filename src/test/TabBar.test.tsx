@@ -23,7 +23,7 @@ const generateValidTabItem = (points = false) => ({
   points: (points) ? generateValidPointsObject() : undefined
 });
 
-const generateValidTabItemArray = (length: number, points = false) => Array(length).fill(1).map(generateValidTabItem)
+const generateValidTabItemArray = (length: number) => Array(length).fill(1).map(generateValidTabItem);
 
 describe("<TabBar/>", () => {
   it("correct number of tabs are created", () => {
@@ -105,7 +105,7 @@ describe("<TabBar/>", () => {
 
         expect(component.container).toHaveTextContent(tabItems[0].label);
       });
-    })
+    });
 
     describe("points are optional", () => {
       it("if points are not provided, only render the label", () => {
@@ -125,9 +125,8 @@ describe("<TabBar/>", () => {
       it("if points are provided, render <POINTS>/<MAX_POINTS>", () => {
         const tabItems = [generateValidTabItem(true)];
         const component = render(<TabBar selectionHandler={ jest.fn() } tabItems={ tabItems } />);
-
-        if (tabItems[0].points)
-          expect(component.container).toHaveTextContent(`${ tabItems[0].points.receivedPoints }/${ tabItems[0].points.maxPoints } | ${ tabItems[0].label }`);
+ 
+        expect(component.container).toHaveTextContent(`${ (tabItems[0].points as PointsProp).receivedPoints }/${ (tabItems[0].points as PointsProp).maxPoints } | ${ tabItems[0].label }`);
       });
     });
   });

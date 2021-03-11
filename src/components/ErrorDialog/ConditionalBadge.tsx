@@ -12,13 +12,13 @@ const ConditionalBadge: React.FC<ConditionalBadgeProps> = ({ badgeContent, color
       >
         { children }
       </Badge>
-    )
+    );
   
   return (
     <>
       { children }
     </>
-  )
+  );
 };
 
 export default ConditionalBadge;

@@ -13,7 +13,7 @@ const TabBar: React.FC<TabBarProps> = ({ tabItems, selectionHandler }) => {
       selectionHandler(id);
   };
 
-  const handleChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
+  const handleChange = (_event: React.ChangeEvent<Record<string, unknown>>, newValue: number) => {
     setSelectedIndex(newValue);
   };
 

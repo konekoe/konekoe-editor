@@ -16,7 +16,7 @@ const processLabel = (label: string, points?: PointsProp) => {
   return label;
 };
 
-const TabItem = ({ label, points, id, clickHandler }: TabProps) => (
+const TabItem = ({ label, points, id, clickHandler }: TabProps): React.ReactNode => (
   <Tab key={ id } label={ processLabel(label, points) } onClick={ clickHandler }/>
 );
 

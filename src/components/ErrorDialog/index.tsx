@@ -1,7 +1,6 @@
 import React from "react";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
 import { ErrorDialogProps } from "../../types";
-import { isNumber } from "../../utils/typeCheckers";
 import ConditionalBadge from "./ConditionalBadge";
 
 const ErrorDialog: React.FC<ErrorDialogProps> = ({ open, title, message, numOfRemainingErrors, closeHandler }) => (
