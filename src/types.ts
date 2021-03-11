@@ -69,3 +69,16 @@ export interface TabBarProps {
   tabItems: Omit<TabProps, "clickHandler">[];
   selectionHandler: (id: string) => void;
 }
+
+export interface ErrorDialogProps {
+  title: string;
+  message: string;
+  open: boolean;
+  numOfRemainingErrors?: number;
+  closeHandler: () => void;
+}
+
+export interface ConditionalBadgeProps { 
+  badgeContent?: number;
+  color?: "primary" | "secondary" | "error"; 
+}
