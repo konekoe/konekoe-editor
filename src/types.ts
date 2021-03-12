@@ -1,3 +1,5 @@
+import { Ace } from "ace-builds";
+
 export interface ErrorState {
   queue: Error[]
 }
@@ -30,9 +32,18 @@ export interface Exercise {
   submissions: string[]; // Array of submission ids.
 }
 
+export interface ExerciseFile {
+  fileId: string;
+  filename: string;
+  data: string;
+}
+
+export type ExerciseFileDict = { [fileId: string]: ExerciseFile };
+
 export interface SubmissionState {
-  submissions: ExerciseDictionary<string[]>;                              // Exercise ID to array of submission ids.
-  activeSubmissions: ExerciseDictionary<{ [filename: string]: string } | undefined>;  // Submissions made by the user that are being processed.
+  allSubmissions: ExerciseDictionary<string[]>;                              // Exercise ID to array of submission ids.
+  activeSubmissions: ExerciseDictionary<ExerciseFileDict>;
+  submissionRequests: ExerciseDictionary<{ [fileId: string]: string } | undefined>;  // Submissions made by the user that are being processed.
   points: ExerciseDictionary<number>;                                     // The most points received from a submission per exercise.
   maxPoints: ExerciseDictionary<number>;                                  // The maximum points that can be received for each exercise.
 }
@@ -84,3 +95,9 @@ export interface ConditionalBadgeProps {
   badgeContent?: number;
   color?: "primary" | "secondary" | "error"; 
 }
+
+export interface CodeEditorProps {
+  exerciseId: string;
+}
+
+export type EditSessionDict = { [fileId: string]: Ace.EditSession };

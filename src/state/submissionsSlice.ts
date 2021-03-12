@@ -6,10 +6,11 @@ import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse } from
 const submissionsSlice = createSlice({
   name: "submissions",
   initialState: {
-    submissions: {},        // Ids for all submissions for all exercises.
-    activeSubmissions: {},  // Submissions that are being processed. One per exercise.
-    points: {},             // Received points per exercise.
-    maxPoints: {}           // Max points per exercise.
+    allSubmissions: {},          // Ids for all submissions for all exercises.
+    activeSubmissions: {},    // Submission filedata being. One per exercise.
+    submissionRequests: {},   // Submissions that are being processed. One per exercise.
+    points: {},               // Received points per exercise.
+    maxPoints: {}             // Max points per exercise.
   } as SubmissionState,
   reducers: {
     submissionInit: (state, action: PayloadAction<Exercise[]>) => {
@@ -18,17 +19,23 @@ const submissionsSlice = createSlice({
       exercises.map(ex => {
         state.points[ex.id] = ex.points;
         state.maxPoints[ex.id] = ex.maxPoints;
-        state.submissions[ex.id] = ex.submissions;
+        state.allSubmissions[ex.id] = ex.submissions;
+        state.submissionRequests = {};
       });
     },
     submit: (state, action: PayloadAction<SubmissionRequest>) => {
       const { exerciseId, files } = action.payload;
-      state.activeSubmissions[exerciseId] = files;
+      
+      // Only one active submission is allowd 
+      if (state.submissionRequests[exerciseId])
+        throw Error("A submission is already being processed.");
+
+      state.submissionRequests[exerciseId] = files;
     },
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
 
-      state.activeSubmissions[exerciseId] = undefined;
+      state.submissionRequests[exerciseId] = undefined;
 
       // Submission might result in an error. This part of the store is not interested in errors.
       const { error } = action.payload;
@@ -44,11 +51,11 @@ const submissionsSlice = createSlice({
 });
 
 /*
-const activeSubmissionsSelector = (store: Store) => store.getState().submissions.activeSubmissions;
+const submissionRequestsSelector = (store: Store) => store.getState().submissions.submissionRequests;
 
 // Generates functions for fetching the current active submission for an exercise.
-export const activeSubmissionSelectorFactory = (id: string) => createSelector(
-  activeSubmissionsSelector,
+export const submissionRequestselectorFactory = (id: string) => createSelector(
+  submissionRequestsSelector,
   submissions => submissions[id]
 );
 
