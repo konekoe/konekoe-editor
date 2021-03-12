@@ -9,6 +9,9 @@
   "testMatch": [
     "**/test/*.(ts?|tsx?)"
   ],
+  "moduleNameMapper": {
+    "\\.(css)$": "identity-obj-proxy"
+  },
   "setupFilesAfterEnv": ["./src/setupTests.ts"],
   "transform": {
     "^.+\\.(ts?|tsx?)$": "ts-jest"
