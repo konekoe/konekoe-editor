@@ -5,8 +5,6 @@ import ErrorDialog from "../components/ErrorDialog";
 describe("<ErrorDialog />", () => {
   it("should display message and title", () => {
     const component = render(<ErrorDialog open={ true } title="Error" message="Hello there" closeHandler={ jest.fn() } />);
-    
-    console.log(component.container.innerHTML);
 
     expect(component.getByText("Hello there")).not.toBeNull();
     expect(component.getByText("Error")).not.toBeNull();
