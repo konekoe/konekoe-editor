@@ -21,6 +21,7 @@ describe("<CodeEditor />", () => {
     store = configureStore()({
       submissions: {
         allSubmissions: [], // TODO: Add suport for fetching different submissions
+        submissionRequests: {},
         activeSubmissions: {
           [exerciseId1]: {
             [fileId1]: {
@@ -135,10 +136,53 @@ describe("<CodeEditor />", () => {
 
       fireEvent.click(submissionButton);
 
-      expect(component.container.querySelector(".message-overlay")).not.toBeNull();
+      expect(component.getByText("Please wait")).not.toBeNull();
     });
 
     it("when a code submission is being processed, another submission can't be sent", () => {
+      store = configureStore()({
+        submissions: {
+          allSubmissions: [], // TODO: Add suport for fetching different submissions
+          submissionRequests: {
+            [exerciseId1]: {
+              [fileId1]: "",
+              [fileId2]: ""
+            }
+          },
+          activeSubmissions: {
+            [exerciseId1]: {
+              [fileId1]: {
+                fileId: fileId1,
+                filename: "main.c",
+                data: "some code here"
+              },
+              [fileId2]: {
+                fileId: fileId2,
+                filename: "main.h",
+                data: "function prototypes here"
+              }
+            },
+            [exerciseId2]: {
+              [fileId3]: {
+                fileId: fileId3,
+                filename: "answers",
+                data: "your answers here."
+              }
+            }
+          },
+          points: {
+            [exerciseId1]: 0,
+            [exerciseId2]: 10
+          },
+          maxPoints: {
+            [exerciseId1]: 10,
+            [exerciseId2]: 20
+          }
+        }
+      });
+
+      store.dispatch = jest.fn();
+
       const component = render(
         <Provider store={ store }>
           <CodeEditor exerciseId={ exerciseId1 }/>
@@ -153,9 +197,8 @@ describe("<CodeEditor />", () => {
         return;
 
       fireEvent.click(submissionButton);
-      fireEvent.click(submissionButton);
 
-      expect(store.dispatch).toHaveBeenCalledTimes(1);
+      expect(store.dispatch).toHaveBeenCalledTimes(0);
     });
   });
 
