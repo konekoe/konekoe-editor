@@ -6,6 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../state/store";
 import { filesToEditSessions, filesToTabItems } from "./utils";
 
+// Set base path for fetching themes.
+ace.config.set(
+  "basePath", 
+  "https://cdn.jsdelivr.net/npm/ace-builds@1.4.3/src-noconflict/"
+);
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   const [editor, setEditor] = useState<Ace.Editor | undefined>();

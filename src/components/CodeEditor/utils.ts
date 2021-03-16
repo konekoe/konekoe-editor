@@ -1,6 +1,7 @@
 import * as ace from "ace-builds/src-noconflict/ace";
-import { ExerciseFile, ExerciseFileDict, EditSessionDict } from "../../types";
+import { ExerciseFile, EditSessionDict } from "../../types";
 import { Ace } from "ace-builds";
+import AceModes from "ace-builds/src-noconflict/ext-modelist";
 
 export const createEditSession = ({ filename, data }: ExerciseFile): Ace.EditSession => {
   const session = new ace.EditSession(data);
@@ -8,7 +9,9 @@ export const createEditSession = ({ filename, data }: ExerciseFile): Ace.EditSes
   // Exctract file extension
   // If no name is given use "" indicating a text file
   // If the name does not contain a file extension use ""
-  //session.setMode(ace.aceModes.getModeForPath(filename.match(/\.[0-9a-z]+$/i) || "").mode);
+
+  // NOTE: filename.match returns an array value or null.
+  session.setMode(AceModes.getModeForPath((filename.match(/\.[0-9a-z]+$/i) || [""])[0]).mode);
   session.filename = filename;
   session.setUndoManager(new ace.UndoManager());
   
