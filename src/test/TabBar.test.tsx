@@ -4,7 +4,7 @@ import TabBar from "../components/TabBar/";
 import { randInt, generateRandomString } from "./utils";
 import { TabProps, PointsProp } from "../types";
 
-const TAB_CLASS_NAME = "MuiButtonBase-root";
+const TAB_CLASS_NAME = "MuiTab-root";
 const ACTIVE_TAB_CLASS_NAME = "Mui-selected";
 const POINTS_CLASS_NAME = "tab-points";
 

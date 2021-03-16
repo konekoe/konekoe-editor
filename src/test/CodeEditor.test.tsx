@@ -12,7 +12,7 @@ const fileId1 = "file1";
 const fileId2 = "file2";
 const fileId3 = "file3";
 
-const TAB_CLASS_NAME = "MuiButtonBase-root";
+const TAB_CLASS_NAME = "MuiTab-root";
 
 describe("<CodeEditor />", () => {
   let store = configureStore()({});
@@ -92,7 +92,7 @@ describe("<CodeEditor />", () => {
         </Provider>
       );
 
-      const submissionButton = component.container.querySelector(".submission-button");
+      const submissionButton = component.container.querySelector(".submit-button");
       
       expect(submissionButton).not.toBeNull();
 
@@ -106,8 +106,14 @@ describe("<CodeEditor />", () => {
         submit({
           exerciseId: exerciseId1,
           files: {
-            "main.c": "some code here",
-            "main.h": "function prototypes here"
+            [fileId1]: {
+              filename: "main.c",
+              data: "some code here"
+            },
+            [fileId2]: {
+              filename: "main.h",
+              data: "function prototypes here"
+            }
           }
         })
       );
@@ -120,7 +126,7 @@ describe("<CodeEditor />", () => {
         </Provider>
       );
 
-      const submissionButton = component.container.querySelector(".submission-button");
+      const submissionButton = component.container.querySelector(".submit-button");
       
       expect(submissionButton).not.toBeNull();
 
@@ -139,7 +145,7 @@ describe("<CodeEditor />", () => {
         </Provider>
       );
 
-      const submissionButton = component.container.querySelector(".submission-button");
+      const submissionButton = component.container.querySelector(".submit-button");
       
       expect(submissionButton).not.toBeNull();
 
