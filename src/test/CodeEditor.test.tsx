@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, RenderResult } from "@testing-library/react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
 import CodeEditor from "../components/CodeEditor/";
 import configureStore from "redux-mock-store";
 import { Provider } from "react-redux";
@@ -37,7 +37,7 @@ describe("<CodeEditor />", () => {
           [exerciseId2]: {
             [fileId3]: {
               fileId: fileId3,
-              filename: "ansers.txt",
+              filename: "answers",
               data: "your answers here."
             }
           }
@@ -79,25 +79,78 @@ describe("<CodeEditor />", () => {
         <CodeEditor exerciseId={ exerciseId1 }/>
       </Provider>
     );
+    
 
     expect(component.container.querySelector(".ace_editor")).not.toBeNull();
   });
 
-  it("editor sessions can be changed by clicking on tabs", () => {
-    expect(true).toBeFalsy();
-  });
-
   describe("code can be submitted", () => {
     it("clicking the submission button sends a code submission action", () => {
-      expect(true).toBeFalsy();
+      const component = render(
+        <Provider store={ store }>
+          <CodeEditor exerciseId={ exerciseId1 }/>
+        </Provider>
+      );
+
+      const submissionButton = component.container.querySelector(".submission-button");
+      
+      expect(submissionButton).not.toBeNull();
+
+      if (!submissionButton)
+        return;
+
+      fireEvent.click(submissionButton);
+
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
+      expect(store.dispatch).toHaveBeenCalledWith(
+        submit({
+          exerciseId: exerciseId1,
+          files: {
+            "main.c": "some code here",
+            "main.h": "function prototypes here"
+          }
+        })
+      );
     });
 
     it("when a code submission is being processed, a message overlay is shown", () => {
-      expect(true).toBeFalsy();
+      const component = render(
+        <Provider store={ store }>
+          <CodeEditor exerciseId={ exerciseId1 }/>
+        </Provider>
+      );
+
+      const submissionButton = component.container.querySelector(".submission-button");
+      
+      expect(submissionButton).not.toBeNull();
+
+      if (!submissionButton)
+        return;
+
+      fireEvent.click(submissionButton);
+
+      expect(component.container.querySelector(".message-overlay")).not.toBeNull();
     });
 
     it("when a code submission is being processed, another submission can't be sent", () => {
-      expect(true).toBeFalsy();
+      const component = render(
+        <Provider store={ store }>
+          <CodeEditor exerciseId={ exerciseId1 }/>
+        </Provider>
+      );
+
+      const submissionButton = component.container.querySelector(".submission-button");
+      
+      expect(submissionButton).not.toBeNull();
+
+      if (!submissionButton)
+        return;
+
+      fireEvent.click(submissionButton);
+      fireEvent.click(submissionButton);
+
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
     });
   });
+
 });
