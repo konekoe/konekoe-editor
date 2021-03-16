@@ -15,7 +15,7 @@ export interface TerminalState {
 
 export interface SubmissionRequest {
   exerciseId: string;
-  files: { [filename: string]: string };
+  files: { [filename: string]: FileData };
 }
 
 export interface SubmissionResponse {
@@ -32,18 +32,23 @@ export interface Exercise {
   submissions: string[]; // Array of submission ids.
 }
 
-export interface ExerciseFile {
-  fileId: string;
+export interface FileData {
   filename: string;
   data: string;
 }
 
+export interface ExerciseFile extends FileData {
+  fileId: string;
+}
+
 export type ExerciseFileDict = { [fileId: string]: ExerciseFile };
+
+export type FileDataDict = { [fileId: string]: FileData };
 
 export interface SubmissionState {
   allSubmissions: ExerciseDictionary<string[]>;                              // Exercise ID to array of submission ids.
   activeSubmissions: ExerciseDictionary<ExerciseFileDict>;
-  submissionRequests: ExerciseDictionary<{ [fileId: string]: string } | undefined>;  // Submissions made by the user that are being processed.
+  submissionRequests: ExerciseDictionary<{ [fileId: string]: FileData } | undefined>;  // Submissions made by the user that are being processed.
   points: ExerciseDictionary<number>;                                     // The most points received from a submission per exercise.
   maxPoints: ExerciseDictionary<number>;                                  // The maximum points that can be received for each exercise.
 }
@@ -100,4 +105,9 @@ export interface CodeEditorProps {
   exerciseId: string;
 }
 
-export type EditSessionDict = { [fileId: string]: Ace.EditSession };
+export type EditSessionDict = { [fileId: string]: FileEditSession };
+
+export interface FileEditSession extends Ace.EditSession {
+  filename: string;
+  fileId: string;
+}

@@ -1,17 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse } from "../types";
 
-
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const submissionsSlice = createSlice({
   name: "submissions",
-  initialState: {
-    allSubmissions: {},          // Ids for all submissions for all exercises.
-    activeSubmissions: {},    // Submission filedata being. One per exercise.
-    submissionRequests: {},   // Submissions that are being processed. One per exercise.
-    points: {},               // Received points per exercise.
-    maxPoints: {}             // Max points per exercise.
-  } as SubmissionState,
+  initialState: {} as SubmissionState,
   reducers: {
     submissionInit: (state, action: PayloadAction<Exercise[]>) => {
       const exercises = action.payload;
@@ -26,7 +19,7 @@ const submissionsSlice = createSlice({
     submit: (state, action: PayloadAction<SubmissionRequest>) => {
       const { exerciseId, files } = action.payload;
       
-      // Only one active submission is allowd 
+      // Only one active submission is allowed 
       if (state.submissionRequests[exerciseId])
         throw Error("A submission is already being processed.");
 

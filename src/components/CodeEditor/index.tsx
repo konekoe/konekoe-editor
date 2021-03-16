@@ -1,11 +1,26 @@
 import React, { createRef, useLayoutEffect, useState, useEffect } from "react";
 import ace, { Ace } from "ace-builds";
-import { CodeEditorProps, ExerciseFileDict } from "../../types";
+import { CodeEditorProps, ExerciseFileDict, EditSessionDict } from "../../types";
 import TabBar from "../TabBar";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../state/store";
-import { filesToEditSessions, filesToTabItems } from "./utils";
+import { filesToEditSessions, filesToTabItems, createFileSubmission } from "./utils";
+import { Grid, Button, Backdrop } from "@material-ui/core";
+import { submit } from "../../state/submissionsSlice";
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: '#fff',
+      position: "absolute"
+    },
+    container: {
+      position: "relative"
+    }
+  }),
+);
 // Set base path for fetching themes.
 ace.config.set(
   "basePath", 
@@ -13,12 +28,15 @@ ace.config.set(
 );
 
 const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
+  const classes = useStyles();
   const [editor, setEditor] = useState<Ace.Editor | undefined>();
-  const [editorSessions, setEditorSessions] = useState<{ [fileId: string]: Ace.EditSession }>({});
+  const [editorSessions, setEditorSessions] = useState<EditSessionDict>({});
   const [activeSession, setActiveSession] = useState<string>("");
 
   // Fetch active files from store.
   const editorContent: ExerciseFileDict = useSelector((state: RootState) => state.submissions.activeSubmissions[exerciseId]);
+
+  const submissionRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionRequests[exerciseId] !== undefined);
 
   const dispatch = useDispatch();
   const editorRef = createRef<HTMLDivElement>();
@@ -33,16 +51,19 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   }, []);
 
   useEffect(() => {
+    setActiveSession(Object.keys(editorContent)[0]);
+  }, [editorContent]);
+
+  useEffect(() => {
     if (!editor)
       return;
-
-    editor.setTheme("ace/theme/cobalt");
 
     if (activeSession)
       editor.setSession(editorSessions[activeSession]);
     else 
       editor.setValue("No files received.");
-  }, [editor, editorSessions]);
+    
+  }, [editor, editorSessions, activeSession]);
 
   const handleTabClick = (fileId: string) => {
     setActiveSession(fileId);
@@ -53,10 +74,54 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
     editor.setSession(editorSessions[fileId]);
   };
 
+  const handleSubmit = () => {
+    if (!submissionRequestExists)
+      dispatch(submit({ exerciseId, files: createFileSubmission(editorSessions) }));
+  };
+
   return (
-    <div>
-      <TabBar selectionHandler={ handleTabClick } tabItems={ filesToTabItems(Object.values(editorContent)) }/>
-      <div ref={ editorRef }/>
+    <div
+      className={ classes.container }
+    >
+      <Backdrop
+        open={ submissionRequestExists }
+        className={ classes.backdrop }
+      >
+        Please wait
+      </Backdrop>
+      <Grid
+        container
+        direction="row" 
+      >
+        <Grid
+          item
+          xs={ 11 }
+        >
+          <TabBar selectionHandler={ handleTabClick } tabItems={ filesToTabItems(Object.values(editorContent)) }/>
+        </Grid>
+        <Grid
+          item
+          xs={ 1 }
+        >
+          <Button
+            className="submit-button"
+            variant="contained"
+            color="primary"
+            disableElevation
+            style={{ height: "100%" }}
+            onClick={ handleSubmit }
+          >
+            Submit
+          </Button>
+        </Grid>
+
+        <Grid
+          item
+          xs={12}
+        >
+          <div style={{ width: "100%", height: "10rem"}} ref={ editorRef }/>     
+        </Grid>
+      </Grid>
     </div>
   );
 };
