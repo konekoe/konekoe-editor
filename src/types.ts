@@ -33,6 +33,7 @@ export interface Exercise {
   points: number;
   maxPoints: number;
   submissions: string[]; // Array of submission ids.
+  title: string;
 }
 
 export interface FileData {
@@ -51,9 +52,10 @@ export type FileDataDict = { [fileId: string]: FileData };
 export interface SubmissionState {
   allSubmissions: ExerciseDictionary<string[]>;                              // Exercise ID to array of submission ids.
   activeSubmissions: ExerciseDictionary<ExerciseFileDict>;
-  submissionRequests: ExerciseDictionary<{ [fileId: string]: FileData } | undefined>;  // Submissions made by the user that are being processed.
+  submissionRequests: ExerciseDictionary<{ [fileId: string]: FileData } | null>;  // Submissions made by the user that are being processed.
   points: ExerciseDictionary<number>;                                     // The most points received from a submission per exercise.
   maxPoints: ExerciseDictionary<number>;                                  // The maximum points that can be received for each exercise.
+  titles: ExerciseDictionary<string>;
 }
 
 export interface TerminalMessage {

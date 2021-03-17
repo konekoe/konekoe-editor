@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse } from "../types";
+import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse, TabItem } from "../types";
+import { RootState } from "./store";
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const submissionsSlice = createSlice({
@@ -9,17 +10,19 @@ const submissionsSlice = createSlice({
     submissionRequests: {},
     activeSubmissions: {},
     points: {},
-    maxPoints: {}
+    maxPoints: {},
+    titles: {}
   } as SubmissionState,
   reducers: {
     submissionInit: (state, action: PayloadAction<Exercise[]>) => {
       const exercises = action.payload;
       
       exercises.map(ex => {
+        state.titles[ex.id] = ex.title;
         state.points[ex.id] = ex.points;
         state.maxPoints[ex.id] = ex.maxPoints;
         state.allSubmissions[ex.id] = ex.submissions;
-        state.submissionRequests = {};
+        state.submissionRequests[ex.id] = null;
       });
     },
     submit: (state, action: PayloadAction<SubmissionRequest>) => {
@@ -34,7 +37,7 @@ const submissionsSlice = createSlice({
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
 
-      state.submissionRequests[exerciseId] = undefined;
+      state.submissionRequests[exerciseId] = null;
 
       // Submission might result in an error. This part of the store is not interested in errors.
       const { error } = action.payload;
@@ -49,28 +52,16 @@ const submissionsSlice = createSlice({
   }
 });
 
-/*
-const submissionRequestsSelector = (store: Store) => store.getState().submissions.submissionRequests;
-
-// Generates functions for fetching the current active submission for an exercise.
-export const submissionRequestselectorFactory = (id: string) => createSelector(
-  submissionRequestsSelector,
-  submissions => submissions[id]
-);
-
-const maxPointsSelector = (store: Store) => store.getState().submissions.maxPoints;
-const pointsSelector = (store: Store) => store.getState().submissions.points;
-
-export const pointsSelectorFactory = (id: string) => createSelector(
-  maxPointsSelector,
-  pointsSelector,
-  (maxPointsMap, pointsMap) => ({ maxPoints: maxPointsMap[id], points: pointsMap[id] })
-);
-
-// Watchers are registered are passed a store object by components which use them.
-export const submissionWatcherFactory = (store: Store, field: string) => watch(store.getState, `submissions.${ field }`);
-
-*/
+export const exerciseTabSelector = (state: RootState): TabItem[] => {
+  return Object.keys(state.submissions.titles).map(exerciseId => ({
+    id: exerciseId,
+    label: state.submissions.titles[exerciseId],
+    points: {
+      receivedPoints: state.submissions.points[exerciseId],
+      maxPoints: state.submissions.maxPoints[exerciseId]
+    }
+  }));
+};
 
 export const { submit, resolveSubmission, submissionInit } = submissionsSlice.actions;
 
