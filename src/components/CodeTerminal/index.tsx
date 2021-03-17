@@ -24,7 +24,13 @@ const CodeTerminal: React.FC<CodeTerminalProps> = ({ terminalId, exerciseId }) =
       // Set up xterm instance.
       terminal.loadAddon(fitAddon);
       terminal.open(terminalRef.current);
-      fitAddon.fit();
+
+      try {
+        fitAddon.fit();
+      }
+      catch (error) {
+        console.log((error as Error).message);
+      }
     }
 
     return () => {
