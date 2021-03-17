@@ -1,5 +1,0 @@
-import 'ace-builds/src-min-noconflict/mode-css'
-import 'ace-builds/src-min-noconflict/mode-c_cpp'
-import 'ace-builds/src-min-noconflict/mode-html'
-import 'ace-builds/src-min-noconflict/mode-javascript'
-import 'ace-builds/src-min-noconflict/theme-cobalt'

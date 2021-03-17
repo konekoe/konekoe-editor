@@ -1,7 +1,10 @@
 import { Ace } from "ace-builds";
+import { CriticalError } from "./utils/errors";
 
 export interface ErrorState {
-  queue: Error[]
+  criticalError: CriticalError | null;
+  minorErrors: MinorError[];
+  messageErrors: ExerciseDictionary<MessageError>;
 }
 
 export type ExerciseDictionary<T> = { [exerciseId: string]: T };
@@ -22,7 +25,7 @@ export interface SubmissionResponse {
   exerciseId: string;
   points: number;
   maxPoints: number;  // NOTE: The backend currently has two ways of defining max points: the database and the grader. Only one should be used so that max points don't need to be received here.
-  error?: Error;
+  error?: MessageError;
 }
 
 export interface Exercise {
@@ -111,3 +114,30 @@ export interface FileEditSession extends Ace.EditSession {
   filename: string;
   fileId: string;
 }
+
+export interface GenericError {
+  name: string;
+  message: string;
+}
+
+// Critical error is a sign of a unrecoverable state of execution. It's equivalent to a crash. Critical errors should never happen.
+export interface CriticalError extends GenericError {
+  name: "CriticalError";
+}
+
+// Message errors occur in the messaging interface.
+// Message errors can contain a type if another type error should be interpreted from them.
+// id can be exerciseId or fileId.
+export interface MessageError extends GenericError {
+  name: "MessageError";
+  id: string;
+  title?: string;
+}
+
+// Minor errors are note worthy but won't cause a crash. For instance, an error produced by the backend grader.
+export interface MinorError extends GenericError {
+  name: "MinorError";
+  title: string;
+}
+
+export type RuntimeError = CriticalError | MinorError | MessageError;

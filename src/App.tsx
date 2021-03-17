@@ -8,38 +8,11 @@ import InfoBox from "./components/InfoBox";
 import CodeTerminal from "./components/CodeTerminal";
 import CodeEditor from "./components/CodeEditor";
 
-const testTabItems: TabItem[] = [
-  {
-    label: "test1",
-    id: "test1",
-  },
-  {
-    label: "test2",
-    id: "test2",
-    points: {
-      receivedPoints: 1,
-      maxPoints: 10
-    }
-  }
-];
-
-const testDescriptions: Record<string, string> = {
-  "test1": `
-    # Hello
-
-    This is a test description
-  `,
-  "test2": `
-    * List item 1
-    * List item 2
-  `
-};
-
 const App: React.FC = () => {
-  const [selectedExercise, setSelectedExercie] = useState<string>(testTabItems[0].id);
+  const [selectedExercise, setSelectedExercise] = useState<string>(testTabItems[0].id);
   
   const tabSelectionHandler = (id: string) => {
-    setSelectedExercie(id);
+    setSelectedExercise(id);
   };
 
   return (
