@@ -4,7 +4,13 @@ import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse } from
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const submissionsSlice = createSlice({
   name: "submissions",
-  initialState: {} as SubmissionState,
+  initialState: {
+    allSubmissions: {},
+    submissionRequests: {},
+    activeSubmissions: {},
+    points: {},
+    maxPoints: {}
+  } as SubmissionState,
   reducers: {
     submissionInit: (state, action: PayloadAction<Exercise[]>) => {
       const exercises = action.payload;

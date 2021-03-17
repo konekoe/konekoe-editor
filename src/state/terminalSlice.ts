@@ -5,7 +5,10 @@ import { TerminalState, TerminalMessage } from "../types";
 const terminalsSlice = createSlice({
   name: "terminals",
   initialState: {
-    output: {},            // Data received from server.
+    output: {
+      "test1": {"test1": "Text here"},
+      "test2": {"test2": "I am test"},
+    },            // Data received from server.
     input: {}              // Data to be sent to server.
   } as TerminalState,
   reducers: {

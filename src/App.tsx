@@ -6,6 +6,7 @@ import TabBar from "./components/TabBar";
 import { TabItem } from "./types";
 import InfoBox from "./components/InfoBox";
 import CodeTerminal from "./components/CodeTerminal";
+import CodeEditor from "./components/CodeEditor";
 
 const testTabItems: TabItem[] = [
   {
@@ -51,9 +52,7 @@ const App: React.FC = () => {
           alignItems="center"
         >
           <Grid item>
-            <CodeTerminal exerciseId="test1" terminalId="test1">
-
-            </CodeTerminal>
+            <CodeEditor exerciseId="some-exercise1" />
           </Grid>
         </Grid>
       </Container>

@@ -4,7 +4,7 @@ import { FitAddon } from "xterm-addon-fit";
 import { CodeTerminalProps, TerminalOutputDictionary } from "../../types";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../state/store";
-import { clearTerminal } from "../../state/terminalSlice";
+import { clearTerminal, addTerminalOutput } from "../../state/terminalSlice";
 import "xterm/css/xterm.css";
 import { Button } from "@material-ui/core";
 
@@ -35,9 +35,10 @@ const CodeTerminal: React.FC<CodeTerminalProps> = ({ terminalId, exerciseId }) =
 
   useEffect(() => {
     if (terminalContent[exerciseId] && terminalContent[exerciseId][terminalId]) {
+      terminal.reset();
       terminal.write(terminalContent[exerciseId][terminalId]);
     }
-  }, [terminalContent]);
+  }, [terminalContent[exerciseId][terminalId]]);
 
   const handleClearClick = () => {
     if (terminalRef.current) {
