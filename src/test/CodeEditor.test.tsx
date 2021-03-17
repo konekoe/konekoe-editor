@@ -85,6 +85,27 @@ describe("<CodeEditor />", () => {
     expect(component.container.querySelector(".ace_editor")).not.toBeNull();
   });
 
+  it("ace editor is attached with empty store", () => {
+    store = configureStore()({
+      submissions: {
+        allSubmissions: {},
+        submissionRequests: {},
+        activeSubmissions: {},
+        points: {},
+        maxPoints: {}
+      }
+    });
+
+    const component = render(
+      <Provider store={ store }>
+        <CodeEditor exerciseId={ exerciseId1 }/>
+      </Provider>
+    );
+    
+
+    expect(component.container.querySelector(".ace_editor")).not.toBeNull();
+  });
+
   describe("code can be submitted", () => {
     it("clicking the submission button sends a code submission action", () => {
       const component = render(

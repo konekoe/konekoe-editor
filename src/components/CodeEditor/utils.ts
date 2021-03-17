@@ -1,5 +1,5 @@
 import * as ace from "ace-builds/src-noconflict/ace";
-import { ExerciseFile, EditSessionDict, FileEditSession, ExerciseFileDict, FileData, FileDataDict } from "../../types";
+import { ExerciseFile, EditSessionDict, FileEditSession, FileDataDict } from "../../types";
 import AceModes from "ace-builds/src-noconflict/ext-modelist";
 
 export const createEditSession = ({ filename, data, fileId }: ExerciseFile): FileEditSession => {

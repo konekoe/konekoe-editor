@@ -34,7 +34,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   const [activeSession, setActiveSession] = useState<string>("");
 
   // Fetch active files from store.
-  const editorContent: ExerciseFileDict = useSelector((state: RootState) => state.submissions.activeSubmissions[exerciseId]);
+  const editorContent: ExerciseFileDict = useSelector((state: RootState) => state.submissions.activeSubmissions[exerciseId] || {});
 
   const submissionRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionRequests[exerciseId] !== undefined);
 
