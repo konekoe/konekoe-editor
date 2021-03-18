@@ -1,5 +1,5 @@
-import GenericError from "./GenericError.js";
-import { MinorError } from "../../types.js";
+import GenericError from "./GenericError";
+import { MinorError } from "../../types";
 
 function MinorError(msg: string, title: string): MinorError {
     return {
