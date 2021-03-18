@@ -22,6 +22,43 @@ const submissionsSlice = createSlice({
             // test the data
           }`
         },
+      },
+      "some-exercise1": {
+        "file1": {
+          fileId: "file1",
+          filename: "index.ts",
+          data: `
+          import { testData } from './functions'
+          import { Data } from './types'
+
+          const someData: Data[] = [
+            {
+              id: "123",
+              value: -1
+            },
+            {
+              id: "321",
+              value: 1
+            },
+          ]
+          `
+        },
+        "file2": {
+          fileId: "file2",
+          filename: "functions.ts",
+          data: `export function(data: Data[]): boolean {
+            // test the data
+          }`
+        },
+        "file3": {
+          fileId: "file3",
+          filename: "types.ts",
+          data: `export interface Data {
+            id: string;
+            value: number;
+          }
+          }`
+        },
       }
     },
   } as SubmissionState,

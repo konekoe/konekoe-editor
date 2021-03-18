@@ -51,6 +51,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   }, []);
 
   useEffect(() => {
+    console.log(editorContent);
     setActiveSession(Object.keys(editorContent)[0]);
     setEditorSessions(filesToEditSessions(Object.values(editorContent)));
   }, [editorContent]);
