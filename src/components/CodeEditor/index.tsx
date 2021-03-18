@@ -7,7 +7,7 @@ import { RootState } from "../../state/store";
 import { filesToEditSessions, filesToTabItems, createFileSubmission } from "./utils";
 import { Grid, Button, Backdrop } from "@material-ui/core";
 import { submit } from "../../state/submissionsSlice";
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,9 +51,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   }, []);
 
   useEffect(() => {
-    console.log(editorContent);
-    setActiveSession(Object.keys(editorContent)[0]);
-    setEditorSessions(filesToEditSessions(Object.values(editorContent)));
+    if (Object.keys(editorContent).length) {
+      setActiveSession(Object.keys(editorContent)[0]);
+      setEditorSessions(filesToEditSessions(Object.values(editorContent)));
+    }
   }, [editorContent]);
 
   useEffect(() => {

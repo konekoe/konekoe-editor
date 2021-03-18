@@ -46,7 +46,7 @@ describe("<CodeTerminal/>", () => {
     </Provider>
     );
     
-    const clearButton = component.container.querySelector(".clear-button");
+    const clearButton = component.container.querySelector("[class*=clearButton]");
     
     expect(clearButton).not.toBeNull();
 
