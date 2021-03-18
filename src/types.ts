@@ -1,5 +1,4 @@
 import { Ace } from "ace-builds";
-import { CriticalError } from "./utils/errors";
 
 export interface ErrorState {
   criticalError: CriticalError | null;
@@ -34,6 +33,7 @@ export interface Exercise {
   maxPoints: number;
   submissions: string[]; // Array of submission ids.
   title: string;
+  description: string;
 }
 
 export interface FileData {
@@ -52,10 +52,14 @@ export type FileDataDict = { [fileId: string]: FileData };
 export interface SubmissionState {
   allSubmissions: ExerciseDictionary<string[]>;                              // Exercise ID to array of submission ids.
   activeSubmissions: ExerciseDictionary<ExerciseFileDict>;
-  submissionRequests: ExerciseDictionary<{ [fileId: string]: FileData } | null>;  // Submissions made by the user that are being processed.
-  points: ExerciseDictionary<number>;                                     // The most points received from a submission per exercise.
-  maxPoints: ExerciseDictionary<number>;                                  // The maximum points that can be received for each exercise.
-  titles: ExerciseDictionary<string>;
+  submissionRequests: ExerciseDictionary<FileDataDict | null>;  // Submissions made by the user that are being processed.
+}
+
+export interface ExerciseState {
+  points: ExerciseDictionary<number>;          // The most points received from a submission per exercise.
+  maxPoints: ExerciseDictionary<number>;       // The maximum points that can be received for each exercise.
+  titles: ExerciseDictionary<string>;         // Exercise titles  
+  descriptions: ExerciseDictionary<string>;   // Exercise markdown descriptions
 }
 
 export interface TerminalMessage {
@@ -70,7 +74,7 @@ export interface InfoBoxProps {
 
 export interface CodeTerminalProps {
   exerciseId: string;
-  terminalId: string;
+  terminalId?: string;
   allowInput?: boolean;
 }
 
