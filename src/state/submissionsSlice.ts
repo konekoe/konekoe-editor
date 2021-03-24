@@ -8,59 +8,7 @@ const submissionsSlice = createSlice({
   initialState: {
     allSubmissions: {},
     submissionRequests: {},
-    activeSubmissions: {
-      "some-exercise": {
-        "file1": {
-          fileId: "file1",
-          filename: "main.js",
-          data: "import { testData } from './functions.js'"
-        },
-        "file2": {
-          fileId: "file2",
-          filename: "functions.js",
-          data: `export function(data) {
-            // test the data
-          }`
-        },
-      },
-      "some-exercise1": {
-        "file1": {
-          fileId: "file1",
-          filename: "index.ts",
-          data: `
-          import { testData } from './functions'
-          import { Data } from './types'
-
-          const someData: Data[] = [
-            {
-              id: "123",
-              value: -1
-            },
-            {
-              id: "321",
-              value: 1
-            },
-          ]
-          `
-        },
-        "file2": {
-          fileId: "file2",
-          filename: "functions.ts",
-          data: `export function(data: Data[]): boolean {
-            // test the data
-          }`
-        },
-        "file3": {
-          fileId: "file3",
-          filename: "types.ts",
-          data: `export interface Data {
-            id: string;
-            value: number;
-          }
-          }`
-        },
-      }
-    },
+    activeSubmissions: {},
   } as SubmissionState,
   reducers: {
     submissionInit: (state, action: PayloadAction<Exercise[]>) => {

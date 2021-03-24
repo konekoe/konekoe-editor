@@ -6,22 +6,10 @@ import { ExerciseState, Exercise, TabItem } from "../types";
 const exerciseSlice = createSlice({
   name: "exercises",
   initialState: {
-    points: {
-      "some-exercise": 1,
-      "some-exercise1": 0
-    },
-    maxPoints: {
-      "some-exercise": 10,
-      "some-exercise1": 100
-    },
-    titles: {
-      "some-exercise": "JavaScript exercise",
-      "some-exercise1": "TypeScript exercise"
-    },
-    descriptions: {
-      "some-exercise": "# Test this version of the editor\nIs it working?",
-      "some-exercise1": "# What to do?\n* Sit down.\n* Shut up\n* Do the tasks."
-    }
+    points: {},
+    maxPoints: {},
+    titles: {},
+    descriptions: {}
   } as ExerciseState,
   reducers: {
     init: (state, action: PayloadAction<Exercise[]>) => {

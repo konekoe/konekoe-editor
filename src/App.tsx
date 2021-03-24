@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "./state/store";
-import { Container, Grid, Paper, Backdrop, Card, CardHeader, CardContent } from "@material-ui/core";
+import { Container, Grid, Paper, Backdrop, Card, CardHeader, CardContent, LinearProgress } from "@material-ui/core";
 import TabBar from "./components/TabBar";
 import { TabItem } from "./types";
 import InfoBox from "./components/InfoBox";
@@ -9,8 +9,26 @@ import CodeTerminal from "./components/CodeTerminal";
 import CodeEditor from "./components/CodeEditor";
 import { exerciseTabSelector } from "./state/exerciseSlice";
 import { ErrorBoundary } from "react-error-boundary";
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    waitScreen: {
+      position: "relative",
+      height: "50vh"
+    },
+    waitScreenContent: {
+      position: "absolute",
+      top: "50%",
+      height: "100%",
+      width: "100%",
+      textAlign: "center",
+    }
+  }),
+);
 
 const App: React.FC = () => {
+  const classes = useStyles();
   const [selectedExercise, setSelectedExercise] = useState<string>("");
   const exerciseTabItems: TabItem[] = useSelector(exerciseTabSelector);
   const exerciseDescription: string = useSelector((state: RootState) => state.exercises.descriptions[selectedExercise] || "No description given");
@@ -41,54 +59,65 @@ const App: React.FC = () => {
         </Backdrop>
       ) }
     >
-      <Grid
-        container
-        direction="row"
-        alignItems="center"
-      >
-        <Grid
-          item
-          xs={ 12 }
-        >
-          <TabBar tabItems={ exerciseTabItems } selectionHandler={ tabSelectionHandler }/>
-        </Grid>
-        <Grid
-          container
-          direction="row"
-        >
+      {
+        (selectedExercise) ?
           <Grid
-            item
-            xs={ 5 }
+            container
+            direction="row"
+            alignItems="center"
           >
-            <InfoBox content={ exerciseDescription } />
-          </Grid>
-
-          <Grid
-            item
-            xs={ 7 }
-          >
+            <Grid
+              item
+              xs={ 12 }
+            >
+              <TabBar tabItems={ exerciseTabItems } selectionHandler={ tabSelectionHandler }/>
+            </Grid>
             <Grid
               container
               direction="row"
             >
               <Grid
                 item
-                xs={ 12 }
+                xs={ 5 }
               >
-                <CodeEditor exerciseId={ selectedExercise } />
+                <InfoBox content={ exerciseDescription } />
               </Grid>
 
               <Grid
                 item
-                xs={ 12 }
+                xs={ 7 }
               >
-                <CodeTerminal exerciseId={ selectedExercise }/>
+                <Grid
+                  container
+                  direction="row"
+                >
+                  <Grid
+                    item
+                    xs={ 12 }
+                  >
+                    <CodeEditor exerciseId={ selectedExercise } />
+                  </Grid>
+
+                  <Grid
+                    item
+                    xs={ 12 }
+                  >
+                    <CodeTerminal exerciseId={ selectedExercise }/>
+                  </Grid>
+                </Grid>
+
               </Grid>
             </Grid>
-
           </Grid>
-        </Grid>
-      </Grid>
+          :
+          <Container className={ classes.waitScreen }>
+            <div className={ classes.waitScreenContent }>
+              <h1>Just a moment</h1>
+              <LinearProgress />
+            </div>
+          </Container>
+      }
+      
     </ErrorBoundary>
   );
 }

@@ -8,7 +8,8 @@
     "postinstall": "npm run build",
     "build": "webpack --config ./webpack.config.js",
     "lint": "eslint ./src/**/*.{ts,tsx}",
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "cypress:open": "./node_modules/.bin/cypress open"
   },
   "author": "",
   "license": "ISC",
