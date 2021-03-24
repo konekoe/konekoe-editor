@@ -22,6 +22,7 @@ describe("Opening the editor page", function () {
     
     it("tabs and exercise description are shown", function (){
       cy.contains("1/1 | Some exercise");
+      cy.contains("0/10 | Some exercise");
       cy.contains("Do something");
     });
 
@@ -53,5 +54,28 @@ describe("Opening the editor page", function () {
       cy.contains("console.log('Hello');");      
     });
 
+    it("clicking the exercise tabs changes the exercise description and code files", function() {
+      cy.window()
+      .its("store")
+      .invoke("dispatch", setActiveSubission({ 
+        exerciseId: "ex1", 
+        data: [
+          {
+            fileId: "file1",
+            filename: "test.js",
+            data: "console.log('Hello');"
+          },
+          {
+            fileId: "file2",
+            filename: "text.txt",
+            data: "Just some text"
+          }
+        ] 
+      }));
+
+      cy.contains("0/10 | Some exercise").click();
+      cy.contains("Works like a charm");
+      cy.contains("No files received");      
+    });
   });
 });
