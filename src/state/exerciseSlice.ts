@@ -36,7 +36,7 @@ export const exerciseTabSelector = (state: RootState): TabItem[] => {
   }));
 };
 
-export const {  } = exerciseSlice.actions;
+export const { init } = exerciseSlice.actions;
 
 export default exerciseSlice.reducer;
 

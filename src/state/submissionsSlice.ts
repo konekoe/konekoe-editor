@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse } from "../types";
+import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse, ExerciseFile, ExerciseFileDict } from "../types";
 
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
@@ -28,6 +28,15 @@ const submissionsSlice = createSlice({
 
       state.submissionRequests[exerciseId] = files;
     },
+    setActiveSubission: (state, action: PayloadAction<{ exerciseId: string, data: ExerciseFile[] }>) => {
+      state.activeSubmissions[action.payload.exerciseId] = action
+      .payload
+      .data
+      .reduce((dict: ExerciseFileDict, curr: ExerciseFile) => {
+        dict[curr.fileId] = curr;
+        return dict;
+      }, {} as ExerciseFileDict);
+    },
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
 
@@ -37,7 +46,7 @@ const submissionsSlice = createSlice({
 });
 
 
-export const { submit, resolveSubmission, submissionInit } = submissionsSlice.actions;
+export const { submit, resolveSubmission, submissionInit, setActiveSubission } = submissionsSlice.actions;
 
 export default submissionsSlice.reducer;
 

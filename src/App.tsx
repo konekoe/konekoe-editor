@@ -36,7 +36,7 @@ const App: React.FC = () => {
   useLayoutEffect(() => {
     if (exerciseTabItems.length)
       setSelectedExercise(exerciseTabItems[0].id);
-  },[]);
+  },[exerciseTabItems]);
 
   const tabSelectionHandler = (id: string) => {
     setSelectedExercise(id);
