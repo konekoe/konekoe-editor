@@ -6,3 +6,8 @@ dist/
 
 #misc
 db.json
+
+#end-to-end testing
+cypress/fixtures
+cypress/screenshots
+cypress/videos
