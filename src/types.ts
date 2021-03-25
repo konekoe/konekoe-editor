@@ -1,4 +1,5 @@
 import { Ace } from "ace-builds";
+import { Store } from "./state/store";
 
 export interface ErrorState {
   criticalError: CriticalError | null;
@@ -147,3 +148,10 @@ export interface MinorError extends GenericError {
 }
 
 export type RuntimeError = CriticalError | MinorError | MessageError;
+
+export interface TestingWindow extends Window {
+  Cypress: boolean;
+  store: Store;
+}
+
+export type GlobalWindow = TestingWindow & typeof globalThis;
