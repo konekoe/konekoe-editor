@@ -1,5 +1,5 @@
 import { Server, WebSocket } from "mock-socket";
-import { RequestMessage, ResponseMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, ServerMessagePayload, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState } from "../../src/types";
+import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, ServerMessagePayload, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState, ResponseMessage } from "../../src/types";
 import { assertNever } from "../../src/utils/errors";
 
 export interface MockServerMessageHandlers {
@@ -95,7 +95,7 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
 
   // Mock for the backend.
   mockServer.on("connection", (socket: WebSocket) => {
-    const sendMessage = (msg: RequestMessage) => socket.send(JSON.stringify(msg));
+    const sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
 
     const resolveRequest = (request: RequestMessage): ServerMessagePayload => {
       switch (request.type) {
