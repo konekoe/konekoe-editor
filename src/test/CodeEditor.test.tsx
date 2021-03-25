@@ -127,16 +127,16 @@ describe("<CodeEditor />", () => {
       expect(store.dispatch).toHaveBeenCalledWith(
         submit({
           exerciseId: exerciseId1,
-          files: {
-            [fileId1]: {
+          files:[
+            {
               filename: "main.c",
               data: "some code here"
             },
-            [fileId2]: {
+            {
               filename: "main.h",
               data: "function prototypes here"
             }
-          }
+          ]
         })
       );
     });

@@ -1,5 +1,5 @@
 import { EditSession, UndoManager } from "ace-builds";
-import { ExerciseFile, EditSessionDict, FileEditSession, FileDataDict, TabItem } from "../../types";
+import { ExerciseFile, EditSessionDict, FileEditSession, TabItem, FileData } from "../../types";
 import AceModes from "ace-builds/src-noconflict/ext-modelist";
 
 const filePathRegex = /\.[0-9a-z]+$/i;
@@ -36,12 +36,8 @@ export const filesToTabItems = (exerciseFiles: ExerciseFile[]): TabItem[] => exe
   id: file.fileId
 }));
 
-export const createFileSubmission = (editSessions: EditSessionDict): FileDataDict => Object.values(editSessions)
-.reduce((acc, curr) => {
-  acc[curr.fileId] = {
-   filename: curr.filename,
-   data: curr.getDocument().getValue() 
-  };
-
-  return acc;
-}, {} as FileDataDict);
+export const createFileSubmission = (editSessions: EditSessionDict): FileData[] => Object.values(editSessions)
+.map((session: FileEditSession) => ({
+  filename: session.filename,
+  data: session.getDocument().getValue() 
+}));
