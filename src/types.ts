@@ -179,11 +179,17 @@ export interface SubmissionFetchRequest {
 
 export type SubmissionFetchResponse = SubmissionFetchRequest & Omit<ExerciseSubmission, "id">; 
 
-export type ServerMessagePayload = ServerConnectRequest | ServerConnectResponse |
-SubmissionRequest | SubmissionResponse |
-SubmissionFetchRequest | SubmissionFetchResponse;
+export type RequestPayload = ServerConnectRequest | SubmissionRequest | SubmissionFetchRequest;
 
-export interface ServerMessage {
+export interface RequestMessage {
   type: "server_connect" | "code_submission" | "submission_fetch";
-  payload: ServerMessagePayload;
+  payload: RequestPayload;
+}
+
+export type ResponePayload = ServerConnectResponse | SubmissionResponse | SubmissionFetchRequest
+
+export interface ResponseMessage {
+  type: "server_connect" | "code_submission" | "submission_fetch" | "terminal_output";
+  payload: ResponePayload;
+  error?: RuntimeError;
 }

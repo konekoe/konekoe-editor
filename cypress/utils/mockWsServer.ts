@@ -1,5 +1,5 @@
 import { Server, WebSocket } from "mock-socket";
-import { ServerMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, ServerMessagePayload, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState } from "../../src/types";
+import { RequestMessage, ResponseMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, ServerMessagePayload, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState } from "../../src/types";
 import { assertNever } from "../../src/utils/errors";
 
 export interface MockServerMessageHandlers {
@@ -95,9 +95,9 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
 
   // Mock for the backend.
   mockServer.on("connection", (socket: WebSocket) => {
-    const sendMessage = (msg: ServerMessage) => socket.send(JSON.stringify(msg));
+    const sendMessage = (msg: RequestMessage) => socket.send(JSON.stringify(msg));
 
-    const resolveRequest = (request: ServerMessage): ServerMessagePayload => {
+    const resolveRequest = (request: RequestMessage): ServerMessagePayload => {
       switch (request.type) {
         case "server_connect":
           // Use given handler or defaul handler.
@@ -123,7 +123,7 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
     };
 
     socket.on("message", (jsonStr: string) => {
-      const jsonObj: ServerMessage = JSON.parse(jsonStr);
+      const jsonObj: RequestMessage = JSON.parse(jsonStr);
 
       sendMessage({ type: jsonObj.type, payload: resolveRequest(jsonObj) });
     });

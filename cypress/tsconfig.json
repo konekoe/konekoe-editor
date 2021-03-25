@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "es5",
     "lib": ["es6", "dom"],
-    "types": ["cypress"]
+    "types": ["cypress"],
+    "baseUrl": "http://localhost:8080"
   },
   "include": ["**/*.ts"]
 }
