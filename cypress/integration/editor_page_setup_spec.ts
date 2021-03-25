@@ -78,4 +78,8 @@ describe("Opening the editor page", function () {
       cy.contains("No files received");      
     });
   });
+
+  describe("fetches data from the server", function() {
+    
+  });
 });

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import CodeEditor from "../components/CodeEditor/";
 import configureStore from "redux-mock-store";
 import { Provider } from "react-redux";

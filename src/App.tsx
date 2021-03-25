@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "./state/store";
-import { Container, Grid, Paper, Backdrop, Card, CardHeader, CardContent, LinearProgress } from "@material-ui/core";
+import { Container, Grid, Backdrop, Card, CardHeader, CardContent, LinearProgress } from "@material-ui/core";
 import TabBar from "./components/TabBar";
 import { TabItem } from "./types";
 import InfoBox from "./components/InfoBox";
@@ -9,9 +9,9 @@ import CodeTerminal from "./components/CodeTerminal";
 import CodeEditor from "./components/CodeEditor";
 import { exerciseTabSelector } from "./state/exerciseSlice";
 import { ErrorBoundary } from "react-error-boundary";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import { makeStyles, createStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     waitScreen: {
       position: "relative",
@@ -120,6 +120,6 @@ const App: React.FC = () => {
       
     </ErrorBoundary>
   );
-}
+};
 
 export default App;

@@ -1,19 +1,26 @@
-import * as ace from "ace-builds/src-noconflict/ace";
-import { ExerciseFile, EditSessionDict, FileEditSession, FileDataDict } from "../../types";
+import { EditSession, UndoManager } from "ace-builds";
+import { ExerciseFile, EditSessionDict, FileEditSession, FileDataDict, TabItem } from "../../types";
 import AceModes from "ace-builds/src-noconflict/ext-modelist";
 
+const filePathRegex = /\.[0-9a-z]+$/i;
+
+// Note: The following eslint rules are disabled as AceModes is a JavaScript module with no typing.
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 export const createEditSession = ({ filename, data, fileId }: ExerciseFile): FileEditSession => {
-  const session = new ace.EditSession(data);
+  const session: FileEditSession = new EditSession(data) as FileEditSession;
   // Exctract file extension
   // If no name is given use "" indicating a text file
   // If the name does not contain a file extension use ""
 
   // NOTE: filename.match returns an array value or null.
 
-  session.setMode(AceModes.getModeForPath((filename.match(/\.[0-9a-z]+$/i) || [""])[0]).mode);
+  session.setMode(AceModes.getModeForPath((filePathRegex.exec(filename) || [""])[0]).mode);
   session.filename = filename;
   session.fileId= fileId;
-  session.setUndoManager(new ace.UndoManager());
+  session.setUndoManager(new UndoManager());
   
   return session;
 };
@@ -24,7 +31,7 @@ export const filesToEditSessions = (exerciseFiles: ExerciseFile[]): EditSessionD
   return acc;
 }, {}));
 
-export const filesToTabItems = (exerciseFiles: ExerciseFile[]) => exerciseFiles.map((file: ExerciseFile) => ({
+export const filesToTabItems = (exerciseFiles: ExerciseFile[]): TabItem[] => exerciseFiles.map((file: ExerciseFile): TabItem => ({
   label: file.filename,
   id: file.fileId
 }));

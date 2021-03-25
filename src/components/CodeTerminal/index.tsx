@@ -8,11 +8,11 @@ import { clearTerminal } from "../../state/terminalSlice";
 import "xterm/css/xterm.css";
 import { Button } from "@material-ui/core";
 import { generateUuid } from "../../utils";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
+import { makeStyles, createStyles } from "@material-ui/core/styles";
 
 const TERMIAL_PREFIX = "terminal";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     container: {
       backgroundColor: "#000000"
@@ -53,7 +53,7 @@ const CodeTerminal: React.FC<CodeTerminalProps> = ({ terminalId, exerciseId }) =
 
     return () => {
       terminal.dispose();
-    }
+    };
 
   }, []);
 
