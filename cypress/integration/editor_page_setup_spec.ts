@@ -80,6 +80,12 @@ describe("Opening the editor page", function () {
   });
 
   describe("fetches data from the server", function() {
-    
+    it("fetches exercises and rerenders", function() {
+
+    });
+
+    it("fetches first submission from list of received submission ids and rerenders editor component", function() {
+
+    });
   });
 });

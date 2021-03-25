@@ -18,14 +18,22 @@ export interface TerminalState {
 
 export interface SubmissionRequest {
   exerciseId: string;
-  files: { [filename: string]: FileData };
+  files: FileData[];
 }
+
 
 export interface SubmissionResponse {
   exerciseId: string;
   points: number;
   maxPoints: number;  // NOTE: The backend currently has two ways of defining max points: the database and the grader. Only one should be used so that max points don't need to be received here.
   error?: MessageError;
+}
+
+export interface ExerciseSubmission {
+  id: string;
+  date: Date;
+  points: number;
+  files: FileData[];
 }
 
 export interface Exercise {
@@ -53,7 +61,7 @@ export type FileDataDict = { [fileId: string]: FileData };
 export interface SubmissionState {
   allSubmissions: ExerciseDictionary<string[]>;                              // Exercise ID to array of submission ids.
   activeSubmissions: ExerciseDictionary<ExerciseFileDict>;
-  submissionRequests: ExerciseDictionary<FileDataDict | null>;  // Submissions made by the user that are being processed.
+  submissionRequests: ExerciseDictionary<FileData[] | null>;  // Submissions made by the user that are being processed.
 }
 
 export interface ExerciseState {
@@ -155,3 +163,27 @@ export interface TestingWindow extends Window {
 }
 
 export type GlobalWindow = TestingWindow & typeof globalThis;
+
+export interface ServerConnectRequest {
+  token: string;
+}
+
+export interface ServerConnectResponse {
+  exercises: Exercise[];
+}
+
+export interface SubmissionFetchRequest {
+  exercisedId: string;
+  submissionId: string;
+}
+
+export type SubmissionFetchResponse = SubmissionFetchRequest & Omit<ExerciseSubmission, "id">; 
+
+export type ServerMessagePayload = ServerConnectRequest | ServerConnectResponse |
+SubmissionRequest | SubmissionResponse |
+SubmissionFetchRequest | SubmissionFetchResponse;
+
+export interface ServerMessage {
+  type: "server_connect" | "code_submission" | "submission_fetch";
+  payload: ServerMessagePayload;
+}
