@@ -1,11 +1,11 @@
 import GenericError from "./GenericError";
-import { CriticalError } from "../../types";
 
-function CriticalError(msg: string): CriticalError {
-    return {
-        ...(GenericError(msg)),
-        name: "CriticalError"
-    };
+class CriticalError extends GenericError {
+    name = "CriticalError";
+
+    constructor(msg: string) {
+      super(msg);
+    }
 }
 
 export default CriticalError;

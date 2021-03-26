@@ -1,5 +1,6 @@
 import { Ace } from "ace-builds";
 import { Store } from "./state/store";
+import { MessageError, CriticalError, MinorError } from "./utils/errors";
 
 export interface ErrorState {
   criticalError: CriticalError | null;
@@ -130,32 +131,7 @@ export interface FileEditSession extends Ace.EditSession {
   fileId: string;
 }
 
-export interface GenericError {
-  name: string;
-  message: string;
-}
-
-// Critical error is a sign of a unrecoverable state of execution. It's equivalent to a crash. Critical errors should never happen.
-export interface CriticalError extends GenericError {
-  name: "CriticalError";
-}
-
-// Message errors occur in the messaging interface.
-// Message errors can contain a type if another type error should be interpreted from them.
-// id can be exerciseId or fileId.
-export interface MessageError extends GenericError {
-  name: "MessageError";
-  id: string;
-  title?: string;
-}
-
-// Minor errors are note worthy but won't cause a crash. For instance, an error produced by the backend grader.
-export interface MinorError extends GenericError {
-  name: "MinorError";
-  title: string;
-}
-
-export type RuntimeError = CriticalError | MinorError | MessageError;
+export type RuntimeError = MessageError | CriticalError | MinorError;
 
 export interface TestingWindow extends Window {
   Cypress: boolean;
@@ -186,10 +162,10 @@ export interface RequestMessage {
   payload: RequestPayload;
 }
 
-export type ResponePayload = ServerConnectResponse | SubmissionResponse | SubmissionFetchRequest
+export type ResponsePayload = ServerConnectResponse | SubmissionResponse | SubmissionFetchRequest;
 
 export interface ResponseMessage {
   type: "server_connect" | "code_submission" | "submission_fetch" | "terminal_output";
-  payload: ResponePayload;
-  error?: RuntimeError;
+  payload: ResponsePayload;
+  error?: MessageError;
 }

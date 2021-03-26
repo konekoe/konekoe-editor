@@ -1,12 +1,15 @@
 import GenericError from "./GenericError";
-import { MessageError } from "../../types";
 
-function MessageError(msg: string, id: string): MessageError {
-    return {
-        ...(GenericError(msg)),
-        name: "MessageError",
-        id
-    };
+class MessageError extends GenericError {
+    name = "MessageError";
+    id: string;
+    title?: string;
+    
+	constructor(msg: string, id: string, title: string | undefined) {
+		super(msg);
+		this.id = id;
+		this.title = title;
+	}
 }
 
 export default MessageError;
