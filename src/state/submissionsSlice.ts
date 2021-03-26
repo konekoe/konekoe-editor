@@ -28,7 +28,7 @@ const submissionsSlice = createSlice({
 
       state.submissionRequests[exerciseId] = files;
     },
-    setActiveSubission: (state, action: PayloadAction<{ exerciseId: string, data: ExerciseFile[] }>) => {
+    setActiveSubmission: (state, action: PayloadAction<{ exerciseId: string, data: ExerciseFile[] }>) => {
       state.activeSubmissions[action.payload.exerciseId] = action
       .payload
       .data
@@ -46,7 +46,7 @@ const submissionsSlice = createSlice({
 });
 
 
-export const { submit, resolveSubmission, submissionInit, setActiveSubission } = submissionsSlice.actions;
+export const { submit, resolveSubmission, submissionInit, setActiveSubmission } = submissionsSlice.actions;
 
 export default submissionsSlice.reducer;
 

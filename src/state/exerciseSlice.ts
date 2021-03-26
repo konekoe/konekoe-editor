@@ -12,7 +12,7 @@ const exerciseSlice = createSlice({
     descriptions: {}
   } as ExerciseState,
   reducers: {
-    init: (state, action: PayloadAction<Exercise[]>) => {
+    exerciseInit: (state, action: PayloadAction<Exercise[]>) => {
       const exercises = action.payload;
       
       exercises.map(ex => {
@@ -36,7 +36,7 @@ export const exerciseTabSelector = (state: RootState): TabItem[] => {
   }));
 };
 
-export const { init } = exerciseSlice.actions;
+export const { exerciseInit } = exerciseSlice.actions;
 
 export default exerciseSlice.reducer;
 
