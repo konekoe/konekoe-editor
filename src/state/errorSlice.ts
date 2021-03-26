@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ErrorState, RuntimeError } from "../types";
-import { assertNever, CriticalError, MinorError } from "../utils/errors";
+import { assertNever, CriticalError, MinorError, MessageError } from "../utils/errors";
 
 const errorSlice = createSlice({
   name: "error",
@@ -11,33 +11,37 @@ const errorSlice = createSlice({
   } as ErrorState,
   reducers: {
     push: (state, action: PayloadAction<RuntimeError>): void => {
-      switch (action.payload.name) {
+      const name = action.payload.name as "CriticalError" | "MinorError" | "MessageError";
+    
+      switch (name) {
         case "CriticalError":
           state.criticalError = action.payload;
           break;
         
         case "MinorError": 
-          state.minorErrors.push(action.payload);
+          state.minorErrors.push(action.payload as MinorError);
           break;
   
         case "MessageError":
-          if (action.payload.title) {
+          const messageError = action.payload as MessageError;
 
-            switch (action.payload.title) {
+          if (messageError.title) {
+
+            switch (messageError.title) {
               case "CriticalError":
-                state.criticalError = CriticalError(action.payload.message);
+                state.criticalError = new CriticalError(action.payload.message);
                 break;
               default:
-                state.minorErrors.push(MinorError(action.payload.message, action.payload.title));
+                state.minorErrors.push(new MinorError(action.payload.message, action.payload.title));
                 break;
             }
           }
 
-          state.messageErrors[action.payload.id] = action.payload;
+          state.messageErrors[messageError.id] = messageError;
           break;
     
         default:
-          assertNever(action.payload);
+          assertNever(name);
       }
     },
     popMinorError: (state: ErrorState): void => {
