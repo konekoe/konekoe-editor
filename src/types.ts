@@ -10,11 +10,11 @@ export interface ErrorState {
 
 export type ExerciseDictionary<T> = { [exerciseId: string]: T };
 
-export type TerminalOutputDictionary = ExerciseDictionary<{ [terminalId: string]: string }>;
+export type TerminalOutputDictionary = ExerciseDictionary<string>;
 
 export interface TerminalState {
   output: TerminalOutputDictionary;
-  input: ExerciseDictionary<{ [terminalId: string]: string[] }>;
+  input: ExerciseDictionary<string[]>;
 }
 
 export interface SubmissionRequest {
@@ -74,7 +74,6 @@ export interface ExerciseState {
 
 export interface TerminalMessage {
   exerciseId: string;
-  terminalId: string;
   data: string;
 }
 
@@ -84,7 +83,6 @@ export interface InfoBoxProps {
 
 export interface CodeTerminalProps {
   exerciseId: string;
-  terminalId?: string;
   allowInput?: boolean;
 }
 
@@ -162,7 +160,7 @@ export interface RequestMessage {
   payload: RequestPayload;
 }
 
-export type ResponsePayload = ServerConnectResponse | SubmissionResponse | SubmissionFetchRequest;
+export type ResponsePayload = ServerConnectResponse | SubmissionResponse | SubmissionFetchRequest | TerminalMessage;
 
 export interface ResponseMessage {
   type: "server_connect" | "code_submission" | "submission_fetch" | "terminal_output";

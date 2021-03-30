@@ -29,10 +29,10 @@ const errorSlice = createSlice({
 
             switch (messageError.title) {
               case "CriticalError":
-                state.criticalError = new CriticalError(action.payload.message);
+                state.criticalError = new CriticalError(messageError.message);
                 break;
               default:
-                state.minorErrors.push(new MinorError(action.payload.message, action.payload.title));
+                state.minorErrors.push(new MinorError(messageError.message, messageError.title));
                 break;
             }
           }

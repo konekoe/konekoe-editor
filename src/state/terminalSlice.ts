@@ -10,28 +10,28 @@ const terminalsSlice = createSlice({
   } as TerminalState,
   reducers: {
     addTerminalOutput: (state, action: PayloadAction<TerminalMessage>): void => {
-      const { exerciseId, terminalId, data } = action.payload;
+      const { exerciseId, data } = action.payload;
       
       if (state.output[exerciseId])
-        state.output[exerciseId][terminalId] = (state.output[exerciseId][terminalId] || "") + data;
+        state.output[exerciseId] = (state.output[exerciseId] || "") + data;
     },
     clearTerminal: (state, action: PayloadAction<Omit<TerminalMessage, "data">>): void => {
-      const { exerciseId, terminalId } = action.payload;
+      const { exerciseId } = action.payload;
       
       if (state.output[exerciseId]) {
-        state.output[exerciseId][terminalId] = "";
+        state.output[exerciseId] = "";
       }
     },
     addTerminalInput: (state, action: PayloadAction<TerminalMessage>): void => {
-      const { exerciseId, terminalId, data } = action.payload;
+      const { exerciseId, data } = action.payload;
       
       if (state.input[exerciseId])
-        state.input[exerciseId][terminalId] = [data].concat(state.input[exerciseId][terminalId] || []);
+        state.input[exerciseId] = [data].concat(state.input[exerciseId] || []);
     },
-    consumeTerminalInput: (state, action: PayloadAction<{ exerciseId: string, terminalId: string }>): void => {
-      const { exerciseId, terminalId } = action.payload;
-      if (state.input[exerciseId] && state.input[exerciseId][terminalId])
-        state.input[exerciseId][terminalId].pop();
+    consumeTerminalInput: (state, action: PayloadAction<{ exerciseId: string }>): void => {
+      const { exerciseId } = action.payload;
+      if (state.input[exerciseId] && state.input[exerciseId])
+        state.input[exerciseId].pop();
     },
   }
 });

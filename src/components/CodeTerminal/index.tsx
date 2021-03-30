@@ -24,11 +24,10 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const CodeTerminal: React.FC<CodeTerminalProps> = ({ terminalId, exerciseId }) => {
+const CodeTerminal: React.FC<CodeTerminalProps> = ({ exerciseId }) => {
   const classes = useStyles();
 
   const terminalContent: TerminalOutputDictionary = useSelector((state: RootState) => state.terminals.output);
-  const [id, setId] = useState<string>("");
   const [terminal] = useState<Terminal>(new Terminal());
   const [fitAddon] = useState<FitAddon>(new FitAddon());
   const dispatch = useDispatch();
@@ -41,8 +40,7 @@ const CodeTerminal: React.FC<CodeTerminalProps> = ({ terminalId, exerciseId }) =
       // Set up xterm instance.
       terminal.loadAddon(fitAddon);
       terminal.open(terminalRef.current);
-      setId(terminalId || generateUuid(TERMIAL_PREFIX));
-
+      
       try {
         fitAddon.fit();
       }
@@ -58,16 +56,16 @@ const CodeTerminal: React.FC<CodeTerminalProps> = ({ terminalId, exerciseId }) =
   }, []);
 
   useEffect(() => {
-    if (terminalContent[exerciseId] && terminalContent[exerciseId][id]) {
+    if (terminalContent[exerciseId]) {
       terminal.reset();
-      terminal.write(terminalContent[exerciseId][id]);
+      terminal.write(terminalContent[exerciseId]);
     }
   }, [terminalContent[exerciseId]]);
 
   const handleClearClick = () => {
     if (terminalRef.current) {
       terminal.reset();
-      dispatch(clearTerminal({ exerciseId, terminalId: id }));
+      dispatch(clearTerminal({ exerciseId }));
     }
   };
 
