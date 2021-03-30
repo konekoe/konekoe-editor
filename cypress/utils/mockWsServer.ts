@@ -1,6 +1,6 @@
 import { Server, WebSocket } from "mock-socket";
-import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState, ResponseMessage, ResponsePayload } from "../../src/types";
-import { assertNever } from "../../src/utils/errors";
+import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState, ResponseMessage, ResponsePayload, RuntimeError } from "../../src/types";
+import { assertNever, MessageError } from "../../src/utils/errors";
 
 export interface MockServerMessageHandlers {
   server_connect?: (data: ServerConnectRequest) => ServerConnectResponse;
@@ -125,7 +125,16 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
     socket.on("message", (jsonStr: string) => {
       const jsonObj: RequestMessage = JSON.parse(jsonStr);
 
-      sendMessage({ type: jsonObj.type, payload: resolveRequest(jsonObj) });
+      let payload: ResponsePayload;
+      let error: MessageError;
+
+      try {
+        payload = resolveRequest(jsonObj);
+      } catch(err) {
+        error = err as MessageError;
+      }
+
+      sendMessage({ type: jsonObj.type, payload: resolveRequest(jsonObj), error });
     });
   });
 
