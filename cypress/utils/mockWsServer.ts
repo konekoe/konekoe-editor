@@ -2,10 +2,12 @@ import { Server, WebSocket } from "mock-socket";
 import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState, ResponseMessage, ResponsePayload, RuntimeError } from "../../src/types";
 import { assertNever, MessageError } from "../../src/utils/errors";
 
+export type ResponseBody<A> = { payload: A, error?: MessageError }
+
 export interface MockServerMessageHandlers {
-  server_connect?: (data: ServerConnectRequest) => ServerConnectResponse;
-  code_submission?: (data: SubmissionRequest) => SubmissionResponse;
-  submission_fetch?: (data: SubmissionFetchRequest) => SubmissionFetchResponse;
+  server_connect?: (data: ServerConnectRequest) => ResponseBody<ServerConnectResponse>;
+  code_submission?: (data: SubmissionRequest) => ResponseBody<SubmissionResponse>;
+  submission_fetch?: (data: SubmissionFetchRequest) => ResponseBody<SubmissionFetchResponse>;
 }
 
 const defaultTestExercises: Exercise[] = [
@@ -50,13 +52,15 @@ const defaultTestSubmissions: ExerciseDictionary<ExerciseSubmission[]> = {
   ]
 };
 
-const defaultServerConnect = (): ServerConnectResponse => (
+const defaultServerConnect = (): ResponseBody<ServerConnectResponse> => (
   {
-    exercises: defaultTestExercises
+    payload: {
+      exercises: defaultTestExercises
+    }
   }
 );
 
-const defaultSubmissionFetchHandler = (request: SubmissionFetchRequest): SubmissionFetchResponse => {
+const defaultSubmissionFetchHandler = (request: SubmissionFetchRequest): ResponseBody<SubmissionFetchResponse> => {
   const defaultSubmission: ExerciseSubmission = {
     id: "submission1",
     date: new Date(),
@@ -74,20 +78,26 @@ const defaultSubmissionFetchHandler = (request: SubmissionFetchRequest): Submiss
   };
 
   if (defaultTestSubmissions[request.exercisedId] && defaultTestSubmissions[request.exercisedId].length) {
-    return { ...request, ...(defaultTestSubmissions[request.exercisedId].find((sub: ExerciseSubmission) => sub.id === request.submissionId) || defaultSubmission) }
+    return {
+      payload: { ...request, ...(defaultTestSubmissions[request.exercisedId].find((sub: ExerciseSubmission) => sub.id === request.submissionId) || defaultSubmission) }
+    };
   }
   
-  return { ...request, ...defaultSubmission };
+  return {
+    payload: { ...request, ...defaultSubmission }
+  };
 };
 
 // By default, all submissions return 0/0.
 // Use MockServer's messageHandlers parameter to utilize more complex logic. 
-const defaultSubmissionHandler = (request: SubmissionRequest): SubmissionResponse => {
+const defaultSubmissionHandler = (request: SubmissionRequest): ResponseBody<SubmissionResponse> => {
   return {
-    exerciseId: request.exerciseId,
-    points: 0,
-    maxPoints: 0,
-  }
+    payload: {
+      exerciseId: request.exerciseId,
+      points: 0,
+      maxPoints: 0,
+    }
+  };
 };
 
 export default function MockServer(addr: string, messageHandlers: MockServerMessageHandlers = {}): Server {
@@ -97,18 +107,20 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
   mockServer.on("connection", (socket: WebSocket) => {
     const sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
 
-    const resolveRequest = (request: RequestMessage): ResponsePayload => {
+    const resolveRequest = (request: RequestMessage): ResponseBody<ResponsePayload> => {
       switch (request.type) {
         case "server_connect":
           // Use given handler or defaul handler.
           if (messageHandlers.server_connect)
             return messageHandlers.server_connect(request.payload as ServerConnectRequest);
+
           return defaultServerConnect();
 
         case "code_submission":
           // Use given handler or defaul handler.
           if (messageHandlers.code_submission)
             return messageHandlers.code_submission(request.payload as SubmissionRequest);
+
           return defaultSubmissionHandler(request.payload as SubmissionRequest);
 
         case "submission_fetch":
@@ -125,16 +137,7 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
     socket.on("message", (jsonStr: string) => {
       const jsonObj: RequestMessage = JSON.parse(jsonStr);
 
-      let payload: ResponsePayload;
-      let error: MessageError;
-
-      try {
-        payload = resolveRequest(jsonObj);
-      } catch(err) {
-        error = err as MessageError;
-      }
-
-      sendMessage({ type: jsonObj.type, payload: resolveRequest(jsonObj), error });
+      sendMessage({ type: jsonObj.type, ...resolveRequest(jsonObj) });
     });
   });
 
