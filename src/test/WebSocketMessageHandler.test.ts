@@ -91,7 +91,7 @@ describe("WebSocketMessageHandler", function() {
         const [server] = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: { exercises: [] },
-            error: new MessageError("Server is busted.", "123", "Server Error");
+            error: new MessageError("Server is busted.", "123", "Server Error")
           })
         });
 
@@ -223,7 +223,7 @@ describe("WebSocketMessageHandler", function() {
         ]
       };
 
-      it("successful fetch updates active submission of target exercise", function() {
+      it("successful fetch updates active submission of target exercise", async function() {
         
         const [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
@@ -246,7 +246,7 @@ describe("WebSocketMessageHandler", function() {
         server.stop();
       });
 
-      it("Incorrect payload produces MinorError", function() {
+      it("Incorrect payload produces MinorError", async function() {
         const [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: { ...testResponse, points: undefined, date: undefined } as unknown as SubmissionFetchResponse
@@ -265,7 +265,7 @@ describe("WebSocketMessageHandler", function() {
         server.stop();
       });
 
-      it("server error produces a MessageError", function() {
+      it("server error produces a MessageError", async function() {
         const [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse,
@@ -286,13 +286,13 @@ describe("WebSocketMessageHandler", function() {
       });
     });
 
-    describe("terminal_output", function() {
+    describe("terminal_output", async function() {
       const testMessage: TerminalMessage = {
         exerciseId: "ex1",
         data: "This is a test"
       };
 
-      it("successful message parsing updates terminal of target exercise", function() {
+      it("successful message parsing updates terminal of target exercise", async function() {
         const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
         new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
@@ -310,7 +310,7 @@ describe("WebSocketMessageHandler", function() {
         server.stop();
       });
 
-      it("Incorrect payload produces console.log", function() {
+      it("Incorrect payload produces console.log", async function() {
         const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
         const mockedConsoleLog = jest.spyOn(global.console, "log");
@@ -328,7 +328,7 @@ describe("WebSocketMessageHandler", function() {
         server.stop();
       });
 
-      it("server error produces a MessageError", function() {
+      it("server error produces a MessageError", async function() {
         const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
         new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
