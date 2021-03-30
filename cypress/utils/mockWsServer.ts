@@ -1,5 +1,5 @@
 import { Server, WebSocket } from "mock-socket";
-import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, ServerMessagePayload, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState, ResponseMessage } from "../../src/types";
+import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState, ResponseMessage, ResponsePayload } from "../../src/types";
 import { assertNever } from "../../src/utils/errors";
 
 export interface MockServerMessageHandlers {
@@ -97,7 +97,7 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
   mockServer.on("connection", (socket: WebSocket) => {
     const sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
 
-    const resolveRequest = (request: RequestMessage): ServerMessagePayload => {
+    const resolveRequest = (request: RequestMessage): ResponsePayload => {
       switch (request.type) {
         case "server_connect":
           // Use given handler or defaul handler.

@@ -1,6 +1,7 @@
-import { init } from "../../src/state/exerciseSlice";
-import { setActiveSubission } from "../../src/state/submissionsSlice";
+import { exerciseInit } from "../../src/state/exerciseSlice";
+import { setActiveSubmission } from "../../src/state/submissionsSlice";
 import { WebSocket, Server } from "mock-socket";
+import { TEST_WS_ADDRESS } from "../../constants";
 import MockServer from "../utils/mockWsServer";
 
 
@@ -18,7 +19,7 @@ describe("Opening the editor page", function () {
       beforeEach(function() {
         cy.window()
         .its("store")
-        .invoke("dispatch", init([
+        .invoke("dispatch", exerciseInit([
           { id: "ex1", submissions: [], title: "Some exercise", points: 1, maxPoints: 1, description: "Do something" },
           { id: "ex2", submissions: [], title: "Some exercise", points: 0, maxPoints: 10, description: "# Works like a charm" }
         ]));  
@@ -37,7 +38,7 @@ describe("Opening the editor page", function () {
       it("code editor is updated after an active sumbission has been set", function() {
         cy.window()
         .its("store")
-        .invoke("dispatch", setActiveSubission({ 
+        .invoke("dispatch", setActiveSubmission({ 
           exerciseId: "ex1", 
           data: [
             {
@@ -61,8 +62,8 @@ describe("Opening the editor page", function () {
       it("clicking the exercise tabs changes the exercise description and code files", function() {
         cy.window()
         .its("store")
-        .invoke("dispatch", setActiveSubission({ 
-          exerciseId: "ex1", 
+        .invoke("dispatch", setActiveSubmission({ 
+          exerciseId: "ex1",
           data: [
             {
               fileId: "file1",
@@ -91,8 +92,8 @@ describe("Opening the editor page", function () {
       cy.visit("/", {
         onBeforeLoad(win) {
           // Create a new mock server and stub Window's WebSocket.
-          server = MockServer("ws://localhost:4000");
-          cy.stub(win, "WebSocket", ()=> new WebSocket("ws://localhost:4000"))
+          server = MockServer(TEST_WS_ADDRESS);
+          cy.stub(win, "WebSocket", ()=> new WebSocket(TEST_WS_ADDRESS))
         }
       });
     });

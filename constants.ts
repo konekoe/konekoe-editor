@@ -1,0 +1,1 @@
+export const TEST_WS_ADDRESS = "ws://localhost:4000";
