@@ -6,10 +6,11 @@ import WebSocketMessageHandler from "../utils/WebSocketMessageHandler";
 import { Store } from "../state/store";
 import { waitFor } from "@testing-library/dom";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
-import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse } from "../types";
-import { submissionInit, resolveSubmission } from "../state/submissionsSlice";
+import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData } from "../types";
+import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
 import { push } from "../state/errorSlice";
 import { CriticalError, MessageError, MinorError } from "../utils/errors";
+import * as Utils from "../utils";
 
 // NOTE: The token field is always an empty string as authentication is left to the server.
 // the editor should not know how the token is used for authentication.
@@ -182,10 +183,11 @@ describe("WebSocketMessageHandler", function() {
 
         handler.sendMessage("code_submission", testRequest);
 
-        await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
+        await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(3));
 
-        expect(store.dispatch).toHaveBeenNthCalledWith(1, resolveSubmission(testResponse));
-        expect(store.dispatch).toHaveBeenNthCalledWith(2, updatePoints(testResponse));
+        expect(store.dispatch).toHaveBeenNthCalledWith(1, push(new MessageError("Test", "ex1")));
+        expect(store.dispatch).toHaveBeenNthCalledWith(2, resolveSubmission(testResponse));
+        expect(store.dispatch).toHaveBeenNthCalledWith(3, updatePoints(testResponse));
     
         server.close();
         server.stop();
@@ -193,16 +195,93 @@ describe("WebSocketMessageHandler", function() {
     });
 
     describe("submission_fetch", function() {
-      it("successful fetch updates active submission of target exercise", function() {
+      const testRequest = {
+        exerciseId: "ex1",
+        submissionId: "sub1"
+      };
 
+      const testDate = new Date();
+
+      // Mock uuid generation to produce empty strings.
+      const mockedUuidGenerate =  jest.spyOn(Utils, "generateUuid");
+      mockedUuidGenerate.mockImplementation(() => "");
+
+      const testResponse: SubmissionFetchResponse = {
+        ...testRequest,
+        date: testDate,
+        points: 10,
+        files: [
+          {
+            filename: "file.txt",
+            data: "I am Teppo Testaaja. This is my test."
+          },
+          {
+            filename: "readme.md",
+            data: "# This is a test"
+          }
+        ]
+      };
+
+      it("successful fetch updates active submission of target exercise", function() {
+        
+        const server = MockServer(TEST_WS_ADDRESS, {
+          submission_fetch: (_data: SubmissionFetchRequest) => ({
+            payload: testResponse
+          })
+        });
+
+        const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
+
+        handler.sendMessage("fetch_submission", testRequest);
+
+        await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        expect(store.dispatch).toHaveBeenNthCalledWith(1, setActiveSubmission({ 
+          exerciseId: testRequest.exerciseId,
+          data: testResponse.files.map((file: FileData) => ({ ...file, fileId: "" }))
+        }));
+    
+        server.close();
+        server.stop();
       });
 
       it("Incorrect payload produces MinorError", function() {
+        const server = MockServer(TEST_WS_ADDRESS, {
+          submission_fetch: (_data: SubmissionFetchRequest) => ({
+            payload: { ...testResponse, points: undefined, date: undefined } as unknown as SubmissionFetchResponse
+          })
+        });
 
+        const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
+
+        handler.sendMessage("fetch_submission", testRequest);
+
+        await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Could not fetch submission", "FetchingError")));
+    
+        server.close();
+        server.stop();
       });
 
       it("server error produces a MessageError", function() {
+        const server = MockServer(TEST_WS_ADDRESS, {
+          submission_fetch: (_data: SubmissionFetchRequest) => ({
+            payload: testResponse,
+            error: new MessageError("Error fetching", "ex1")
+          })
+        });
 
+        const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
+
+        handler.sendMessage("fetch_submission", testRequest);
+
+        await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("Error fetching", "ex1")));
+    
+        server.close();
+        server.stop();
       });
     });
 
