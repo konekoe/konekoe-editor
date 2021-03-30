@@ -16,9 +16,7 @@ describe("<CodeTerminal/>", () => {
     store = configureStore()({
       terminals: {
         output: {
-          [exerciseId]: {
-            [terminalId]: "Hello there"
-          }
+          [exerciseId]: "Hello there"
         },
         input: {} // NOTE: Input handling is not implemented yet.
       }
@@ -32,7 +30,7 @@ describe("<CodeTerminal/>", () => {
   it("xterm terminal is attached", () => { 
     const component = render(
     <Provider store={ store }>
-      <CodeTerminal exerciseId={ exerciseId } terminalId={ terminalId }/>
+      <CodeTerminal exerciseId={ exerciseId }/>
     </Provider>
     );
 
@@ -42,7 +40,7 @@ describe("<CodeTerminal/>", () => {
   it("clear button sends clear action to state", () => {
     const component = render(
     <Provider store={ store }>
-      <CodeTerminal exerciseId={ exerciseId } terminalId={ terminalId }/>
+      <CodeTerminal exerciseId={ exerciseId }/>
     </Provider>
     );
     
@@ -57,7 +55,7 @@ describe("<CodeTerminal/>", () => {
 
     expect(store.dispatch).toHaveBeenCalledTimes(1);
     expect(store.dispatch).toHaveBeenCalledWith(
-      clearTerminal({ exerciseId, terminalId })
+      clearTerminal({ exerciseId })
     );
 
   });
