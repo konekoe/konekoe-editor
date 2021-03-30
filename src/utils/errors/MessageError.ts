@@ -5,7 +5,7 @@ class MessageError extends GenericError {
     id: string;
     title?: string;
     
-	constructor(msg: string, id: string, title: string | undefined) {
+	constructor(msg: string, id: string, title?: string) {
 		super(msg);
 		this.id = id;
 		this.title = title;
