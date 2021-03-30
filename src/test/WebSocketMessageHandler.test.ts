@@ -6,11 +6,12 @@ import WebSocketMessageHandler from "../utils/WebSocketMessageHandler";
 import { Store } from "../state/store";
 import { waitFor } from "@testing-library/dom";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
-import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData } from "../types";
+import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData, TerminalMessage } from "../types";
 import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
 import { push } from "../state/errorSlice";
 import { CriticalError, MessageError, MinorError } from "../utils/errors";
 import * as Utils from "../utils";
+import { addTerminalOutput } from "../state/terminalSlice";
 
 // NOTE: The token field is always an empty string as authentication is left to the server.
 // the editor should not know how the token is used for authentication.
@@ -38,7 +39,7 @@ describe("WebSocketMessageHandler", function() {
           description: "This is a test"
         };
 
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: {
               exercises: [testExercise]
@@ -66,7 +67,7 @@ describe("WebSocketMessageHandler", function() {
           points: 1,
         } as Exercise;
 
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: {
               exercises: [testExercise]
@@ -87,7 +88,7 @@ describe("WebSocketMessageHandler", function() {
       });
 
       it("server error produces a CriticalError", async function() {
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: { exercises: [] },
             error: new MessageError("Server is busted.", "123", "Server Error");
@@ -120,7 +121,7 @@ describe("WebSocketMessageHandler", function() {
           maxPoints: 10
         };
 
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse
           })
@@ -145,7 +146,7 @@ describe("WebSocketMessageHandler", function() {
           points: 0,
         } as SubmissionResponse;
 
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse
           })
@@ -172,7 +173,7 @@ describe("WebSocketMessageHandler", function() {
           maxPoints: 10
         };
 
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse,
             error: new MessageError("Test", "ex1")
@@ -224,7 +225,7 @@ describe("WebSocketMessageHandler", function() {
 
       it("successful fetch updates active submission of target exercise", function() {
         
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse
           })
@@ -246,7 +247,7 @@ describe("WebSocketMessageHandler", function() {
       });
 
       it("Incorrect payload produces MinorError", function() {
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: { ...testResponse, points: undefined, date: undefined } as unknown as SubmissionFetchResponse
           })
@@ -265,7 +266,7 @@ describe("WebSocketMessageHandler", function() {
       });
 
       it("server error produces a MessageError", function() {
-        const server = MockServer(TEST_WS_ADDRESS, {
+        const [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse,
             error: new MessageError("Error fetching", "ex1")
@@ -286,16 +287,64 @@ describe("WebSocketMessageHandler", function() {
     });
 
     describe("terminal_output", function() {
-      it("successful message parsing updates terminal of target exercise", function() {
+      const testMessage: TerminalMessage = {
+        exerciseId: "ex1",
+        data: "This is a test"
+      };
 
+      it("successful message parsing updates terminal of target exercise", function() {
+        const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
+
+        new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
+
+        sendMessage({
+          type: "terminal_output",
+          payload: testMessage
+        });
+
+        await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        expect(store.dispatch).toHaveBeenCalledWith(addTerminalOutput(testMessage));
+    
+        server.close();
+        server.stop();
       });
 
       it("Incorrect payload produces console.log", function() {
+        const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
+        const mockedConsoleLog = jest.spyOn(global.console, "log");
+
+        new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
+
+        sendMessage({
+          type: "terminal_output",
+          payload: testMessage
+        });
+
+        await waitFor(() => expect(mockedConsoleLog).toHaveBeenCalledTimes(1));
+    
+        server.close();
+        server.stop();
       });
 
       it("server error produces a MessageError", function() {
+        const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
+        new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
+
+        sendMessage({
+          type: "terminal_output",
+          payload: testMessage,
+          error: new MessageError("This is a test.", "123")
+        });
+
+        await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("This is a test.", "123")));
+    
+        server.close();
+        server.stop();
       });
     });
   });

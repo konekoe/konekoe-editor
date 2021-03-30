@@ -92,7 +92,7 @@ describe("Opening the editor page", function () {
       cy.visit("/", {
         onBeforeLoad(win) {
           // Create a new mock server and stub Window's WebSocket.
-          server = MockServer(TEST_WS_ADDRESS);
+          server = MockServer(TEST_WS_ADDRESS)[0];
           cy.stub(win, "WebSocket", ()=> new WebSocket(TEST_WS_ADDRESS))
         }
       });

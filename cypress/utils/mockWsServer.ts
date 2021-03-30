@@ -100,12 +100,14 @@ const defaultSubmissionHandler = (request: SubmissionRequest): ResponseBody<Subm
   };
 };
 
-export default function MockServer(addr: string, messageHandlers: MockServerMessageHandlers = {}): Server {
+export default function MockServer(addr: string, messageHandlers: MockServerMessageHandlers = {}): [Server, (msg: ResponseMessage) => void] {
   const mockServer = new Server(addr);
+
+  let sendMessage: (msg: ResponseMessage) => void;
 
   // Mock for the backend.
   mockServer.on("connection", (socket: WebSocket) => {
-    const sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
+    sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
 
     const resolveRequest = (request: RequestMessage): ResponseBody<ResponsePayload> => {
       switch (request.type) {
@@ -141,5 +143,5 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
     });
   });
 
-  return mockServer;
+  return [mockServer, sendMessage];
 };
