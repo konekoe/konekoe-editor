@@ -1,5 +1,5 @@
 import { Server, WebSocket } from "mock-socket";
-import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, FileData, ExerciseState, ResponseMessage, ResponsePayload, RuntimeError } from "../../src/types";
+import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, exerciseictionary, FileData, ExerciseState, ResponseMessage, ResponsePayload, RuntimeError } from "../../src/types";
 import { assertNever, MessageError } from "../../src/utils/errors";
 
 export type ResponseBody<A> = { payload: A, error?: MessageError }
@@ -29,7 +29,7 @@ const defaultTestExercises: Exercise[] = [
   }
 ];
 
-const defaultTestSubmissions: ExerciseDictionary<ExerciseSubmission[]> = {
+const defaultTestSubmissions: exerciseictionary<ExerciseSubmission[]> = {
   "ex2": [
     {
       id: "submission1",
@@ -77,9 +77,9 @@ const defaultSubmissionFetchHandler = (request: SubmissionFetchRequest): Respons
     ]
   };
 
-  if (defaultTestSubmissions[request.exercisedId] && defaultTestSubmissions[request.exercisedId].length) {
+  if (defaultTestSubmissions[request.exerciseId] && defaultTestSubmissions[request.exerciseId].length) {
     return {
-      payload: { ...request, ...(defaultTestSubmissions[request.exercisedId].find((sub: ExerciseSubmission) => sub.id === request.submissionId) || defaultSubmission) }
+      payload: { ...request, ...(defaultTestSubmissions[request.exerciseId].find((sub: ExerciseSubmission) => sub.id === request.submissionId) || defaultSubmission) }
     };
   }
   

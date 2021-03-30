@@ -27,7 +27,6 @@ export interface SubmissionResponse {
   exerciseId: string;
   points: number;
   maxPoints: number;  // NOTE: The backend currently has two ways of defining max points: the database and the grader. Only one should be used so that max points don't need to be received here.
-  error?: MessageError;
 }
 
 export interface ExerciseSubmission {
@@ -147,7 +146,7 @@ export interface ServerConnectResponse {
 }
 
 export interface SubmissionFetchRequest {
-  exercisedId: string;
+  exerciseId: string;
   submissionId: string;
 }
 
