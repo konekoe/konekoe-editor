@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { ExerciseState, Exercise, TabItem } from "../types";
+import { ExerciseState, Exercise, TabItem, SubmissionResponse } from "../types";
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const exerciseSlice = createSlice({
@@ -21,6 +21,17 @@ const exerciseSlice = createSlice({
         state.maxPoints[ex.id] = ex.maxPoints;
         state.descriptions[ex.id] = ex.description;
       });
+    },
+    updatePoints: (state, action: PayloadAction<SubmissionResponse>) => {
+      const { exerciseId, points, maxPoints } = action.payload;
+
+      if (state.points[exerciseId] && state.maxPoints[exerciseId]) {
+        if (state.points[exerciseId] < points)
+          state.points[exerciseId] = points;
+
+        state.maxPoints[exerciseId] = maxPoints;
+      }
+
     }
   }
 });
@@ -36,7 +47,7 @@ export const exerciseTabSelector = (state: RootState): TabItem[] => {
   }));
 };
 
-export const { exerciseInit } = exerciseSlice.actions;
+export const { exerciseInit, updatePoints } = exerciseSlice.actions;
 
 export default exerciseSlice.reducer;
 

@@ -1,12 +1,12 @@
 import { MockServer } from "./utils";
-import { WebSocket } from "mock-socket";
+import { WebSocket as MockSocket, Server } from "mock-socket";
 import { TEST_WS_ADDRESS } from "../../constants";
 import configureStore from "redux-mock-store";
 import WebSocketMessageHandler from "../utils/WebSocketMessageHandler";
 import { Store } from "../state/store";
 import { waitFor } from "@testing-library/dom";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
-import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData, TerminalMessage } from "../types";
+import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData, TerminalMessage, ResponseMessage } from "../types";
 import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
 import { push } from "../state/errorSlice";
 import { CriticalError, MessageError, MinorError } from "../utils/errors";
@@ -16,7 +16,18 @@ import { addTerminalOutput } from "../state/terminalSlice";
 // NOTE: The token field is always an empty string as authentication is left to the server.
 // the editor should not know how the token is used for authentication.
 
+
+// Mock globla WebSocket object utilized byt WebSocketMessageHandler.
+global.WebSocket = MockSocket;
+
 describe("WebSocketMessageHandler", function() {
+  let server: Server;
+
+  afterEach(function() {
+    server.close();
+    server.stop();
+  });
+
   describe("Received messages are parsed and store is updated.", function() {
     let store: Store = configureStore()({}) as Store;
 
@@ -39,7 +50,7 @@ describe("WebSocketMessageHandler", function() {
           description: "This is a test"
         };
 
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: {
               exercises: [testExercise]
@@ -55,9 +66,6 @@ describe("WebSocketMessageHandler", function() {
 
         expect(store.dispatch).toHaveBeenNthCalledWith(1, exerciseInit([testExercise]));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, submissionInit([testExercise]));
-    
-        server.close();
-        server.stop();
       });
 
       it("malformed payload produces a CriticalError", async function() {
@@ -67,7 +75,7 @@ describe("WebSocketMessageHandler", function() {
           points: 1,
         } as Exercise;
 
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: {
               exercises: [testExercise]
@@ -82,13 +90,10 @@ describe("WebSocketMessageHandler", function() {
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new CriticalError("Invalid server response")));
-
-        server.close();
-        server.stop();
       });
 
       it("server error produces a CriticalError", async function() {
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: { exercises: [] },
             error: new MessageError("Server is busted.", "123", "Server Error")
@@ -102,9 +107,6 @@ describe("WebSocketMessageHandler", function() {
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new CriticalError("Server is busted.")));
-
-        server.close();
-        server.stop();
       });
     });
 
@@ -121,7 +123,7 @@ describe("WebSocketMessageHandler", function() {
           maxPoints: 10
         };
 
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse
           })
@@ -135,9 +137,6 @@ describe("WebSocketMessageHandler", function() {
 
         expect(store.dispatch).toHaveBeenNthCalledWith(1, resolveSubmission(testResponse));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, updatePoints(testResponse));
-    
-        server.close();
-        server.stop();
       });
 
       it("Incorrect payload produces a MinorError", async function() {
@@ -146,7 +145,7 @@ describe("WebSocketMessageHandler", function() {
           points: 0,
         } as SubmissionResponse;
 
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse
           })
@@ -159,9 +158,6 @@ describe("WebSocketMessageHandler", function() {
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Invalid response", "MessageError")));
-
-        server.close();
-        server.stop();
       });
 
       it("server error produces MessageError, but the submission is also resolved", async function() {
@@ -173,7 +169,7 @@ describe("WebSocketMessageHandler", function() {
           maxPoints: 10
         };
 
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse,
             error: new MessageError("Test", "ex1")
@@ -189,9 +185,6 @@ describe("WebSocketMessageHandler", function() {
         expect(store.dispatch).toHaveBeenNthCalledWith(1, push(new MessageError("Test", "ex1")));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, resolveSubmission(testResponse));
         expect(store.dispatch).toHaveBeenNthCalledWith(3, updatePoints(testResponse));
-    
-        server.close();
-        server.stop();
       });
     });
 
@@ -225,7 +218,7 @@ describe("WebSocketMessageHandler", function() {
 
       it("successful fetch updates active submission of target exercise", async function() {
         
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse
           })
@@ -241,13 +234,10 @@ describe("WebSocketMessageHandler", function() {
           exerciseId: testRequest.exerciseId,
           data: testResponse.files.map((file: FileData) => ({ ...file, fileId: "" }))
         }));
-    
-        server.close();
-        server.stop();
       });
 
       it("Incorrect payload produces MinorError", async function() {
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: { ...testResponse, points: undefined, date: undefined } as unknown as SubmissionFetchResponse
           })
@@ -260,13 +250,10 @@ describe("WebSocketMessageHandler", function() {
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Could not fetch submission", "FetchingError")));
-    
-        server.close();
-        server.stop();
       });
 
       it("server error produces a MessageError", async function() {
-        const [server] = MockServer(TEST_WS_ADDRESS, {
+        [server] = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse,
             error: new MessageError("Error fetching", "ex1")
@@ -280,9 +267,6 @@ describe("WebSocketMessageHandler", function() {
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("Error fetching", "ex1")));
-    
-        server.close();
-        server.stop();
       });
     });
 
@@ -292,8 +276,10 @@ describe("WebSocketMessageHandler", function() {
         data: "This is a test"
       };
 
+      let sendMessage: (msg: ResponseMessage) => void;
+
       it("successful message parsing updates terminal of target exercise", async function() {
-        const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
+        [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
         new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
@@ -305,13 +291,10 @@ describe("WebSocketMessageHandler", function() {
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
         expect(store.dispatch).toHaveBeenCalledWith(addTerminalOutput(testMessage));
-    
-        server.close();
-        server.stop();
       });
 
       it("Incorrect payload produces console.log", async function() {
-        const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
+        [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
         const mockedConsoleLog = jest.spyOn(global.console, "log");
 
@@ -323,13 +306,10 @@ describe("WebSocketMessageHandler", function() {
         });
 
         await waitFor(() => expect(mockedConsoleLog).toHaveBeenCalledTimes(1));
-    
-        server.close();
-        server.stop();
       });
 
       it("server error produces a MessageError", async function() {
-        const [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
+        [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
 
         new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
@@ -342,15 +322,12 @@ describe("WebSocketMessageHandler", function() {
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("This is a test.", "123")));
-    
-        server.close();
-        server.stop();
       });
     });
   });
 
   describe("Receiving random data produces an error", function(){
-    it("random JSON data and completely random data are handeled identically", function() {
+    it("random JSON data and completely random data are handled identically", function() {
 
     });
 
