@@ -2,7 +2,7 @@ import { MinorError, CriticalError, MessageError, assertNever } from "./errors";
 import { Store } from "../state/store";
 import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData } from "../types";
 import { push } from "../state/errorSlice";
-import { exerciseInit } from "../state/exerciseSlice";
+import { exerciseInit, updatePoints } from "../state/exerciseSlice";
 import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
 import { isServerConnectResponse, isSubmissionResponse, isTerminalMessage, isSubmissionFetchResponse, isResponseMessage } from "./typeCheckers";
 import { addTerminalOutput } from "../state/terminalSlice";
@@ -25,6 +25,7 @@ class WebSocketMessageHandler {
 
     this._socket.onmessage = ({ data }: { data: string }) => {
       try {
+        
         const msgObj: Record<string, unknown> = JSON.parse(data);
 
         if (!isResponseMessage(msgObj))
@@ -37,6 +38,8 @@ class WebSocketMessageHandler {
       }
     };
 
+    /*
+
     this._store.subscribe(submissionWatcherFactory(this._store, "activeSubmissions")((newState, oldState) => {
       // Find a submission. The data must have changed and be a non null object.
       const submission = Object.entries(newState).find(sub => sub[1] && !oldState[sub[0]]);
@@ -48,20 +51,12 @@ class WebSocketMessageHandler {
       }
       
     }));
+
+    */
   }
 
-  public async open() {
-    return new Promise((resolve) => {
-      this._socket.addEventListener("open", (event) => {
-        this._socket.send(JSON.stringify({ type: "server_connect", payload: { token: this._token } }));
-      });
-  
-      document.addEventListener("server_connect", ({ detail }) => {
-        document.removeEventListener("server_connect", this);
-
-        resolve(detail);
-      });  
-    });
+  public open() {
+    this._socket.send(JSON.stringify({ type: "server_connect", payload: { token: this._token } }));
   }
 
   public async sendMessage(type: string, payload: RequestPayload) {
@@ -90,7 +85,8 @@ class WebSocketMessageHandler {
     if (!isSubmissionResponse(payload))
       throw new MinorError("Invalid response", "MessageError");
     
-      this._store.dispatch(resolveSubmission(payload));
+    this._store.dispatch(resolveSubmission(payload));
+    this._store.dispatch(updatePoints(payload));
   }
 
   private _handleTerminalOutput(payload: ResponsePayload, error?: MessageError) {
@@ -113,7 +109,7 @@ class WebSocketMessageHandler {
       throw new MinorError("Could not fetch submission", "FetchingError");
 
     this._store.dispatch(setActiveSubmission({
-      exerciseId: payload.exercisedId,
+      exerciseId: payload.exerciseId,
       data: payload.files.map((data: FileData): ExerciseFile => ({ fileId: generateUuid("file"), ...data })) 
     }));
   }

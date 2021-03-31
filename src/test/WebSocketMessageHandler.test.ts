@@ -21,12 +21,7 @@ import { addTerminalOutput } from "../state/terminalSlice";
 global.WebSocket = MockSocket;
 
 describe("WebSocketMessageHandler", function() {
-  let server: Server;
-
-  afterEach(function() {
-    server.close();
-    server.stop();
-  });
+  let server = MockServer(TEST_WS_ADDRESS);
 
   describe("Received messages are parsed and store is updated.", function() {
     let store: Store = configureStore()({}) as Store;
@@ -37,6 +32,9 @@ describe("WebSocketMessageHandler", function() {
       store = configureStore()({}) as Store;
 
       store.dispatch = jest.fn();
+
+      server.stop();
+      server.close();
     });
 
     describe("server_connect and open", function() {
@@ -50,7 +48,7 @@ describe("WebSocketMessageHandler", function() {
           description: "This is a test"
         };
 
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: {
               exercises: [testExercise]
@@ -63,7 +61,7 @@ describe("WebSocketMessageHandler", function() {
         handler.open();
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
-
+        
         expect(store.dispatch).toHaveBeenNthCalledWith(1, exerciseInit([testExercise]));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, submissionInit([testExercise]));
       });
@@ -75,7 +73,7 @@ describe("WebSocketMessageHandler", function() {
           points: 1,
         } as Exercise;
 
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: {
               exercises: [testExercise]
@@ -89,11 +87,14 @@ describe("WebSocketMessageHandler", function() {
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
-        expect(store.dispatch).toHaveBeenCalledWith(push(new CriticalError("Invalid server response")));
+        
+        
+
+        expect(store.dispatch).toHaveBeenCalledWith(push(new CriticalError("Invalid server response.")));
       });
 
       it("server error produces a CriticalError", async function() {
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: { exercises: [] },
             error: new MessageError("Server is busted.", "123", "Server Error")
@@ -105,6 +106,9 @@ describe("WebSocketMessageHandler", function() {
         handler.open();
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        
+        
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new CriticalError("Server is busted.")));
       });
@@ -123,7 +127,7 @@ describe("WebSocketMessageHandler", function() {
           maxPoints: 10
         };
 
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse
           })
@@ -135,6 +139,9 @@ describe("WebSocketMessageHandler", function() {
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
 
+        
+        
+
         expect(store.dispatch).toHaveBeenNthCalledWith(1, resolveSubmission(testResponse));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, updatePoints(testResponse));
       });
@@ -145,7 +152,7 @@ describe("WebSocketMessageHandler", function() {
           points: 0,
         } as SubmissionResponse;
 
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse
           })
@@ -156,6 +163,9 @@ describe("WebSocketMessageHandler", function() {
         handler.sendMessage("code_submission", testRequest);
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        
+        
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Invalid response", "MessageError")));
       });
@@ -169,7 +179,7 @@ describe("WebSocketMessageHandler", function() {
           maxPoints: 10
         };
 
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse,
             error: new MessageError("Test", "ex1")
@@ -181,6 +191,9 @@ describe("WebSocketMessageHandler", function() {
         handler.sendMessage("code_submission", testRequest);
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(3));
+
+        
+        
 
         expect(store.dispatch).toHaveBeenNthCalledWith(1, push(new MessageError("Test", "ex1")));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, resolveSubmission(testResponse));
@@ -218,7 +231,7 @@ describe("WebSocketMessageHandler", function() {
 
       it("successful fetch updates active submission of target exercise", async function() {
         
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse
           })
@@ -226,18 +239,19 @@ describe("WebSocketMessageHandler", function() {
 
         const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
-        handler.sendMessage("fetch_submission", testRequest);
+        handler.sendMessage("submission_fetch", testRequest);
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
-        expect(store.dispatch).toHaveBeenNthCalledWith(1, setActiveSubmission({ 
+
+        expect(store.dispatch).toHaveBeenCalledWith(setActiveSubmission({ 
           exerciseId: testRequest.exerciseId,
           data: testResponse.files.map((file: FileData) => ({ ...file, fileId: "" }))
         }));
       });
 
       it("Incorrect payload produces MinorError", async function() {
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: { ...testResponse, points: undefined, date: undefined } as unknown as SubmissionFetchResponse
           })
@@ -245,15 +259,18 @@ describe("WebSocketMessageHandler", function() {
 
         const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
-        handler.sendMessage("fetch_submission", testRequest);
+        handler.sendMessage("submission_fetch", testRequest);
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+        
+        
+        
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Could not fetch submission", "FetchingError")));
       });
 
       it("server error produces a MessageError", async function() {
-        [server] = MockServer(TEST_WS_ADDRESS, {
+        server = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse,
             error: new MessageError("Error fetching", "ex1")
@@ -262,31 +279,35 @@ describe("WebSocketMessageHandler", function() {
 
         const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
-        handler.sendMessage("fetch_submission", testRequest);
+        handler.sendMessage("submission_fetch", testRequest);
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        
+        
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("Error fetching", "ex1")));
       });
     });
 
-    describe("terminal_output", async function() {
+    describe("terminal_output", function() {
       const testMessage: TerminalMessage = {
         exerciseId: "ex1",
         data: "This is a test"
       };
 
-      let sendMessage: (msg: ResponseMessage) => void;
-
       it("successful message parsing updates terminal of target exercise", async function() {
-        [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
+        server = MockServer(TEST_WS_ADDRESS, {});
 
         new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
-        sendMessage({
-          type: "terminal_output",
-          payload: testMessage
-        });
+        await waitFor(() => expect(server.sendMessage).toBeDefined());
+
+        if (server.sendMessage)
+          server.sendMessage({
+            type: "terminal_output",
+            payload: testMessage
+          });
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
@@ -294,63 +315,90 @@ describe("WebSocketMessageHandler", function() {
       });
 
       it("Incorrect payload produces console.log", async function() {
-        [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
+        
+        server = MockServer(TEST_WS_ADDRESS, {});
 
         const mockedConsoleLog = jest.spyOn(global.console, "log");
 
         new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
-        sendMessage({
-          type: "terminal_output",
-          payload: testMessage
-        });
+        await waitFor(() => expect(server.sendMessage).toBeDefined());
 
+        if (server.sendMessage)
+          server.sendMessage({
+            type: "terminal_output",
+            payload: {
+              test: "Hello"
+            }
+          } as unknown as ResponseMessage);
+
+      
         await waitFor(() => expect(mockedConsoleLog).toHaveBeenCalledTimes(1));
       });
 
       it("server error produces a MessageError", async function() {
-        [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
+        
+        server = MockServer(TEST_WS_ADDRESS, {});
 
         new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
-        sendMessage({
-          type: "terminal_output",
-          payload: testMessage,
-          error: new MessageError("This is a test.", "123")
-        });
+        await waitFor(() => expect(server.sendMessage).toBeDefined());
+
+        if (server.sendMessage)
+          server.sendMessage({
+            type: "terminal_output",
+            payload: testMessage,
+            error: new MessageError("This is a test.", "123")
+          });
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+
+        
+        
 
         expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("This is a test.", "123")));
       });
     });
+
+    it("random JSON data and completely random data are handled identically", async function() {
+      const store: Store = configureStore()({}) as Store;
+      store.dispatch = jest.fn();
+  
+      server = MockServer(TEST_WS_ADDRESS, {});
+  
+      new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
+  
+      await waitFor(() => expect(server.sendMessage).toBeDefined());
+  
+      if (server.sendMessage)
+        server.sendMessage({
+          test: "This is a test"
+        } as unknown as ResponseMessage);
+  
+      await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
+  
+      expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Malformed message data.", "An error occured")));
+      
+      if (server.sendMessage)
+        server.sendMessage("This is a test" as unknown as ResponseMessage);
+  
+      await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
+  
+      
+      
+  
+      expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Malformed message data.", "An error occured")));
+    });
   });
 
-  it("random JSON data and completely random data are handled identically", async function() {
-    const store: Store = configureStore()({}) as Store;
-    store.dispatch = jest.fn();
-
-    let sendMessage: (msg: ResponseMessage) => void;
-    [server, sendMessage] = MockServer(TEST_WS_ADDRESS, {});
-
-    new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
-
-    sendMessage({
-      test: "This is a test"
-    } as unknown as ResponseMessage);
-
-    await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
-
-    expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Malformed message data.", "An error occured")));
-    
-    sendMessage("This is a test" as unknown as ResponseMessage);
-
-    await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
-
-    expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Malformed message data.", "An error occured")));
-  });
 
   describe("message handler watches for state updates", function() {
+
+    beforeEach(function () {
+      server.close();
+      server.stop();
+    });
+
     it("if the state contains a submission request, send a code_submission", async function() {
       const testResponse: SubmissionResponse = {
         exerciseId: "ex1",
@@ -372,7 +420,7 @@ describe("WebSocketMessageHandler", function() {
       }) as Store;
       store.dispatch = jest.fn();
 
-      [server] = MockServer(TEST_WS_ADDRESS, {
+      server = MockServer(TEST_WS_ADDRESS, {
         code_submission: (_data: SubmissionRequest) => ({
           payload: testResponse
         })
@@ -382,8 +430,9 @@ describe("WebSocketMessageHandler", function() {
 
       await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
 
-        expect(store.dispatch).toHaveBeenNthCalledWith(1, resolveSubmission(testResponse));
-        expect(store.dispatch).toHaveBeenNthCalledWith(2, updatePoints(testResponse));
+    
+      expect(store.dispatch).toHaveBeenNthCalledWith(1, resolveSubmission(testResponse));
+      expect(store.dispatch).toHaveBeenNthCalledWith(2, updatePoints(testResponse));
     });
 
     it("if state contains a submission fetch request, send a submission_fetch", async function() {
@@ -411,7 +460,7 @@ describe("WebSocketMessageHandler", function() {
       }) as Store;
       store.dispatch = jest.fn();
 
-      [server] = MockServer(TEST_WS_ADDRESS, {
+      server = MockServer(TEST_WS_ADDRESS, {
         submission_fetch: (_data: SubmissionFetchRequest) => ({
           payload: testResponse
         })
@@ -419,11 +468,9 @@ describe("WebSocketMessageHandler", function() {
 
       const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
 
-      handler.sendMessage("fetch_submission", testRequest);
-
       await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
 
-      expect(store.dispatch).toHaveBeenNthCalledWith(1, setActiveSubmission({ 
+      expect(store.dispatch).toHaveBeenCalledWith(setActiveSubmission({ 
         exerciseId: testRequest.exerciseId,
         data: []
       }));

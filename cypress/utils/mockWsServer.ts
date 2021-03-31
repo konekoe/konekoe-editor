@@ -1,5 +1,5 @@
 import { Server, WebSocket } from "mock-socket";
-import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, exerciseictionary, FileData, ExerciseState, ResponseMessage, ResponsePayload, RuntimeError } from "../../src/types";
+import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, ResponseMessage, ResponsePayload, RuntimeError } from "../../src/types";
 import { assertNever, MessageError } from "../../src/utils/errors";
 
 export type ResponseBody<A> = { payload: A, error?: MessageError }
@@ -29,7 +29,7 @@ const defaultTestExercises: Exercise[] = [
   }
 ];
 
-const defaultTestSubmissions: exerciseictionary<ExerciseSubmission[]> = {
+const defaultTestSubmissions: ExerciseDictionary<ExerciseSubmission[]> = {
   "ex2": [
     {
       id: "submission1",
@@ -100,14 +100,20 @@ const defaultSubmissionHandler = (request: SubmissionRequest): ResponseBody<Subm
   };
 };
 
-export default function MockServer(addr: string, messageHandlers: MockServerMessageHandlers = {}): [Server, (msg: ResponseMessage) => void] {
-  const mockServer = new Server(addr);
 
-  let sendMessage: (msg: ResponseMessage) => void;
+export interface ServerMock extends Server {
+  sendMessage?: (msg: ResponseMessage) => void;
+}
+
+
+export default function MockServer(addr: string, messageHandlers: MockServerMessageHandlers = {}): ServerMock {
+  const mockServer: ServerMock = new Server(addr);
+
 
   // Mock for the backend.
   mockServer.on("connection", (socket: WebSocket) => {
-    sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
+    
+    mockServer.sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
 
     const resolveRequest = (request: RequestMessage): ResponseBody<ResponsePayload> => {
       switch (request.type) {
@@ -132,16 +138,20 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
           return defaultSubmissionFetchHandler(request.payload as SubmissionFetchRequest);
 
         default:
-          assertNever(request.type);
+          return assertNever(request.type);
+
       }
     };
 
-    socket.on("message", (jsonStr: string) => {
-      const jsonObj: RequestMessage = JSON.parse(jsonStr);
+    socket.on("message", (message: string | Blob | ArrayBuffer | ArrayBufferView) => {
 
-      sendMessage({ type: jsonObj.type, ...resolveRequest(jsonObj) });
+      // In testing we assume message to be a string.
+      const jsonObj: RequestMessage = JSON.parse(message as unknown as string);
+
+      if (mockServer.sendMessage)
+        mockServer.sendMessage({ type: jsonObj.type, ...resolveRequest(jsonObj) });
     });
   });
 
-  return [mockServer, sendMessage];
+  return mockServer;
 };

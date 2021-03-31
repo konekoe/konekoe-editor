@@ -97,7 +97,7 @@ export const isTerminalMessage = (param: unknown): param is TerminalMessage => {
   if (!isStringRecord(param))
     return false;
 
-  return multiCheck(["exerciseId","terminalId", "data"], [isString, isString, isString], param);
+  return multiCheck(["exerciseId", "data"], [isString, isString], param);
 };
 
 export const isSubmissionFetchResponse = (param: unknown): param is SubmissionFetchResponse => {
@@ -105,8 +105,8 @@ export const isSubmissionFetchResponse = (param: unknown): param is SubmissionFe
     return false;
 
   return multiCheck(
-    ["exerciseId","submissionId", "data", "date", "points", "files"],
-    [isString, isString, isString, isDate, isNumber, isFileDataArray],
+    ["exerciseId","submissionId", "date", "points", "files"],
+    [isString, isString, isDate, isNumber, isFileDataArray],
     param);
 };
 
@@ -118,11 +118,9 @@ export const isResponseMessage = (param: unknown): param is ResponseMessage => {
     return false;
 
   return multiCheck(
-    ["type","payload", "error"],
+    ["type"],
     [
-      includedIn(["server_connect", "code_submission", "submission_fetch", "terminal_output"]),
-      or(or(isServerConnectResponse, isSubmissionResponse), or(isTerminalMessage, isSubmissionFetchResponse)),
-      or(isMessageError)
+      includedIn(["server_connect", "code_submission", "submission_fetch", "terminal_output"])
     ],
     param);
 };
