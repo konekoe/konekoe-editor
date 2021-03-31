@@ -22,6 +22,7 @@ describe("<CodeEditor />", () => {
       submissions: {
         allSubmissions: [], // TODO: Add suport for fetching different submissions
         submissionRequests: {},
+        submissionFetchRequests: {},
         activeSubmissions: {
           [exerciseId1]: {
             [fileId1]: {
@@ -90,6 +91,7 @@ describe("<CodeEditor />", () => {
       submissions: {
         allSubmissions: {},
         submissionRequests: {},
+        submissionFetchRequests: {},
         activeSubmissions: {},
         points: {},
         maxPoints: {}
@@ -164,6 +166,7 @@ describe("<CodeEditor />", () => {
       store = configureStore()({
         submissions: {
           allSubmissions: [], // TODO: Add suport for fetching different submissions
+          submissionFetchRequests: {},
           submissionRequests: {
             [exerciseId1]: {
               [fileId1]: "",

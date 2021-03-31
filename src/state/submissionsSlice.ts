@@ -9,6 +9,7 @@ const submissionsSlice = createSlice({
     allSubmissions: {},
     submissionRequests: {},
     activeSubmissions: {},
+    submissionFetchRequests: {}
   } as SubmissionState,
   reducers: {
     submissionInit: (state, action: PayloadAction<Exercise[]>) => {
@@ -36,6 +37,8 @@ const submissionsSlice = createSlice({
         dict[curr.fileId] = curr;
         return dict;
       }, {} as ExerciseFileDict);
+
+      state.submissionFetchRequests[action.payload.exerciseId] = undefined;
     },
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
