@@ -1,10 +1,10 @@
-import { MinorError, CriticalError, GenericError, MessageError, assertNever } from "./errors";
+import { MinorError, CriticalError, MessageError, assertNever } from "./errors";
 import { Store } from "../state/store";
-import { RequestMessage, ResponseMessage, ResponsePayload, ServerConnectResponse, RequestPayload, Exercise, RuntimeError, ExerciseFile, FileData } from "../types";
+import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData } from "../types";
 import { push } from "../state/errorSlice";
 import { exerciseInit } from "../state/exerciseSlice";
 import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
-import { isServerConnectResponse, isSubmissionResponse, isTerminalMessage, isSubmissionFetchResponse } from "./typeCheckers";
+import { isServerConnectResponse, isSubmissionResponse, isTerminalMessage, isSubmissionFetchResponse, isResponseMessage } from "./typeCheckers";
 import { addTerminalOutput } from "../state/terminalSlice";
 import { generateUuid } from ".";
 
@@ -21,25 +21,21 @@ class WebSocketMessageHandler {
     this._store = store;
 
     this.open = this.open.bind(this);
-    this._sendMessage = this._sendMessage.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
 
     this._socket.onmessage = ({ data }: { data: string }) => {
       try {
-        const msgObj: ResponseMessage = JSON.parse(data);
+        const msgObj: Record<string, unknown> = JSON.parse(data);
 
-        if (!msgObj.type)
-          return this._store.dispatch(push(new MinorError("Invalid message received.", "Message Error")));
+        if (!isResponseMessage(msgObj))
+          throw Error("Malformed message");
         
         this._handleMessage(msgObj);
       }
       catch (err) {
-        return this._store.dispatch(push(new MessageError("Malformed message data.")));
+        return this._store.dispatch(push(new MinorError("Malformed message data.", "An error occured")));
       }
     };
-
-    document.addEventListener("terminal_write", ({ detail }) => {
-      this._sendMessage("terminal_input", detail);
-    });
 
     this._store.subscribe(submissionWatcherFactory(this._store, "activeSubmissions")((newState, oldState) => {
       // Find a submission. The data must have changed and be a non null object.
@@ -92,7 +88,7 @@ class WebSocketMessageHandler {
     }
 
     if (!isSubmissionResponse(payload))
-      throw new MinorError("Invalid response ", "MessageError");
+      throw new MinorError("Invalid response", "MessageError");
     
       this._store.dispatch(resolveSubmission(payload));
   }

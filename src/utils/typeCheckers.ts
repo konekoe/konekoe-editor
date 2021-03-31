@@ -1,7 +1,9 @@
-import { PointsProp, Exercise, ServerConnectResponse, SubmissionResponse, TerminalMessage, SubmissionFetchResponse, FileData } from "../types";
+import { PointsProp, Exercise, ServerConnectResponse, SubmissionResponse, TerminalMessage, SubmissionFetchResponse, FileData, ResponseMessage } from "../types";
 import { MessageError } from "./errors";
 
 type TypeChecker = (p: unknown) => boolean;
+
+// -------------- Helpers -------------------
 
 const multiCheck = (searchValues: string[], typeCheckers: Array<TypeChecker>, target: Record<string, unknown>): boolean => {
   return searchValues.reduce((acc: boolean, curr: string, index: number) => acc && typeCheckers[index](target[curr]), true);
@@ -9,9 +11,15 @@ const multiCheck = (searchValues: string[], typeCheckers: Array<TypeChecker>, ta
 
 const arrayReducer = (typeCheck: TypeChecker) => (acc: boolean, curr: unknown) => acc && typeCheck(curr);
 
-export const isUndefined: TypeChecker = (param: unknown): param is undefined => typeof param === undefined;
-
 const or = (f1 = isUndefined, f2 = isUndefined): TypeChecker => (p: unknown) => f1(p) || f2(p);
+
+const includedIn = (arr: string[]): TypeChecker => (p: unknown) => isString(p) && arr.includes(p);
+
+
+//------------------ Exports -----------------
+
+
+export const isUndefined: TypeChecker = (param: unknown): param is undefined => typeof param === undefined;
 
 export const isString = (param: unknown): param is string => typeof param === "string" || param instanceof(String);
 
@@ -82,7 +90,7 @@ export const isSubmissionResponse = (param: unknown): param is SubmissionRespons
   if (!isStringRecord(param))
     return false;
 
-  return multiCheck(["exerciseId","points", "maxPoints", "error"], [isString, isNumber, isNumber, or(isMessageError)], param);
+  return multiCheck(["exerciseId","points", "maxPoints"], [isString, isNumber, isNumber], param);
 };
 
 export const isTerminalMessage = (param: unknown): param is TerminalMessage => {
@@ -99,5 +107,22 @@ export const isSubmissionFetchResponse = (param: unknown): param is SubmissionFe
   return multiCheck(
     ["exerciseId","submissionId", "data", "date", "points", "files"],
     [isString, isString, isString, isDate, isNumber, isFileDataArray],
+    param);
+};
+
+// NOTE: Does not check that type field and payload correspond.
+// Technically the type itself does not define links between the type field and payload type.
+
+export const isResponseMessage = (param: unknown): param is ResponseMessage => {
+  if (!isStringRecord(param))
+    return false;
+
+  return multiCheck(
+    ["type","payload", "error"],
+    [
+      includedIn(["server_connect", "code_submission", "submission_fetch", "terminal_output"]),
+      or(or(isServerConnectResponse, isSubmissionResponse), or(isTerminalMessage, isSubmissionFetchResponse)),
+      or(isMessageError)
+    ],
     param);
 };
