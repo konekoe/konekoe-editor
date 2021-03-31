@@ -7,7 +7,7 @@ import { Store } from "../state/store";
 import { waitFor } from "@testing-library/dom";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
 import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData, TerminalMessage, ResponseMessage } from "../types";
-import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
+import { submissionInit, resolveSubmission, setActiveSubmission, submit } from "../state/submissionsSlice";
 import { push } from "../state/errorSlice";
 import { CriticalError, MessageError, MinorError } from "../utils/errors";
 import * as Utils from "../utils";
@@ -388,92 +388,6 @@ describe("WebSocketMessageHandler", function() {
       
   
       expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Malformed message data.", "An error occured")));
-    });
-  });
-
-
-  describe("message handler watches for state updates", function() {
-
-    beforeEach(function () {
-      server.close();
-      server.stop();
-    });
-
-    it("if the state contains a submission request, send a code_submission", async function() {
-      const testResponse: SubmissionResponse = {
-        exerciseId: "ex1",
-        points: 1,
-        maxPoints: 1
-      };
-
-      const store: Store = configureStore()({
-        submissions: {
-          allSubmissions: {},
-          submissionRequests: {
-            "ex1": [{
-              filename: "test.txt",
-              data: "This is a test"
-            }]
-          },
-          activeSubmissions: {},
-        }
-      }) as Store;
-      store.dispatch = jest.fn();
-
-      server = MockServer(TEST_WS_ADDRESS, {
-        code_submission: (_data: SubmissionRequest) => ({
-          payload: testResponse
-        })
-      });
-
-      new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
-
-      await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
-
-    
-      expect(store.dispatch).toHaveBeenNthCalledWith(1, resolveSubmission(testResponse));
-      expect(store.dispatch).toHaveBeenNthCalledWith(2, updatePoints(testResponse));
-    });
-
-    it("if state contains a submission fetch request, send a submission_fetch", async function() {
-      const testRequest = {
-        exerciseId: "ex1",
-        submissionId: "sub1"
-      };
-
-      const testResponse: SubmissionFetchResponse = {
-        ...testRequest,
-        date: new Date(),
-        points: 10,
-        files: []
-      };
-
-      const store: Store = configureStore()({
-        submissions: {
-          allSubmissions: {},
-          submissionFetchRequests: {
-            [testRequest.exerciseId]: testRequest.submissionId
-          },
-          submissionRequests: {},
-          activeSubmissions: {},
-        }
-      }) as Store;
-      store.dispatch = jest.fn();
-
-      server = MockServer(TEST_WS_ADDRESS, {
-        submission_fetch: (_data: SubmissionFetchRequest) => ({
-          payload: testResponse
-        })
-      });
-
-      const handler = new WebSocketMessageHandler(TEST_WS_ADDRESS, "", store);
-
-      await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
-
-      expect(store.dispatch).toHaveBeenCalledWith(setActiveSubmission({ 
-        exerciseId: testRequest.exerciseId,
-        data: []
-      }));
     });
   });
 });

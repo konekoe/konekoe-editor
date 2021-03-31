@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse, ExerciseFile, ExerciseFileDict } from "../types";
-
+import watch from "redux-watch";
+import { Store } from "./store";
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const submissionsSlice = createSlice({
@@ -48,6 +49,8 @@ const submissionsSlice = createSlice({
   }
 });
 
+// Watchers are registered are passed a store object by components which use them.
+export const submissionWatcherFactory = (store: Store, field: string) => watch(store.getState, `submissions.${ field }`);
 
 export const { submit, resolveSubmission, submissionInit, setActiveSubmission } = submissionsSlice.actions;
 

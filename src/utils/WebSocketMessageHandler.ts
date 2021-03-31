@@ -1,9 +1,9 @@
 import { MinorError, CriticalError, MessageError, assertNever } from "./errors";
 import { Store } from "../state/store";
-import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData } from "../types";
+import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData, ExerciseDictionary } from "../types";
 import { push } from "../state/errorSlice";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
-import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
+import { submissionInit, resolveSubmission, setActiveSubmission, submissionWatcherFactory } from "../state/submissionsSlice";
 import { isServerConnectResponse, isSubmissionResponse, isTerminalMessage, isSubmissionFetchResponse, isResponseMessage } from "./typeCheckers";
 import { addTerminalOutput } from "../state/terminalSlice";
 import { generateUuid } from ".";
@@ -38,21 +38,31 @@ class WebSocketMessageHandler {
       }
     };
 
-    /*
-
-    this._store.subscribe(submissionWatcherFactory(this._store, "activeSubmissions")((newState, oldState) => {
+    this._store.subscribe(submissionWatcherFactory(this._store, "submsissionRequests")((newState: ExerciseDictionary<FileData[] | null>, oldState: ExerciseDictionary<FileData[] | null>) => {
       // Find a submission. The data must have changed and be a non null object.
-      const submission = Object.entries(newState).find(sub => sub[1] && !oldState[sub[0]]);
+      const submission: [string, FileData[] | null] | undefined = Object.entries(newState).find(([exerciseId, files]: [string, FileData[] | null]) => files && !oldState[exerciseId]);
 
-      // Check that a submission was found.
-      // This function is triggered when the results of a submission are recorded in which case we don't want to do anything.
+      // Send a message if a new submission request was found.
       if (submission) {
-        this._sendMessage("code_submission", { id: submission[0], files: submission[1] });
+        // This function is triggered when a submission request is resolved (set to null) in which case 
+        // we don't want to do anything.
+        if (submission[1] !== null)
+          this.sendMessage("code_submission", { exerciseId: submission[0], files: submission[1] });
       }
-      
     }));
 
-    */
+    this._store.subscribe(submissionWatcherFactory(this._store, "submsissionFetchRequests")((newState: ExerciseDictionary<string | undefined>, oldState: ExerciseDictionary<string | undefined>) => {
+      // Find a request. The data must have changed and be defined.
+      const request: [string, string | undefined] | undefined = Object.entries(newState).find(([exerciseId, submissionId]: [string, string | undefined]) => submissionId && !oldState[exerciseId]);
+
+      // Send a message if a new submission request was found.
+      if (request) {
+        // This function is triggered when a request is resolved (set to undefined) in which case 
+        // we don't want to do anything.
+        if (request[1] !== undefined)
+          this.sendMessage("submission_fetch", { exerciseId: request[0], submissionId: request[1] });
+      }
+    }));
   }
 
   public open() {
