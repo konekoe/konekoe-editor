@@ -7,13 +7,13 @@
     "js"
   ],
   "testMatch": [
-    "**/test/*.(ts?|tsx?)"
+    "**/test/*.test.(ts|tsx)"
   ],
   "moduleNameMapper": {
     "\\.(css)$": "identity-obj-proxy"
   },
   "setupFilesAfterEnv": ["./src/setupTests.ts"],
   "transform": {
-    "^.+\\.(ts?|tsx?)$": "ts-jest"
+    "^.+\\.test.(ts|tsx)$": "ts-jest"
   }
 }
