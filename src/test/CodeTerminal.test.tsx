@@ -6,7 +6,6 @@ import { Provider } from "react-redux";
 import { clearTerminal } from "../state/terminalSlice";
 
 const exerciseId = "some-exercise";
-const terminalId = "test-id";
 
 
 describe("<CodeTerminal/>", () => {

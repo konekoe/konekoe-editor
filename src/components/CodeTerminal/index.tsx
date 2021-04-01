@@ -7,10 +7,7 @@ import { RootState } from "../../state/store";
 import { clearTerminal } from "../../state/terminalSlice";
 import "xterm/css/xterm.css";
 import { Button } from "@material-ui/core";
-import { generateUuid } from "../../utils";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
-
-const TERMIAL_PREFIX = "terminal";
 
 const useStyles = makeStyles(() =>
   createStyles({

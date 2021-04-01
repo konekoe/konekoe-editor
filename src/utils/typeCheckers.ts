@@ -11,7 +11,8 @@ const multiCheck = (searchValues: string[], typeCheckers: Array<TypeChecker>, ta
 
 const arrayReducer = (typeCheck: TypeChecker) => (acc: boolean, curr: unknown) => acc && typeCheck(curr);
 
-const or = (f1 = isUndefined, f2 = isUndefined): TypeChecker => (p: unknown) => f1(p) || f2(p);
+// Commented out to please the linter.
+//const or = (f1 = isUndefined, f2 = isUndefined): TypeChecker => (p: unknown) => f1(p) || f2(p);
 
 const includedIn = (arr: string[]): TypeChecker => (p: unknown) => isString(p) && arr.includes(p);
 
@@ -59,7 +60,7 @@ export const isExerciseArray = (param: unknown): param is Exercise[] => {
     return false;
 
   return param.reduce(arrayReducer(isExercise), true);
-}
+};
 
 export const isFileData = (param: unknown): param is FileData => {
   if (!isStringRecord(param))

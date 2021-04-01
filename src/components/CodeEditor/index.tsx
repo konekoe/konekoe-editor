@@ -57,7 +57,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
     if (!submissionFetchRequestExists && exerciseId && submissionList.length && !Object.keys(editorContent).length)
       dispatch(fetchSubmission({ exerciseId, submissionId: submissionList[0] }));
       
-  }, [submissionList, editorContent]);
+  }, [submissionList]);
 
   useEffect(() => {
     if (Object.keys(editorContent).length) {

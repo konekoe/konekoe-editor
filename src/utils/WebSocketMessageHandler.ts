@@ -1,5 +1,5 @@
 import { MinorError, CriticalError, MessageError, assertNever } from "./errors";
-import { Store, RootState } from "../state/store";
+import { Store } from "../state/store";
 import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData, ExerciseDictionary } from "../types";
 import { push } from "../state/errorSlice";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
@@ -28,7 +28,7 @@ class WebSocketMessageHandler {
     this._socket.onmessage = ({ data }: { data: string }) => {
       try {
         
-        const msgObj: Record<string, unknown> = JSON.parse(data);
+        const msgObj: Record<string, unknown> = JSON.parse(data) as Record<string, unknown>;
 
         if (!isResponseMessage(msgObj))
           throw Error("Malformed message");
@@ -67,19 +67,19 @@ class WebSocketMessageHandler {
     }));
   }
 
-  private _server_connect() {
+  private _server_connect(): void {
     this._socket .send(JSON.stringify({ type: "server_connect", payload: { token: this._token } }));
   }
 
-  public open() {
+  public open(): void {
     if (this._socket.readyState === 1)
       this._server_connect();    
     else
-    this._socket.onopen = (): void => this._server_connect();
+      this._socket.onopen = (): void => this._server_connect();
   }
 
-  public async sendMessage(type: string, payload: RequestPayload) {
-   this._socket.send(JSON.stringify({ type, payload }))
+  public sendMessage(type: string, payload: RequestPayload): void {
+   this._socket.send(JSON.stringify({ type, payload }));
   }
 
   private _serverConnectHandler(payload: ResponsePayload, error?: MessageError) {

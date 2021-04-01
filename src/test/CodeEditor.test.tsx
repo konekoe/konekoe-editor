@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import CodeEditor from "../components/CodeEditor/";
 import configureStore from "redux-mock-store";
 import { Provider } from "react-redux";
@@ -109,7 +109,7 @@ describe("<CodeEditor />", () => {
   });
 
   describe("code can be submitted", () => {
-    it("clicking the submission button sends a code submission action", async () => {
+    it("clicking the submission button sends a code submission action", () => {
       const component = render(
         <Provider store={ store }>
           <CodeEditor exerciseId={ exerciseId1 }/>

@@ -1,5 +1,5 @@
 import { MockServer } from "./utils";
-import { WebSocket as MockSocket, Server } from "mock-socket";
+import { WebSocket as MockSocket } from "mock-socket";
 import { TEST_WS_ADDRESS } from "../../constants";
 import configureStore from "redux-mock-store";
 import WebSocketMessageHandler from "../utils/WebSocketMessageHandler";
@@ -7,7 +7,7 @@ import { Store } from "../state/store";
 import { waitFor } from "@testing-library/dom";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
 import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData, TerminalMessage, ResponseMessage } from "../types";
-import { submissionInit, resolveSubmission, setActiveSubmission, submit } from "../state/submissionsSlice";
+import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
 import { push } from "../state/errorSlice";
 import { CriticalError, MessageError, MinorError } from "../utils/errors";
 import * as Utils from "../utils";
@@ -139,8 +139,6 @@ describe("WebSocketMessageHandler", function() {
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(2));
 
-        
-        
 
         expect(store.dispatch).toHaveBeenNthCalledWith(1, resolveSubmission(testResponse));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, updatePoints(testResponse));
