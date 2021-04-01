@@ -19,7 +19,7 @@ const submissionsSlice = createSlice({
       
       exercises.map(ex => {
         state.allSubmissions[ex.id] = ex.submissions;
-        state.submissionRequests[ex.id] = null;
+        state.submissionRequests[ex.id] = undefined;
       });
     },
     submit: (state, action: PayloadAction<SubmissionRequest>) => {
@@ -40,13 +40,12 @@ const submissionsSlice = createSlice({
         return dict;
       }, {} as ExerciseFileDict);
 
-      console.log("Active submission for", action.payload.exerciseId);
       state.submissionFetchRequests[action.payload.exerciseId] = undefined;
     },
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
 
-      state.submissionRequests[exerciseId] = null;
+      state.submissionRequests[exerciseId] = undefined;
     },
     fetchSubmission: (state, action: PayloadAction<SubmissionFetchRequest>) => {
       const { exerciseId, submissionId } = action.payload;

@@ -37,7 +37,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   const editorContent: ExerciseFileDict = useSelector((state: RootState) => state.submissions.activeSubmissions[exerciseId] || {});
   const submissionList: string[] = useSelector((state: RootState) => state.submissions.allSubmissions[exerciseId] || []);
 
-  const submissionRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionRequests[exerciseId] !== null);
+  const submissionRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionRequests[exerciseId] !== undefined);
   const submissionFetchRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionFetchRequests[exerciseId] !== undefined);
 
   const dispatch = useDispatch();
@@ -52,7 +52,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
     }
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     
     if (!submissionFetchRequestExists && exerciseId && submissionList.length && !Object.keys(editorContent).length)
       dispatch(fetchSubmission({ exerciseId, submissionId: submissionList[0] }));
@@ -90,6 +90,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   };
 
   const handleSubmit = () => {
+    console.log(submissionRequestExists);
+
     if (!submissionRequestExists)
       dispatch(submit({ exerciseId, files: createFileSubmission(editorSessions) }));
   };

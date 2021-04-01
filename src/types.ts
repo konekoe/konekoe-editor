@@ -61,7 +61,7 @@ export type FileDataDict = { [fileId: string]: FileData };
 export interface SubmissionState {
   allSubmissions: ExerciseDictionary<string[]>;               // Exercise ID to array of submission ids.
   activeSubmissions: ExerciseDictionary<ExerciseFileDict>;    // The files being edited
-  submissionRequests: ExerciseDictionary<FileData[] | null>;  // Submissions made by the user that are being processed.
+  submissionRequests: ExerciseDictionary<FileData[] | undefined>;  // Submissions made by the user that are being processed.
   submissionFetchRequests: ExerciseDictionary<string | undefined>         // Requests for fetching an older submission.
 }
 

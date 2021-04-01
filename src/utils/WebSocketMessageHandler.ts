@@ -121,7 +121,6 @@ class WebSocketMessageHandler {
   }
 
   private _handleSubmissionFetch(payload: ResponsePayload, error?: MessageError) {
-    console.log("Received fetch", payload);
     if (error) 
       throw error;
 
