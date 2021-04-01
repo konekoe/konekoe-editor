@@ -1,5 +1,5 @@
 import { MinorError, CriticalError, MessageError, assertNever } from "./errors";
-import { Store } from "../state/store";
+import { Store, RootState } from "../state/store";
 import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData, ExerciseDictionary } from "../types";
 import { push } from "../state/errorSlice";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
@@ -22,6 +22,8 @@ class WebSocketMessageHandler {
 
     this.open = this.open.bind(this);
     this.sendMessage = this.sendMessage.bind(this);
+
+    this._server_connect = this._server_connect.bind(this);
 
     this._socket.onmessage = ({ data }: { data: string }) => {
       try {
@@ -51,7 +53,7 @@ class WebSocketMessageHandler {
       }
     }));
 
-    this._store.subscribe(submissionWatcherFactory(this._store, "submsissionFetchRequests")((newState: ExerciseDictionary<string | undefined>, oldState: ExerciseDictionary<string | undefined>) => {
+    this._store.subscribe(submissionWatcherFactory(this._store, "submissionFetchRequests")((newState: ExerciseDictionary<string | undefined>, oldState: ExerciseDictionary<string | undefined>) => {
       // Find a request. The data must have changed and be defined.
       const request: [string, string | undefined] | undefined = Object.entries(newState).find(([exerciseId, submissionId]: [string, string | undefined]) => submissionId && !oldState[exerciseId]);
 
@@ -65,8 +67,15 @@ class WebSocketMessageHandler {
     }));
   }
 
+  private _server_connect() {
+    this._socket .send(JSON.stringify({ type: "server_connect", payload: { token: this._token } }));
+  }
+
   public open() {
-    this._socket.send(JSON.stringify({ type: "server_connect", payload: { token: this._token } }));
+    if (this._socket.readyState === 1)
+      this._server_connect();    
+    else
+    this._socket.onopen = (): void => this._server_connect();
   }
 
   public async sendMessage(type: string, payload: RequestPayload) {
@@ -112,6 +121,7 @@ class WebSocketMessageHandler {
   }
 
   private _handleSubmissionFetch(payload: ResponsePayload, error?: MessageError) {
+    console.log("Received fetch", payload);
     if (error) 
       throw error;
 

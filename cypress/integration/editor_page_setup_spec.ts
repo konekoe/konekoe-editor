@@ -92,13 +92,15 @@ describe("Opening the editor page", function () {
       cy.visit("/", {
         onBeforeLoad(win) {
           // Create a new mock server and stub Window's WebSocket.
-          server = MockServer(TEST_WS_ADDRESS)[0];
+          server = MockServer(TEST_WS_ADDRESS);
           cy.stub(win, "WebSocket", ()=> new WebSocket(TEST_WS_ADDRESS))
         }
       });
     });
 
     describe("fetches data from the server", function() {
+      Cypress.config('defaultCommandTimeout', 30000);
+
       it("fetches exercises and rerenders", function() {
         cy.contains("Exercise 1: Do something");
         server.close();
@@ -106,10 +108,11 @@ describe("Opening the editor page", function () {
       });
   
       it("fetches first submission from list of received submission ids and rerenders editor component", function() {
-        cy.contains("function.ts");
-        cy.contains("types.ts");
-        server.close();
-        server.stop();
+        // Exercise 1 has no submissions to test the edge case where no submissions are received.
+        // For this test use exercise 2 which does have submissions.
+        cy.contains("10/100 | Exercise 2: Code").click();
+        cy.contains("source.c");
+        
       });
     });
   });

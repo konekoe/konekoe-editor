@@ -60,6 +60,8 @@ const defaultServerConnect = (): ResponseBody<ServerConnectResponse> => (
   }
 );
 
+const removeIdFromSubmission = ({ id, ...other } : ExerciseSubmission): Omit<ExerciseSubmission, "id"> => other;
+
 const defaultSubmissionFetchHandler = (request: SubmissionFetchRequest): ResponseBody<SubmissionFetchResponse> => {
   const defaultSubmission: ExerciseSubmission = {
     id: "submission1",
@@ -79,12 +81,12 @@ const defaultSubmissionFetchHandler = (request: SubmissionFetchRequest): Respons
 
   if (defaultTestSubmissions[request.exerciseId] && defaultTestSubmissions[request.exerciseId].length) {
     return {
-      payload: { ...request, ...(defaultTestSubmissions[request.exerciseId].find((sub: ExerciseSubmission) => sub.id === request.submissionId) || defaultSubmission) }
+      payload: { ...request, ...removeIdFromSubmission((defaultTestSubmissions[request.exerciseId].find((sub: ExerciseSubmission) => sub.id === request.submissionId) || defaultSubmission)) }
     };
   }
   
   return {
-    payload: { ...request, ...defaultSubmission }
+    payload: { ...request, ...removeIdFromSubmission(defaultSubmission) }
   };
 };
 
@@ -112,7 +114,6 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
 
   // Mock for the backend.
   mockServer.on("connection", (socket: WebSocket) => {
-    
     mockServer.sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
 
     const resolveRequest = (request: RequestMessage): ResponseBody<ResponsePayload> => {

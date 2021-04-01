@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse, ExerciseFile, ExerciseFileDict } from "../types";
+import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse, ExerciseFile, ExerciseFileDict, SubmissionFetchRequest } from "../types";
 import watch from "redux-watch";
 import { Store } from "./store";
+import { MinorError } from "../utils/errors";
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const submissionsSlice = createSlice({
@@ -26,7 +27,7 @@ const submissionsSlice = createSlice({
       
       // Only one active submission is allowed 
       if (state.submissionRequests[exerciseId])
-        throw Error("A submission is already being processed.");
+        throw new MinorError("A submission is already being processed.", "Please wait");
 
       state.submissionRequests[exerciseId] = files;
     },
@@ -39,12 +40,21 @@ const submissionsSlice = createSlice({
         return dict;
       }, {} as ExerciseFileDict);
 
+      console.log("Active submission for", action.payload.exerciseId);
       state.submissionFetchRequests[action.payload.exerciseId] = undefined;
     },
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
 
       state.submissionRequests[exerciseId] = null;
+    },
+    fetchSubmission: (state, action: PayloadAction<SubmissionFetchRequest>) => {
+      const { exerciseId, submissionId } = action.payload;
+      // Only one active submission is allowed 
+      if (state.submissionFetchRequests[exerciseId])
+        throw new MinorError("A submission is already being fetched.", "Please wait");
+
+      state.submissionFetchRequests[exerciseId] = submissionId;
     }
   }
 });
@@ -52,7 +62,7 @@ const submissionsSlice = createSlice({
 // Watchers are registered are passed a store object by components which use them.
 export const submissionWatcherFactory = (store: Store, field: string) => watch(store.getState, `submissions.${ field }`);
 
-export const { submit, resolveSubmission, submissionInit, setActiveSubmission } = submissionsSlice.actions;
+export const { submit, resolveSubmission, submissionInit, setActiveSubmission, fetchSubmission } = submissionsSlice.actions;
 
 export default submissionsSlice.reducer;
 

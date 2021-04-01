@@ -1,6 +1,6 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "./state/store";
+import { RootState, Store } from "./state/store";
 import { Container, Grid, Backdrop, Card, CardHeader, CardContent, LinearProgress } from "@material-ui/core";
 import TabBar from "./components/TabBar";
 import { TabItem } from "./types";
@@ -10,6 +10,7 @@ import CodeEditor from "./components/CodeEditor";
 import { exerciseTabSelector } from "./state/exerciseSlice";
 import { ErrorBoundary } from "react-error-boundary";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
+import WebSocketMessageHandler from "./utils/WebSocketMessageHandler";
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -27,15 +28,23 @@ const useStyles = makeStyles(() =>
   }),
 );
 
-const App: React.FC = () => {
+const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({ serverAddress, token, store }) => {
   const classes = useStyles();
   const [selectedExercise, setSelectedExercise] = useState<string>("");
+  const [messageHandler] = useState<WebSocketMessageHandler>(new WebSocketMessageHandler(serverAddress, token, store));
   const exerciseTabItems: TabItem[] = useSelector(exerciseTabSelector);
   const exerciseDescription: string = useSelector((state: RootState) => state.exercises.descriptions[selectedExercise] || "No description given");
 
-  useLayoutEffect(() => {
-    if (exerciseTabItems.length)
+
+  useEffect(() => {
+    messageHandler.open();
+  },[]);
+
+  useEffect(() => {
+    if (exerciseTabItems.length && selectedExercise === "") {
       setSelectedExercise(exerciseTabItems[0].id);
+    }
+      
   },[exerciseTabItems]);
 
   const tabSelectionHandler = (id: string) => {

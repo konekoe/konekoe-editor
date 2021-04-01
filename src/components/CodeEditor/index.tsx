@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../state/store";
 import { filesToEditSessions, filesToTabItems, createFileSubmission } from "./utils";
 import { Grid, Button, Backdrop } from "@material-ui/core";
-import { submit } from "../../state/submissionsSlice";
+import { submit, fetchSubmission } from "../../state/submissionsSlice";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -35,8 +35,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
 
   // Fetch active files from store.
   const editorContent: ExerciseFileDict = useSelector((state: RootState) => state.submissions.activeSubmissions[exerciseId] || {});
+  const submissionList: string[] = useSelector((state: RootState) => state.submissions.allSubmissions[exerciseId] || []);
 
-  const submissionRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionRequests[exerciseId] !== undefined);
+  const submissionRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionRequests[exerciseId] !== null);
+  const submissionFetchRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionFetchRequests[exerciseId] !== undefined);
 
   const dispatch = useDispatch();
   const editorRef = createRef<HTMLDivElement>();
@@ -49,6 +51,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
       setEditor(ace.edit(editorRef.current));
     }
   }, []);
+
+  useEffect(() => {
+    
+    if (!submissionFetchRequestExists && exerciseId && submissionList.length && !Object.keys(editorContent).length)
+      dispatch(fetchSubmission({ exerciseId, submissionId: submissionList[0] }));
+      
+  }, [submissionList, editorContent]);
 
   useEffect(() => {
     if (Object.keys(editorContent).length) {
@@ -90,7 +99,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
       className={ classes.container }
     >
       <Backdrop
-        open={ submissionRequestExists }
+        open={ submissionRequestExists || submissionFetchRequestExists }
         className={ classes.backdrop }
       >
         Please wait
