@@ -14,7 +14,7 @@ class ErrorFactory {
       name: "MinorError",
       message,
       title
-    }
+    };
   }
 
   message(message: string, id: string, title?: string): MessageError {
@@ -23,7 +23,7 @@ class ErrorFactory {
       message,
       id,
       title
-    }
+    };
   }
 }
 

@@ -1,5 +1,4 @@
-import { PointsProp, Exercise, ServerConnectResponse, SubmissionResponse, TerminalMessage, SubmissionFetchResponse, FileData, ResponseMessage } from "../types";
-import { MessageError } from "./errors";
+import { PointsProp, Exercise, ServerConnectResponse, SubmissionResponse, TerminalMessage, SubmissionFetchResponse, FileData, ResponseMessage, MessageError } from "../types";
 
 type TypeChecker = (p: unknown) => boolean;
 
@@ -12,7 +11,7 @@ const multiCheck = (searchValues: string[], typeCheckers: Array<TypeChecker>, ta
 const arrayReducer = (typeCheck: TypeChecker) => (acc: boolean, curr: unknown) => acc && typeCheck(curr);
 
 // Commented out to please the linter.
-//const or = (f1 = isUndefined, f2 = isUndefined): TypeChecker => (p: unknown) => f1(p) || f2(p);
+const or = (f1 = isUndefined, f2 = isUndefined): TypeChecker => (p: unknown) => f1(p) || f2(p);
 
 const includedIn = (arr: string[]): TypeChecker => (p: unknown) => isString(p) && arr.includes(p);
 
@@ -85,7 +84,12 @@ export const isServerConnectResponse = (param: unknown): param is ServerConnectR
   return multiCheck(["exercises"], [isExerciseArray], param);
 };
 
-export const isMessageError = (param: unknown): param is MessageError => param instanceof MessageError;
+export const isMessageError = (param: unknown): param is MessageError => {
+  if (!isStringRecord(param))
+    return false;
+
+  return multiCheck(["message","id", "title"], [isString, isString, or(isString, isUndefined)], param);
+};
 
 export const isSubmissionResponse = (param: unknown): param is SubmissionResponse => {
   if (!isStringRecord(param))

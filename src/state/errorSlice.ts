@@ -11,7 +11,7 @@ const errorSlice = createSlice({
   } as ErrorState,
   reducers: {
     push: (state, action: PayloadAction<RuntimeError>): void => {
-      const name = action.payload.name as "CriticalError" | "MinorError" | "MessageError";
+      const name = action.payload.name;
     
       switch (name) {
         case "CriticalError":

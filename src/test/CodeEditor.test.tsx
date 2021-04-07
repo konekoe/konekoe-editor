@@ -91,7 +91,9 @@ describe("<CodeEditor />", () => {
       submissions: {
         allSubmissions: {},
         submissionRequests: {},
-        submissionFetchRequests: {},
+        submissionFetchRequests: {
+          "some-exercise1": "req" // Submission fetching creates an infinite loop when the state doesn't actually update
+        },
         activeSubmissions: {},
         points: {},
         maxPoints: {}

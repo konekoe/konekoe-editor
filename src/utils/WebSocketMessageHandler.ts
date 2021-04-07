@@ -125,7 +125,7 @@ class WebSocketMessageHandler {
       throw error;
 
     if (!isSubmissionFetchResponse(payload))
-      throw new MinorError("Could not fetch submission", "FetchingError");
+      throw ErrorFactory.minor("Could not fetch submission", "FetchingError");
 
     this._store.dispatch(setActiveSubmission({
       exerciseId: payload.exerciseId,
