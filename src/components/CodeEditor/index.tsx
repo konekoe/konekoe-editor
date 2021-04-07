@@ -53,10 +53,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   }, []);
 
   useEffect(() => {
-    if (!submissionFetchRequestExists && exerciseId && !Object.keys(editorContent).length) 
+    if (!submissionFetchRequestExists && exerciseId && !Object.keys(editorContent).length)
       dispatch(fetchSubmission({ exerciseId, submissionId: submissionList[0] }));
       
-  }, [submissionList, exerciseId]);
+  }, [submissionList]);
 
   useEffect(() => {
     if (Object.keys(editorContent).length) {
@@ -64,10 +64,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
       setEditorSessions(filesToEditSessions(Object.values(editorContent)));
     }
     else {
-      if (activeSession)
-        setActiveSession("");
+      setActiveSession("");
     }
-  }, [editorContent, activeSession]);
+  }, [editorContent]);
 
   useEffect(() => {
     if (!editor)

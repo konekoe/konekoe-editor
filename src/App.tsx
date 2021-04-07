@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState, Store } from "./state/store";
-import { Container, Grid, Backdrop, Card, CardHeader, CardContent, LinearProgress } from "@material-ui/core";
+import { Container, Grid, Backdrop, Card, CardHeader, CardContent, LinearProgress, Paper } from "@material-ui/core";
 import TabBar from "./components/TabBar";
-import { TabItem } from "./types";
+import { TabItem, CriticalError, MinorError } from "./types";
 import InfoBox from "./components/InfoBox";
 import CodeTerminal from "./components/CodeTerminal";
 import CodeEditor from "./components/CodeEditor";
@@ -11,12 +11,17 @@ import { exerciseTabSelector } from "./state/exerciseSlice";
 import { ErrorBoundary } from "react-error-boundary";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import WebSocketMessageHandler from "./utils/WebSocketMessageHandler";
+import ErrorDialog from "./components/ErrorDialog";
+import { popMinorError } from "./state/errorSlice";
 
 const useStyles = makeStyles(() =>
   createStyles({
     waitScreen: {
       position: "relative",
       height: "50vh"
+    },
+    criticalErrorMessage: {
+      color: "red"
     },
     waitScreenContent: {
       position: "absolute",
@@ -34,7 +39,11 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
   const [messageHandler] = useState<WebSocketMessageHandler>(new WebSocketMessageHandler(serverAddress, token, store));
   const exerciseTabItems: TabItem[] = useSelector(exerciseTabSelector);
   const exerciseDescription: string = useSelector((state: RootState) => state.exercises.descriptions[selectedExercise] || "No description given");
+  const criticalError: CriticalError | null = useSelector((state: RootState) => state.error.criticalError);
+  const minorError: MinorError | undefined = useSelector((state: RootState) => state.error.minorErrors[0]);
+  const remainingMinorErrors: number = useSelector((state: RootState) => state.error.minorErrors.length);
 
+  const dispatch = useDispatch();
 
   useEffect(() => {
     messageHandler.open();
@@ -49,6 +58,10 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
 
   const tabSelectionHandler = (id: string) => {
     setSelectedExercise(id);
+  };
+
+  const errorCloseHandler = (): void => {
+    dispatch(popMinorError());
   };
 
   return (
@@ -68,7 +81,26 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
         </Backdrop>
       ) }
     >
+      <ErrorDialog
+        error={ minorError }
+        numOfRemainingErrors={ remainingMinorErrors }
+        closeHandler={ errorCloseHandler }
+      />
       {
+      (criticalError) ?
+        <Backdrop
+          open={ true }
+        >
+          <Container>
+            <h1 className={ classes.criticalErrorMessage }>
+              Critical Error
+            </h1>
+            <Paper>
+              { criticalError.message }
+            </Paper>
+          </Container>
+        </Backdrop>
+        :
         (selectedExercise) ?
           <Grid
             container

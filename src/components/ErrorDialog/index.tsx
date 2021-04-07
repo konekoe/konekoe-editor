@@ -3,10 +3,10 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 import { ErrorDialogProps } from "../../types";
 import ConditionalBadge from "./ConditionalBadge";
 
-const ErrorDialog: React.FC<ErrorDialogProps> = ({ open, title, message, numOfRemainingErrors, closeHandler }) => (
-  <Dialog open={ open }>
+const ErrorDialog: React.FC<ErrorDialogProps> = ({ error, numOfRemainingErrors, closeHandler }) => (
+  <Dialog open={ error !== undefined }>
     <DialogTitle>
-      { title }
+      { (error) ? error.title : "" }
     </DialogTitle>
     <DialogContent>
       <ConditionalBadge
@@ -14,7 +14,7 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({ open, title, message, numOfRe
         color={ "error" }
       >
         <DialogContentText>
-          { message }
+          { (error) ? error.message : "" }
         </DialogContentText>
       </ConditionalBadge>  
     </DialogContent>

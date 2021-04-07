@@ -105,9 +105,7 @@ export interface TabBarProps {
 }
 
 export interface ErrorDialogProps {
-  title: string;
-  message: string;
-  open: boolean;
+  error?: MinorError;
   numOfRemainingErrors?: number;
   closeHandler: () => void;
 }
