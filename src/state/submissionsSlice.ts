@@ -44,7 +44,7 @@ const submissionsSlice = createSlice({
     },
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
-
+      
       state.submissionRequests[exerciseId] = undefined;
     },
     fetchSubmission: (state, action: PayloadAction<SubmissionFetchRequest>) => {

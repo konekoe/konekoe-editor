@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { ExerciseState, Exercise, TabItem, SubmissionResponse } from "../types";
+import { isNumber } from "../utils/typeCheckers";
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const exerciseSlice = createSlice({
@@ -25,7 +26,7 @@ const exerciseSlice = createSlice({
     updatePoints: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId, points, maxPoints } = action.payload;
 
-      if (state.points[exerciseId] && state.maxPoints[exerciseId]) {
+      if (isNumber(state.points[exerciseId]) && isNumber(state.maxPoints[exerciseId])) {
         if (state.points[exerciseId] < points)
           state.points[exerciseId] = points;
 

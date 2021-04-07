@@ -40,7 +40,7 @@ class WebSocketMessageHandler {
       }
     };
 
-    this._store.subscribe(submissionWatcherFactory(this._store, "submsissionRequests")((newState: ExerciseDictionary<FileData[] | null>, oldState: ExerciseDictionary<FileData[] | null>) => {
+    this._store.subscribe(submissionWatcherFactory(this._store, "submissionRequests")((newState: ExerciseDictionary<FileData[] | null>, oldState: ExerciseDictionary<FileData[] | null>) => {
       // Find a submission. The data must have changed and be a non null object.
       const submission: [string, FileData[] | null] | undefined = Object.entries(newState).find(([exerciseId, files]: [string, FileData[] | null]) => files && !oldState[exerciseId]);
 
