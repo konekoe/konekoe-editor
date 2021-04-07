@@ -61,9 +61,9 @@ describe("<CodeEditor />", function () {
               const submissionChecker = (fd: FileData): boolean => {
                 switch (fd.filename) {
                   case "function.ts":
-                    return fd.data === testContent1;
+                    return fd.data.includes(testContent1);
                   case "types.ts":
-                    return fd.data === testContent2;
+                    return fd.data.includes(testContent2);
                   default:
                     return false;
                 }
@@ -105,7 +105,7 @@ describe("<CodeEditor />", function () {
       cy.contains("Submit").click();
       cy.contains("Please wait");
       cy.contains("10/10 | Exercise 1: Do something");
-      cy.contains("Please wait").should("not.exist");
+      cy.contains("Please wait").should("not.be.visible");
     });
 
     it("server side error is displayed and wait screen cleared", function(){
@@ -113,7 +113,7 @@ describe("<CodeEditor />", function () {
       cy.contains("Submit").click();
       cy.contains("Please wait");
       cy.contains("This is a test");
-      cy.contains("Please wait").should("not.exist");
+      cy.contains("Please wait").should("not.be.visible");
     });
   });
 });
