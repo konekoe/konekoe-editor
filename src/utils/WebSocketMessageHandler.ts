@@ -79,7 +79,7 @@ class WebSocketMessageHandler {
   }
 
   public sendMessage(type: string, payload: RequestPayload): void {
-   this._socket.send(JSON.stringify({ type, payload }));
+    this._socket.send(JSON.stringify({ type, payload }));
   }
 
   private _serverConnectHandler(payload: ResponsePayload, error?: MessageError) {

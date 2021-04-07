@@ -53,8 +53,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   }, []);
 
   useLayoutEffect(() => {
-    
-    if (!submissionFetchRequestExists && exerciseId && submissionList.length && !Object.keys(editorContent).length)
+    if (!submissionFetchRequestExists && exerciseId && !Object.keys(editorContent).length)
       dispatch(fetchSubmission({ exerciseId, submissionId: submissionList[0] }));
       
   }, [submissionList]);
@@ -90,8 +89,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   };
 
   const handleSubmit = () => {
-    console.log(submissionRequestExists);
-
     if (!submissionRequestExists)
       dispatch(submit({ exerciseId, files: createFileSubmission(editorSessions) }));
   };

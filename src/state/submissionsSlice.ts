@@ -53,7 +53,7 @@ const submissionsSlice = createSlice({
       if (state.submissionFetchRequests[exerciseId])
         throw new MinorError("A submission is already being fetched.", "Please wait");
 
-      state.submissionFetchRequests[exerciseId] = submissionId;
+      state.submissionFetchRequests[exerciseId] = submissionId || "DEFAULT";
     }
   }
 });
