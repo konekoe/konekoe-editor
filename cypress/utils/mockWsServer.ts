@@ -15,7 +15,7 @@ const defaultTestExercises: Exercise[] = [
     id: "ex1",
     points: 0,
     maxPoints: 1,
-    submissions: [""],
+    submissions: [],
     title: "Exercise 1: Do something",
     description: "# In this exercise you're supposed to do something\n> Figure it out!"
   },
