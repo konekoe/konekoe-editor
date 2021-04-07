@@ -1,6 +1,5 @@
 import { Ace } from "ace-builds";
 import { Store } from "./state/store";
-import { MessageError, CriticalError, MinorError } from "./utils/errors";
 
 export interface ErrorState {
   criticalError: CriticalError | null;
@@ -166,4 +165,24 @@ export interface ResponseMessage {
   type: "server_connect" | "code_submission" | "submission_fetch" | "terminal_output";
   payload: ResponsePayload;
   error?: MessageError;
+}
+
+interface GenericError {
+  name: string;
+  message: string;
+}
+
+export interface CriticalError extends GenericError {
+  name: "CriticalError";
+}
+
+export interface MinorError extends GenericError {
+  name: "MinorError";
+  title: string;
+}
+
+export interface MessageError extends GenericError {
+  name: "MessageError";
+  title?: string;
+  id: string;
 }

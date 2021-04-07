@@ -1,6 +1,6 @@
-import { MinorError, CriticalError, MessageError, assertNever } from "./errors";
+import { ErrorFactory, assertNever } from "./errors";
 import { Store } from "../state/store";
-import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData, ExerciseDictionary } from "../types";
+import { ResponseMessage, ResponsePayload, RequestPayload, RuntimeError, ExerciseFile, FileData, ExerciseDictionary, MessageError } from "../types";
 import { push } from "../state/errorSlice";
 import { exerciseInit, updatePoints } from "../state/exerciseSlice";
 import { submissionInit, resolveSubmission, setActiveSubmission, submissionWatcherFactory } from "../state/submissionsSlice";
@@ -36,7 +36,7 @@ class WebSocketMessageHandler {
         this._handleMessage(msgObj);
       }
       catch (err) {
-        return this._store.dispatch(push(new MinorError("Malformed message data.", "An error occured")));
+        return this._store.dispatch(push(ErrorFactory.minor("Malformed message data.", "An error occured")));
       }
     };
 
@@ -84,11 +84,11 @@ class WebSocketMessageHandler {
 
   private _serverConnectHandler(payload: ResponsePayload, error?: MessageError) {
     if (error) {
-      throw new CriticalError(error.message);
+      throw ErrorFactory.critical(error.message);
     }
 
     if (!isServerConnectResponse(payload))
-      throw new CriticalError("Invalid server response.");
+      throw ErrorFactory.critical("Invalid server response.");
 
     this._store.dispatch(exerciseInit(payload.exercises)); 
     this._store.dispatch(submissionInit(payload.exercises));
@@ -102,7 +102,7 @@ class WebSocketMessageHandler {
     }
 
     if (!isSubmissionResponse(payload))
-      throw new MinorError("Invalid response", "MessageError");
+      throw ErrorFactory.minor("Invalid response", "MessageError");
     
     this._store.dispatch(resolveSubmission(payload));
     this._store.dispatch(updatePoints(payload));

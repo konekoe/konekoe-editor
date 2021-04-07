@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SubmissionState, Exercise, SubmissionRequest, SubmissionResponse, ExerciseFile, ExerciseFileDict, SubmissionFetchRequest } from "../types";
 import watch from "redux-watch";
 import { Store } from "./store";
-import { MinorError } from "../utils/errors";
+import { ErrorFactory } from "../utils/errors";
 
 // All the state objects are maps of form <EXERCISE_ID> -> data
 const submissionsSlice = createSlice({
@@ -27,7 +27,7 @@ const submissionsSlice = createSlice({
       
       // Only one active submission is allowed 
       if (state.submissionRequests[exerciseId])
-        throw new MinorError("A submission is already being processed.", "Please wait");
+        throw ErrorFactory.minor("A submission is already being processed.", "Please wait");
 
       state.submissionRequests[exerciseId] = files;
     },
@@ -44,14 +44,14 @@ const submissionsSlice = createSlice({
     },
     resolveSubmission: (state, action: PayloadAction<SubmissionResponse>) => {
       const { exerciseId } = action.payload;
-      
+
       state.submissionRequests[exerciseId] = undefined;
     },
     fetchSubmission: (state, action: PayloadAction<SubmissionFetchRequest>) => {
       const { exerciseId, submissionId } = action.payload;
       // Only one active submission is allowed 
       if (state.submissionFetchRequests[exerciseId])
-        throw new MinorError("A submission is already being fetched.", "Please wait");
+        throw ErrorFactory.minor("A submission is already being fetched.", "Please wait");
 
       state.submissionFetchRequests[exerciseId] = submissionId || "DEFAULT";
     }

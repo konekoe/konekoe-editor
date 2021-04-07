@@ -1,6 +1,6 @@
 import { Server, WebSocket } from "mock-socket";
-import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, ResponseMessage, ResponsePayload, RuntimeError } from "../../src/types";
-import { assertNever, MessageError } from "../../src/utils/errors";
+import { RequestMessage, ServerConnectRequest, ServerConnectResponse, SubmissionRequest, SubmissionResponse, SubmissionFetchRequest, SubmissionFetchResponse, Exercise, ExerciseSubmission, ExerciseDictionary, ResponseMessage, ResponsePayload, RuntimeError, MessageError } from "../../src/types";
+import { assertNever } from "../../src/utils/errors";
 
 export type ResponseBody<A> = { payload: A, error?: MessageError }
 

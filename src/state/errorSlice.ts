@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ErrorState, RuntimeError } from "../types";
-import { assertNever, CriticalError, MinorError, MessageError } from "../utils/errors";
+import { ErrorState, RuntimeError, MinorError, MessageError, CriticalError } from "../types";
+import { assertNever, ErrorFactory } from "../utils/errors";
 
 const errorSlice = createSlice({
   name: "error",
@@ -15,11 +15,11 @@ const errorSlice = createSlice({
     
       switch (name) {
         case "CriticalError":
-          state.criticalError = action.payload;
+          state.criticalError = action.payload as CriticalError;
           break;
         
         case "MinorError": 
-          state.minorErrors.push(action.payload as MinorError);
+          state.minorErrors.push((action.payload as MinorError));
           break;
   
         case "MessageError":
@@ -29,10 +29,10 @@ const errorSlice = createSlice({
 
             switch (messageError.title) {
               case "CriticalError":
-                state.criticalError = new CriticalError(messageError.message);
+                state.criticalError = ErrorFactory.critical(messageError.message);
                 break;
               default:
-                state.minorErrors.push(new MinorError(messageError.message, messageError.title));
+                state.minorErrors.push(ErrorFactory.minor(messageError.message, messageError.title));
                 break;
             }
           }

@@ -2,7 +2,7 @@ import { WebSocket } from "mock-socket";
 import { TEST_WS_ADDRESS } from "../../constants";
 import MockServer, { ServerMock, ResponseBody } from "../utils/mockWsServer";
 import { SubmissionRequest, FileData, SubmissionResponse } from "../../src/types";
-import { MessageError } from "../../src/utils/errors";
+import { ErrorFactory } from "../../src/utils/errors";
 
 const testContent1 = "function() { console.log('Hello'); }";
 const testContent2 = "export type BooleanType = boolean;";
@@ -86,7 +86,7 @@ describe("<CodeEditor />", function () {
                     points: 0,
                     maxPoints: 0
                   },
-                  error: new MessageError("Test", "ex1", "This is a test") 
+                  error: ErrorFactory.message("Test", "ex1", "This is a test") 
                 }
             }
           });

@@ -9,7 +9,7 @@ import { exerciseInit, updatePoints } from "../state/exerciseSlice";
 import { ServerConnectRequest, Exercise, SubmissionRequest, SubmissionResponse, SubmissionFetchResponse, SubmissionFetchRequest, FileData, TerminalMessage, ResponseMessage } from "../types";
 import { submissionInit, resolveSubmission, setActiveSubmission } from "../state/submissionsSlice";
 import { push } from "../state/errorSlice";
-import { CriticalError, MessageError, MinorError } from "../utils/errors";
+import { ErrorFactory } from "../utils/errors";
 import * as Utils from "../utils";
 import { addTerminalOutput } from "../state/terminalSlice";
 
@@ -90,14 +90,14 @@ describe("WebSocketMessageHandler", function() {
         
         
 
-        expect(store.dispatch).toHaveBeenCalledWith(push(new CriticalError("Invalid server response.")));
+        expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.critical("Invalid server response.")));
       });
 
       it("server error produces a CriticalError", async function() {
         server = MockServer(TEST_WS_ADDRESS, {
           server_connect: (_data: ServerConnectRequest) => ({
             payload: { exercises: [] },
-            error: new MessageError("Server is busted.", "123", "Server Error")
+            error: ErrorFactory.message("Server is busted.", "123", "Server Error")
           })
         });
 
@@ -110,7 +110,7 @@ describe("WebSocketMessageHandler", function() {
         
         
 
-        expect(store.dispatch).toHaveBeenCalledWith(push(new CriticalError("Server is busted.")));
+        expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.critical("Server is busted.")));
       });
     });
 
@@ -165,7 +165,7 @@ describe("WebSocketMessageHandler", function() {
         
         
 
-        expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Invalid response", "MessageError")));
+        expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.minor("Invalid response", "MessageError")));
       });
 
       it("server error produces MessageError, but the submission is also resolved", async function() {
@@ -180,7 +180,7 @@ describe("WebSocketMessageHandler", function() {
         server = MockServer(TEST_WS_ADDRESS, {
           code_submission: (_data: SubmissionRequest) => ({
             payload: testResponse,
-            error: new MessageError("Test", "ex1")
+            error: ErrorFactory.message("Test", "ex1")
           })
         });
 
@@ -193,7 +193,7 @@ describe("WebSocketMessageHandler", function() {
         
         
 
-        expect(store.dispatch).toHaveBeenNthCalledWith(1, push(new MessageError("Test", "ex1")));
+        expect(store.dispatch).toHaveBeenNthCalledWith(1, push(ErrorFactory.message("Test", "ex1")));
         expect(store.dispatch).toHaveBeenNthCalledWith(2, resolveSubmission(testResponse));
         expect(store.dispatch).toHaveBeenNthCalledWith(3, updatePoints(testResponse));
       });
@@ -264,14 +264,14 @@ describe("WebSocketMessageHandler", function() {
         
         
 
-        expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Could not fetch submission", "FetchingError")));
+        expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.minor("Could not fetch submission", "FetchingError")));
       });
 
       it("server error produces a MessageError", async function() {
         server = MockServer(TEST_WS_ADDRESS, {
           submission_fetch: (_data: SubmissionFetchRequest) => ({
             payload: testResponse,
-            error: new MessageError("Error fetching", "ex1")
+            error: ErrorFactory.message("Error fetching", "ex1")
           })
         });
 
@@ -284,7 +284,7 @@ describe("WebSocketMessageHandler", function() {
         
         
 
-        expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("Error fetching", "ex1")));
+        expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.message("Error fetching", "ex1")));
       });
     });
 
@@ -346,7 +346,7 @@ describe("WebSocketMessageHandler", function() {
           server.sendMessage({
             type: "terminal_output",
             payload: testMessage,
-            error: new MessageError("This is a test.", "123")
+            error: ErrorFactory.message("This is a test.", "123")
           });
 
         await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
@@ -354,7 +354,7 @@ describe("WebSocketMessageHandler", function() {
         
         
 
-        expect(store.dispatch).toHaveBeenCalledWith(push(new MessageError("This is a test.", "123")));
+        expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.message("This is a test.", "123")));
       });
     });
 
@@ -375,7 +375,7 @@ describe("WebSocketMessageHandler", function() {
   
       await waitFor(() => expect(store.dispatch).toHaveBeenCalledTimes(1));
   
-      expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Malformed message data.", "An error occured")));
+      expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.minor("Malformed message data.", "An error occured")));
       
       if (server.sendMessage)
         server.sendMessage("This is a test" as unknown as ResponseMessage);
@@ -385,7 +385,7 @@ describe("WebSocketMessageHandler", function() {
       
       
   
-      expect(store.dispatch).toHaveBeenCalledWith(push(new MinorError("Malformed message data.", "An error occured")));
+      expect(store.dispatch).toHaveBeenCalledWith(push(ErrorFactory.minor("Malformed message data.", "An error occured")));
     });
   });
 });
