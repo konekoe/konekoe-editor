@@ -9,7 +9,8 @@
     "build": "webpack --config ./webpack.config.js",
     "lint": "eslint ./src/**/*.{ts,tsx}",
     "test": "jest --verbose",
-    "cypress:open": "./node_modules/.bin/cypress open"
+    "cypress:open": "./node_modules/.bin/cypress open",
+    "cypress:run": "./node_modules/.bin/cypress run"
   },
   "author": "",
   "license": "ISC",
