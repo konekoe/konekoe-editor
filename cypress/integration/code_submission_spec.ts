@@ -30,6 +30,7 @@ describe("<CodeEditor />", function () {
     it("Can switch between file tabs", function() {
       // Content of file received at index 0.
       cy.contains("import");
+      cy.wait(100);
       cy.contains("types.ts").click();
       //Content of second file with filename types.ts
       cy.contains("export");
@@ -37,6 +38,7 @@ describe("<CodeEditor />", function () {
 
     it("can write to file and edits persist when switching file tabs", function(){
       cy.contains("import");
+      cy.wait(100);
       cy.get(".ace_text-input").first().focus().type("This is a test");
       cy.contains("types.ts").click();
       cy.contains("function.ts").click();
@@ -98,6 +100,7 @@ describe("<CodeEditor />", function () {
 
     it("successful submit updates points and clears wait screen", function(){
       cy.contains("import"); // Wait until file tabs are ready.
+      cy.wait(100);
       cy.get(".ace_text-input").first().focus().type(testContent1, { parseSpecialCharSequences: false });
       cy.contains("types.ts").click();
       cy.get(".ace_text-input").first().focus().type(testContent2, { parseSpecialCharSequences: false });
@@ -110,6 +113,7 @@ describe("<CodeEditor />", function () {
 
     it("server side error is displayed and wait screen cleared", function(){
       cy.contains("import"); // Wait until file tabs are ready.
+      cy.wait(100);
       cy.contains("Submit").click();
       cy.contains("Please wait");
       cy.contains("This is a test");

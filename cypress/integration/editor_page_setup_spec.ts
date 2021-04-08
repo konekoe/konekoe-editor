@@ -8,7 +8,12 @@ import MockServer from "../utils/mockWsServer";
 describe("Opening the editor page", function () {
   describe("Manually set data tests", function(){
     beforeEach(function() {
-      cy.visit("/");
+      cy.wait(300); // A hack to deal with SameSite cookie errors occuring in firefox due to use of http dev server. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+      cy.visit("/", {
+        onBeforeLoad(win) {
+          cy.stub(win, "WebSocket", ()=> ({ readyState: 1, send: () => {}, close: () => {} }));
+      }
+    });
     });
 
     it("Displays a wait screen", function () {
@@ -22,7 +27,7 @@ describe("Opening the editor page", function () {
         .invoke("dispatch", exerciseInit([
           { id: "ex1", submissions: [], title: "Some exercise", points: 1, maxPoints: 1, description: "Do something" },
           { id: "ex2", submissions: [], title: "Some exercise", points: 0, maxPoints: 10, description: "# Works like a charm" }
-        ]));  
+        ]));
       });
       
       it("tabs and exercise description are shown", function (){
@@ -33,6 +38,32 @@ describe("Opening the editor page", function () {
   
       it("without submission data, a default code file is shown", function() {
         cy.contains("No files received");
+      });
+
+
+      it("clicking the exercise tabs changes the exercise description and code files", function() {
+        cy.wait(100);
+        cy.window()
+        .its("store")
+        .invoke("dispatch", setActiveSubmission({ 
+          exerciseId: "ex1",
+          data: [
+            {
+              fileId: "file1",
+              filename: "test.js",
+              data: "console.log('Hello');"
+            },
+            {
+              fileId: "file2",
+              filename: "text.txt",
+              data: "Just some text"
+            }
+          ] 
+        }));
+  
+        cy.contains("0/10 | Some exercise").click();
+        cy.contains("Works like a charm");
+        cy.contains("No files received");      
       });
   
       it("code editor is updated after an active sumbission has been set", function() {
@@ -58,30 +89,6 @@ describe("Opening the editor page", function () {
         cy.contains("text.txt");
         cy.contains("console.log('Hello');");      
       });
-  
-      it("clicking the exercise tabs changes the exercise description and code files", function() {
-        cy.window()
-        .its("store")
-        .invoke("dispatch", setActiveSubmission({ 
-          exerciseId: "ex1",
-          data: [
-            {
-              fileId: "file1",
-              filename: "test.js",
-              data: "console.log('Hello');"
-            },
-            {
-              fileId: "file2",
-              filename: "text.txt",
-              data: "Just some text"
-            }
-          ] 
-        }));
-  
-        cy.contains("0/10 | Some exercise").click();
-        cy.contains("Works like a charm");
-        cy.contains("No files received");      
-      });
     });
   });
 
@@ -89,6 +96,7 @@ describe("Opening the editor page", function () {
     let server: Server;
 
     beforeEach(function(){
+      cy.wait(300);
       cy.visit("/", {
         onBeforeLoad(win) {
           // Create a new mock server and stub Window's WebSocket.
