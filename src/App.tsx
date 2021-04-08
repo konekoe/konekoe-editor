@@ -36,7 +36,7 @@ const useStyles = makeStyles(() =>
 const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({ serverAddress, token, store }) => {
   const classes = useStyles();
   const [selectedExercise, setSelectedExercise] = useState<string>("");
-  const [messageHandler] = useState<WebSocketMessageHandler>(new WebSocketMessageHandler(serverAddress, token, store));
+  const [messageHandler, setMessageHandler] = useState<WebSocketMessageHandler>();
   const exerciseTabItems: TabItem[] = useSelector(exerciseTabSelector);
   const exerciseDescription: string = useSelector((state: RootState) => state.exercises.descriptions[selectedExercise] || "No description given");
   const criticalError: CriticalError | null = useSelector((state: RootState) => state.error.criticalError);
@@ -46,8 +46,14 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    messageHandler.open();
+    setMessageHandler(new WebSocketMessageHandler(serverAddress, token, store));
   },[]);
+
+  useEffect(() => {
+    if (messageHandler)
+      messageHandler.open();
+      
+  },[messageHandler]);
 
   useEffect(() => {
     if (exerciseTabItems.length && selectedExercise === "") {
