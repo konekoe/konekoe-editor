@@ -14,7 +14,6 @@ class WebSocketMessageHandler {
   private _store: Store;
 
   constructor(address: string, token: string, store: Store) {
-
     this._socket = new WebSocket(address);
     this._token = token;
 
@@ -68,12 +67,12 @@ class WebSocketMessageHandler {
   }
 
   private _server_connect(): void {
-    this._socket .send(JSON.stringify({ type: "server_connect", payload: { token: this._token } }));
+    this._socket.send(JSON.stringify({ type: "server_connect", payload: { token: this._token } }));
   }
 
   public open(): void {
     if (this._socket.readyState === 1)
-      this._server_connect();    
+      this._server_connect();
     else
       this._socket.onopen = (): void => this._server_connect();
   }
