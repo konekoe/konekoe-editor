@@ -7,6 +7,9 @@ stages:
 Unit_Test:
   stage: unit
   image: node:latest
+  tags:
+    - editor
+    - test
   only:
     - master
     - dev
@@ -20,6 +23,10 @@ Unit_Test:
 End_To_End:
   stage: e2e
   image: cypress/browsers:node12.14.1-chrome85-ff81
+  tags:
+    - editor
+    - test
+    - e2e
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
