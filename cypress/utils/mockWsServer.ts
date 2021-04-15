@@ -84,6 +84,7 @@ const defaultSubmissionFetchHandler = (request: SubmissionFetchRequest): Respons
       payload: { ...request, ...removeIdFromSubmission((defaultTestSubmissions[request.exerciseId].find((sub: ExerciseSubmission) => sub.id === request.submissionId) || defaultSubmission)) }
     };
   }
+
   
   return {
     payload: { ...request, ...removeIdFromSubmission(defaultSubmission) }
@@ -114,10 +115,14 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
 
   // Mock for the backend.
   mockServer.on("connection", (socket: WebSocket) => {
-    mockServer.sendMessage = (msg: ResponseMessage) => socket.send(JSON.stringify(msg));
+    
+    // Used to expose message sending to testing environment.
+    mockServer.sendMessage = (msg: ResponseMessage) => {
+      socket.send(JSON.stringify(msg));
+    };
 
     const resolveRequest = (request: RequestMessage): ResponseBody<ResponsePayload> => {
-      switch (request.type) {
+      switch (request.type) {  
         case "server_connect":
           // Use given handler or defaul handler.
           if (messageHandlers.server_connect)
@@ -145,12 +150,13 @@ export default function MockServer(addr: string, messageHandlers: MockServerMess
     };
 
     socket.on("message", (message: string | Blob | ArrayBuffer | ArrayBufferView) => {
-
+      
       // In testing we assume message to be a string.
       const jsonObj: RequestMessage = JSON.parse(message as unknown as string);
 
-      if (mockServer.sendMessage)
-        mockServer.sendMessage({ type: jsonObj.type, ...resolveRequest(jsonObj) });
+      //Note: In E2E testing, mockServer.sendMessage can be reassignment by async operations.
+      // Therefore, the server itself uses the socket directly.
+      socket.send(JSON.stringify({ type: jsonObj.type, ...resolveRequest(jsonObj) }));
     });
   });
 

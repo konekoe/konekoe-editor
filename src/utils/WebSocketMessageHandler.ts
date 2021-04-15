@@ -15,6 +15,7 @@ class WebSocketMessageHandler {
 
   constructor(address: string, token: string, store: Store) {
     this._socket = new WebSocket(address);
+    
     this._token = token;
 
     this._store = store;
@@ -28,9 +29,11 @@ class WebSocketMessageHandler {
       try {
         
         const msgObj: Record<string, unknown> = JSON.parse(data) as Record<string, unknown>;
+        
 
         if (!isResponseMessage(msgObj))
           throw Error("Malformed message");
+        
         
         this._handleMessage(msgObj);
       }
@@ -94,7 +97,6 @@ class WebSocketMessageHandler {
   }
 
   private _codeSubmissionHandler(payload: ResponsePayload, error?: MessageError) {
-    
     // Submissions should resolve even if the server produces an error and possible grader errors be shown to the user.
     if (error) {
       this._store.dispatch(push(error));

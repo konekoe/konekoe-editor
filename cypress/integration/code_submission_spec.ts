@@ -17,7 +17,6 @@ describe("<CodeEditor />", function () {
         onBeforeLoad(win) {
           // Create a new mock server and stub Window's WebSocket.
           if (server) {
-            server.close();
             server.stop();
           }
 
@@ -53,7 +52,6 @@ describe("<CodeEditor />", function () {
         onBeforeLoad(win) {
           // Create a new mock server and stub Window's WebSocket.
           if (server) {
-            server.close();
             server.stop();
           }
 
