@@ -1,0 +1,42 @@
+stages:
+  - unit
+  - e2e
+  - deploy
+
+
+Unit_Test:
+  stage: unit
+  image: node:latest
+  only:
+    - master
+    - dev
+  cache:
+    paths:
+      - node_modules/
+  script:
+    - npm install
+    - npm test
+
+End_To_End:
+  stage: e2e
+  image: cypress/browsers:node12.14.1-chrome85-ff81
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - .npm/
+
+  only:
+    - master
+    - dev
+  script:
+    - npm install
+    - npm start
+    - npm run cypress:run -- --browser chrome
+    - npm run cypress:run -- --browser firefox
+  artifacts:
+    when: always
+    paths:
+      - cypress/videos/**/*.mp4
+      - cypress/screenshots/**/*.png
+    expire_in: 1 day
