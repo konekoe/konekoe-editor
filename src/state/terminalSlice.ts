@@ -12,7 +12,7 @@ const terminalsSlice = createSlice({
     addTerminalOutput: (state, action: PayloadAction<TerminalMessage>): void => {
       const { exerciseId, data } = action.payload;
       
-      state.output[exerciseId] = (state.output[exerciseId] || "") + data;
+      state.output[exerciseId] = data;
     },
     clearTerminal: (state, action: PayloadAction<Omit<TerminalMessage, "data">>): void => {
       const { exerciseId } = action.payload;
