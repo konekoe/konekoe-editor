@@ -4,9 +4,6 @@ node_modules/
 # build
 dist/
 
-#misc
-db.json
-
 #end-to-end testing
 cypress/fixtures
 cypress/screenshots

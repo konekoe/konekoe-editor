@@ -1,0 +1,3 @@
+[submodule "konekoe-editor-release"]
+	path = konekoe-editor-release
+	url = git@version.aalto.fi:konekoe/konekoe-editor-release.git

@@ -5,7 +5,7 @@ module.exports = {
   
   entry: "./src/index.tsx",
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "konekoe-editor-release"),
     filename: "konekoe-editor.js"
   },
   mode: "production",
