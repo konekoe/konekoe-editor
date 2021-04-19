@@ -44,7 +44,7 @@ End_To_End:
     expire_in: 1 day
 
 Build:
-  stage: build
+  stage: deploy
   image: node:latest
   tags:
     - editor
