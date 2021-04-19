@@ -27,11 +27,6 @@ End_To_End:
     - editor
     - test
     - e2e
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-      - .npm/
 
   only:
     - master
@@ -47,3 +42,31 @@ End_To_End:
       - cypress/videos/**/*.mp4
       - cypress/screenshots/**/*.png
     expire_in: 1 day
+
+Build:
+  stage: build
+  image: node:latest
+  tags:
+    - editor
+    - build
+  only: master
+  cache:
+    paths:
+      - node_modules/
+  before_script:
+    # Install ssh-agent and add the content of the SSH_PRIVATE_KEY variable to the agent store
+    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # Remember to set up user informantion for the git commands to work.
+    - git config --global user.email "user@example.com"
+    - git config --global user.name "User name"
+  script:
+    - npm install
+    - npm run build
+    - cd konekoe-editor-release/
+    - git add konekoe-editor.js
+    - git commit -m "Build on $CI_COMMIT_TIMESTAMP"
+    - git push
