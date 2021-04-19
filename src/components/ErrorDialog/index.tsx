@@ -2,6 +2,7 @@ import React from "react";
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@material-ui/core";
 import { ErrorDialogProps } from "../../types";
 import ConditionalBadge from "./ConditionalBadge";
+import { isNumber } from "../../utils/typeCheckers";
 
 const ErrorDialog: React.FC<ErrorDialogProps> = ({ error, numOfRemainingErrors, closeHandler }) => (
   <Dialog open={ error !== undefined }>
@@ -15,13 +16,13 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({ error, numOfRemainingErrors, 
     </DialogContent>
     <DialogActions>
       <ConditionalBadge
-        badgeContent={ numOfRemainingErrors - 1 }
+        badgeContent={ (isNumber(numOfRemainingErrors)) ? numOfRemainingErrors - 1 : numOfRemainingErrors }
         color={ "error" }
       >
         <Button
           onClick={ closeHandler }
         >
-          { (numOfRemainingErrors > 1) ? "Show next error" : "Close" }
+          { (isNumber(numOfRemainingErrors) && numOfRemainingErrors > 1) ? "Show next error" : "Close" }
         </Button>
       </ConditionalBadge>
     </DialogActions>
