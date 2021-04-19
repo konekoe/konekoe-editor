@@ -18,6 +18,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     container: {
       position: "relative"
+    },
+    contentContainer: {
+      height: "45vh"
+    },
+    topContent: {
+      height: "12%"
+    },
+    bottomContent: {
+      height: "87%"
     }
   }),
 );
@@ -105,17 +114,20 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
       </Backdrop>
       <Grid
         container
-        direction="row" 
+        direction="row"
+        className={ classes.contentContainer }
       >
         <Grid
           item
           xs={ 11 }
+          className={ classes.topContent }
         >
           <TabBar selectionHandler={ handleTabClick } tabItems={ filesToTabItems(Object.values(editorContent)) }/>
         </Grid>
         <Grid
           item
           xs={ 1 }
+          className={ classes.topContent }
         >
           <Button
             className="submit-button"
@@ -132,8 +144,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
         <Grid
           item
           xs={12}
+          className={ classes.bottomContent }
         >
-          <div style={{ width: "100%", height: "10rem"}} ref={ editorRef }/>     
+          <div style={{ width: "100%", height: "100%"}} ref={ editorRef }/>     
         </Grid>
       </Grid>
     </div>

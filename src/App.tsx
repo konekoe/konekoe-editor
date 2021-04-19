@@ -23,6 +23,16 @@ const useStyles = makeStyles(() =>
     criticalErrorMessage: {
       color: "red"
     },
+    descriptionBox: {
+      maxHeight: "100%"
+    },
+    contentContainer: {
+      height: "90vh"
+    },
+    codingBox: {
+      maxHeight: "100%",
+      minHeight: "50%"
+    },
     waitScreenContent: {
       position: "absolute",
       top: "50%",
@@ -112,6 +122,7 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
             container
             direction="row"
             alignItems="center"
+            className={ classes.contentContainer }
           >
             <Grid
               item
@@ -122,35 +133,33 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
             <Grid
               container
               direction="row"
+              className={ classes.contentContainer }
             >
               <Grid
                 item
-                xs={ 5 }
+                xs={ 3 }
+                className={ classes.descriptionBox }
               >
                 <InfoBox content={ exerciseDescription } />
               </Grid>
 
               <Grid
                 item
-                xs={ 7 }
+                xs={ 9 }
               >
                 <Grid
-                  container
-                  direction="row"
+                  item
+                  xs={ 12 }
+                  className={ classes.codingBox }
                 >
-                  <Grid
-                    item
-                    xs={ 12 }
-                  >
-                    <CodeEditor exerciseId={ selectedExercise } />
-                  </Grid>
+                  <CodeEditor exerciseId={ selectedExercise } />
+                </Grid>
 
-                  <Grid
-                    item
-                    xs={ 12 }
-                  >
-                    <CodeTerminal exerciseId={ selectedExercise }/>
-                  </Grid>
+                <Grid
+                  item
+                  xs={ 12 }
+                >
+                  <CodeTerminal exerciseId={ selectedExercise }/>
                 </Grid>
 
               </Grid>
