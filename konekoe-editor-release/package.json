@@ -1,0 +1,14 @@
+{
+  "name": "konekoe-editor-release",
+  "version": "1.0.0",
+  "description": "Online code editor",
+  "main": "konekoe-editor.js",
+  "scripts": {
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
