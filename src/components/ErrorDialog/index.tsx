@@ -9,21 +9,21 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({ error, numOfRemainingErrors, 
       { (error) ? error.title : "" }
     </DialogTitle>
     <DialogContent>
-      <ConditionalBadge
-        badgeContent={ numOfRemainingErrors }
-        color={ "error" }
-      >
-        <DialogContentText>
-          { (error) ? error.message : "" }
-        </DialogContentText>
-      </ConditionalBadge>  
+      <DialogContentText>
+        { (error) ? error.message : "" }
+      </DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button
-        onClick={ closeHandler }
+      <ConditionalBadge
+        badgeContent={ numOfRemainingErrors - 1 }
+        color={ "error" }
       >
-        Close
-      </Button>
+        <Button
+          onClick={ closeHandler }
+        >
+          { (numOfRemainingErrors > 1) ? "Show next error" : "Close" }
+        </Button>
+      </ConditionalBadge>
     </DialogActions>
   </Dialog>
 );
