@@ -68,6 +68,7 @@ Build:
     - npm install
     - npm run build
     - cd konekoe-editor-release/
+    - git checkout master
     - git add konekoe-editor.js
     - git commit -m "Build on $CI_COMMIT_TIMESTAMP"
     - git push
