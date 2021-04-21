@@ -16,7 +16,7 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({ error, numOfRemainingErrors, 
     </DialogContent>
     <DialogActions>
       <ConditionalBadge
-        badgeContent={ (isNumber(numOfRemainingErrors)) ? numOfRemainingErrors - 1 : numOfRemainingErrors }
+        badgeContent={ (isNumber(numOfRemainingErrors)) ? numOfRemainingErrors : numOfRemainingErrors }
         color={ "error" }
       >
         <Button

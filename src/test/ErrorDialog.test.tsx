@@ -21,7 +21,7 @@ describe("<ErrorDialog />", () => {
     const closeHandler = jest.fn();
     const component = render(<ErrorDialog error={ ErrorFactory.minor("Hello there", "Error") } numOfRemainingErrors={ 5 } closeHandler={ closeHandler } />);
 
-    const cancelButton = component.getByText("Close");
+    const cancelButton = component.getByText("Show next error");
 
     fireEvent.click(cancelButton);
 

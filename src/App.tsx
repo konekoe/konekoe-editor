@@ -51,7 +51,7 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
   const exerciseDescription: string = useSelector((state: RootState) => state.exercises.descriptions[selectedExercise] || "No description given");
   const criticalError: CriticalError | null = useSelector((state: RootState) => state.error.criticalError);
   const minorError: MinorError | undefined = useSelector((state: RootState) => state.error.minorErrors[0]);
-  const remainingMinorErrors: number = useSelector((state: RootState) => state.error.minorErrors.length);
+  const remainingMinorErrors: number = useSelector((state: RootState) => state.error.minorErrors.length - 1); // Don't count error at index 0 as is will be shown.
 
   const dispatch = useDispatch();
 
