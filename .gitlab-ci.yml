@@ -69,7 +69,7 @@ Build:
     - cd konekoe-editor-release/
     - git add konekoe-editor.js
     - git commit -m "Build on $CI_COMMIT_TIMESTAMP"
-    - LATEST_COMMIT=git log -1 --format=format:"%H"
+    - LATEST_COMMIT=$(git log -1 --format=format:"%H")
     - git checkout master
     - git merge $LATEST_COMMIT
     - git push
