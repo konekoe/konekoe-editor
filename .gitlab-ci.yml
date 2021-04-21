@@ -62,8 +62,7 @@ Build:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     # Remember to set up user informantion for the git commands to work.
-    - git config --global user.email "user@example.com"
-    - git config --global user.name "User name"
+    - git config --global user.email "email@example.com"
   script:
     - npm install
     - npm run build
