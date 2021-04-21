@@ -9,10 +9,6 @@ const ConditionalBadge: React.FC<ConditionalBadgeProps> = ({ badgeContent, color
       <Badge
         badgeContent={ badgeContent }
         color={ color }
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
       >
         { children }
       </Badge>

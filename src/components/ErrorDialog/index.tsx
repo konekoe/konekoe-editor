@@ -5,7 +5,10 @@ import ConditionalBadge from "./ConditionalBadge";
 import { isNumber } from "../../utils/typeCheckers";
 
 const ErrorDialog: React.FC<ErrorDialogProps> = ({ error, numOfRemainingErrors, closeHandler }) => (
-  <Dialog open={ error !== undefined }>
+  <Dialog
+    open={ error !== undefined }
+    
+  >
     <DialogTitle>
       { (error) ? error.title : "" }
     </DialogTitle>
@@ -14,7 +17,7 @@ const ErrorDialog: React.FC<ErrorDialogProps> = ({ error, numOfRemainingErrors, 
         { (error) ? error.message : "" }
       </DialogContentText>
     </DialogContent>
-    <DialogActions>
+    <DialogActions style={{ padding: "1rem"} }>
       <ConditionalBadge
         badgeContent={ (isNumber(numOfRemainingErrors)) ? numOfRemainingErrors : numOfRemainingErrors }
         color={ "error" }
