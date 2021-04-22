@@ -46,7 +46,7 @@ End_To_End:
 Build:
   stage: deploy
   variables:
-    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SUBMODULE_STRATEGY: "recursive"
   image: node:latest
   tags:
     - editor
