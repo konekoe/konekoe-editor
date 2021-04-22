@@ -74,5 +74,5 @@ Build:
     - LATEST_COMMIT=$(git log -1 --format=format:"%H")
     - git checkout master
     - git merge $LATEST_COMMIT
-    - git remote add ssh_remote git@version.aalto.fi:konekoe/konekoe-editor-release.git
-    - git push ssh-remote origin
+    - git remote add ssh-remote git@version.aalto.fi:konekoe/konekoe-editor-release.git
+    - git push ssh-remote master
