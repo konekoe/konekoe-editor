@@ -75,4 +75,4 @@ Build:
     - git checkout master
     - git merge $LATEST_COMMIT
     - git remote add ssh_remote git@version.aalto.fi:konekoe/konekoe-editor-release.git
-    - git push ssh-remote
+    - git push ssh-remote origin
