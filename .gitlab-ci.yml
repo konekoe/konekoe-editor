@@ -64,8 +64,8 @@ Build:
     # Remember to set up user informantion for the git commands to work.
     - git config --global user.email "email@example.com"
   script:
-    - git remote rename origin upstream
-    - git remote add origin git@version.aalto.fi:konekoe/konekoe-editor-release.git
+    - rm -rd konekoe-editor-release #cleanup release directory
+    - git submodule update --init # Update submodule
     - npm install
     - npm run build # build directly into submodule directory
     - cd konekoe-editor-release/
