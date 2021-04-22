@@ -64,10 +64,10 @@ Build:
     # Remember to set up user informantion for the git commands to work.
     - git config --global user.email "email@example.com"
   script:
-    - git submodule update --init # Update submodules
     - npm install
     - npm run build # build directly into submodule directory
     - cd konekoe-editor-release/
+    - git remote -v # Just test. Should be removed.
     - git add konekoe-editor.js
     - git commit -m "Build on $CI_COMMIT_TIMESTAMP"
     - LATEST_COMMIT=$(git log -1 --format=format:"%H")
