@@ -76,4 +76,5 @@ Build:
     - git checkout master
     - git merge $LATEST_COMMIT
     - git remote set-url --push origin git@version.aalto.fi:konekoe/konekoe-editor-release.git
-    - git push origin master
+    - git remote -v
+    - git push
