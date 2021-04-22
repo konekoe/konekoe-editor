@@ -45,6 +45,8 @@ End_To_End:
 
 Build:
   stage: deploy
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
   image: node:latest
   tags:
     - editor
@@ -64,8 +66,6 @@ Build:
     # Remember to set up user informantion for the git commands to work.
     - git config --global user.email "email@example.com"
   script:
-    - rm -rd konekoe-editor-release #cleanup release directory
-    - git submodule update --init # Update submodule
     - npm install
     - npm run build # build directly into submodule directory
     - cd konekoe-editor-release/
