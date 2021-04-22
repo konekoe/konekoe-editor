@@ -64,8 +64,9 @@ Build:
     # Remember to set up user informantion for the git commands to work.
     - git config --global user.email "email@example.com"
   script:
+    - git submodule update --init # Update submodules
     - npm install
-    - npm run build
+    - npm run build # build directly into submodule directory
     - cd konekoe-editor-release/
     - git add konekoe-editor.js
     - git commit -m "Build on $CI_COMMIT_TIMESTAMP"
