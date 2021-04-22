@@ -51,8 +51,6 @@ Build:
     - build
   only:
     - master
-  variables:
-    GIT_SUBMODULE_STRATEGY: recursive
   cache:
     paths:
       - node_modules/
