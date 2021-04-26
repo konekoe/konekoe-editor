@@ -59,7 +59,7 @@ Build:
   before_script:
     # Register the contents of the SSH_PRIVATE_KEY variable to the agent store
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh/*
+    - chmod 700 ~/.ssh
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     # Remember to set up user informantion for the git commands to work.
