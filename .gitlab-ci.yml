@@ -65,6 +65,7 @@ Build:
     - ssh-add ~/.ssh/id_konekoe-delivery
     # Remember to set up user informantion for the git commands to work.
     - git config --global user.email "email@example.com"
+    - git config --global user.name "CI Runner"
   script:
     - npm install
     - npm run build # build directly into submodule directory
