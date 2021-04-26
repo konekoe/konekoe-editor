@@ -57,14 +57,12 @@ Build:
     paths:
       - node_modules/
   before_script:
-    # Install ssh-agent and add the content of the SSH_PRIVATE_KEY variable to the agent store
-    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    # Register the contents of the SSH_PRIVATE_KEY variable to the agent store
     - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    # Remember to set up user informantion for the git commands to work.
-    - git config --global user.email "email@example.com"
+    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_konekoe-delivery
+    - chmod 700 ~/.ssh/*
+    - eval $(ssh-agent -s)
+    - ssh-add ~/.ssh/id_konekoe-delivery
   script:
     - npm install
     - npm run build # build directly into submodule directory
