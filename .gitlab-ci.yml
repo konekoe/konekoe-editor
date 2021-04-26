@@ -59,10 +59,9 @@ Build:
   before_script:
     # Register the contents of the SSH_PRIVATE_KEY variable to the agent store
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_konekoe-delivery
     - chmod 700 ~/.ssh/*
     - eval $(ssh-agent -s)
-    - ssh-add ~/.ssh/id_konekoe-delivery
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     # Remember to set up user informantion for the git commands to work.
     - git config --global user.email "email@example.com"
     - git config --global user.name "CI Runner"
@@ -75,5 +74,5 @@ Build:
     - LATEST_COMMIT=$(git log -1 --format=format:"%H")
     - git checkout master
     - git merge $LATEST_COMMIT
-    - git remote add ssh-remote git@version.aalto.fi:konekoe/konekoe-editor-release.git
-    - git push ssh-remote master
+    - git remote set-url --push origin "ssh://git@version.aalto.fi:konekoe/konekoe-editor-release.git"
+    - git push
