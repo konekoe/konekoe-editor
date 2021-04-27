@@ -58,7 +58,8 @@ describe("<CodeTerminal />", function () {
     });
     cy.contains("Hello");
     cy.contains("10/100 | Exercise 2: Code").click();
-    cy.contains("Hello").should("not.exist");
+    cy.contains("Hello")
+    .should("not.have.a.property", "role");
     cy.contains("Exercise 1: Do something");
     cy.contains("Hello");
   });

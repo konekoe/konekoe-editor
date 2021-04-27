@@ -53,6 +53,9 @@ const CodeTerminal: React.FC<CodeTerminalProps> = ({ exerciseId }) => {
   }, []);
 
   useEffect(() => {
+    terminal.reset();
+    terminal.write("");
+
     if (terminalContent[exerciseId]) {
       terminal.write(terminalContent[exerciseId]);
     }
