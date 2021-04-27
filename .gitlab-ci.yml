@@ -62,7 +62,8 @@ Build:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
-    - ssh-keyscan "${CI_REPOSITORY_URL}" >> ~/.ssh/known_hosts # Set up host key verification.
+    - gitlab_hostname=$(echo "${CI_REPOSITORY_URL}" | sed -e 's|https\?://gitlab-ci-token:.*@||g' | sed -e 's|/.*||g')
+    - ssh-keyscan "${gitlab_hostname}" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
     
     # Remember to set up user informantion for the git commands to work.
@@ -77,5 +78,6 @@ Build:
     - LATEST_COMMIT=$(git log -1 --format=format:"%H")
     - git checkout master
     - git merge $LATEST_COMMIT
-    - git remote set-url --push origin "ssh://git@version.aalto.fi/gitlab/konekoe/konekoe-editor-release.git"
-    - git push
+    - url_host=$(echo "${CI_REPOSITORY_URL}" | sed -e 's|https\?://gitlab-ci-token:.*@|ssh://git@|g')
+    - git remote set-url --push origin "${url_host}"
+    - git push origin master
