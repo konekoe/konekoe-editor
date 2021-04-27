@@ -73,11 +73,11 @@ Build:
     - git config --global user.name "CI Runner"
   script:
     - npm install
+    - cd konekoe-editor-release/
+    - git checkout master
+    - cd ../
     - npm run build # build directly into submodule directory
     - cd konekoe-editor-release/
-    - git stash
-    - git checkout master
-    - git stash pop
     - git add konekoe-editor.js
     - git commit -m "Built from ${CI_COMMIT_SHA}"
     # By default, Gitlab CI uses https. Explicitly set remote to utilize ssh and the deploy key set up in the before_script. 
