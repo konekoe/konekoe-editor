@@ -78,6 +78,5 @@ Build:
     - LATEST_COMMIT=$(git log -1 --format=format:"%H")
     - git checkout master
     - git merge $LATEST_COMMIT
-    - url_host=$(echo "${CI_REPOSITORY_URL}" | sed -e 's|https\?://gitlab-ci-token:.*@|ssh://git@|g')
-    - git remote set-url --push origin "${url_host}"
-    - git push origin master
+    - git remote set-url --push origin "ssh://git@version.aalto.fi/gitlab/konekoe/konekoe-editor-release.git"
+    - git push
