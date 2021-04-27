@@ -58,10 +58,13 @@ Build:
       - node_modules/
   before_script:
     # Register the contents of the SSH_PRIVATE_KEY variable to the agent store
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan "${CI_REPOSITORY_URL}" >> ~/.ssh/known_hosts # Set up host key verification.
+    - chmod 644 ~/.ssh/known_hosts
+    
     # Remember to set up user informantion for the git commands to work.
     - git config --global user.email "email@example.com"
     - git config --global user.name "CI Runner"
