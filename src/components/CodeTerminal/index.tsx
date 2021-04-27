@@ -25,7 +25,7 @@ const CodeTerminal: React.FC<CodeTerminalProps> = ({ exerciseId }) => {
   const classes = useStyles();
 
   const terminalContent: TerminalOutputDictionary = useSelector((state: RootState) => state.terminals.output);
-  const [terminal] = useState<Terminal>(new Terminal());
+  const [terminal] = useState<Terminal>(new Terminal({ screenReaderMode: true }));
   const [fitAddon] = useState<FitAddon>(new FitAddon());
   const dispatch = useDispatch();
   const terminalRef = createRef<HTMLDivElement>();

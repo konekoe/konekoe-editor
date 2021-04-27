@@ -112,10 +112,9 @@ export interface ServerMock extends Server {
 export default function MockServer(addr: string, messageHandlers: MockServerMessageHandlers = {}): ServerMock {
   const mockServer: ServerMock = new Server(addr);
 
-
   // Mock for the backend.
   mockServer.on("connection", (socket: WebSocket) => {
-    
+
     // Used to expose message sending to testing environment.
     mockServer.sendMessage = (msg: ResponseMessage) => {
       socket.send(JSON.stringify(msg));
