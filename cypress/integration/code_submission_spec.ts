@@ -9,6 +9,8 @@ const testContent2 = "export type BooleanType = boolean;";
 
 describe("<CodeEditor />", function () {
   let server: ServerMock;
+  
+  Cypress.config('defaultCommandTimeout', 60000);
 
   describe("tabs and editing files", function() {
 

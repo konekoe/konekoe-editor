@@ -6,6 +6,7 @@ import MockServer from "../utils/mockWsServer";
 
 
 describe("Opening the editor page", function () {
+  
   describe("Manually set data tests", function(){
     beforeEach(function() {
       cy.wait(300); // A hack to deal with SameSite cookie errors occuring in firefox due to use of http dev server. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite

@@ -34,7 +34,6 @@ End_To_End:
   script:
     - npm install
     - npm start &
-    - sleep "10" &
     - npm run cypress:run -- --browser chrome
     - npm run cypress:run -- --browser firefox
   artifacts:
