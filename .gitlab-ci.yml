@@ -60,8 +60,10 @@ Build:
     # Register the contents of the SSH_PRIVATE_KEY variable to the agent store
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    # Create .ssh with the correct permissions
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
+    # Set up known_hosts. Required for host verification.
     - gitlab_hostname=$(echo "${CI_REPOSITORY_URL}" | sed -e 's|https\?://gitlab-ci-token:.*@||g' | sed -e 's|/.*||g')
     - ssh-keyscan "${gitlab_hostname}" >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
@@ -73,10 +75,11 @@ Build:
     - npm install
     - npm run build # build directly into submodule directory
     - cd konekoe-editor-release/
-    - git add konekoe-editor.js
-    - git commit -m "Build on $CI_COMMIT_TIMESTAMP"
-    - LATEST_COMMIT=$(git log -1 --format=format:"%H")
+    - git stash
     - git checkout master
-    - git merge $LATEST_COMMIT
+    - git stash pop
+    - git add konekoe-editor.js
+    - git commit -m "Built from ${CI_COMMIT_SHA}"
+    # By default, Gitlab CI uses https. Explicitly set remote to utilize ssh and the deploy key set up in the before_script. 
     - git remote set-url --push origin "git@version.aalto.fi:konekoe/konekoe-editor-release.git"
     - git push
