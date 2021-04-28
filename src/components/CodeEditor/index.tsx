@@ -124,7 +124,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
           xs={ 11 }
           className={ classes.topContent }
         >
-          <TabBar selectionHandler={ handleTabClick } tabItems={ editorTabs }/>
+          <TabBar
+            selectionHandler={ handleTabClick }
+            tabItems={ editorTabs }
+            selectionResettingOn={ true }
+          />
         </Grid>
         <Grid
           item

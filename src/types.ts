@@ -102,6 +102,7 @@ export type TabItem = Omit<TabProps, "clickHandler">;
 export interface TabBarProps {
   tabItems: TabItem[];
   selectionHandler: (id: string) => void;
+  selectionResettingOn?: boolean;
 }
 
 export interface ErrorDialogProps {

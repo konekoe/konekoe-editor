@@ -3,7 +3,7 @@ import { TabBarProps, TabProps } from "../../types";
 import { Tabs } from "@material-ui/core";
 import TabItem from "./Tab";
 
-const TabBar: React.FC<TabBarProps> = ({ tabItems, selectionHandler }) => {
+const TabBar: React.FC<TabBarProps> = ({ tabItems, selectionHandler, selectionResettingOn }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
 
   const clickHandlerFactory = (id: string, index: number) => () => {
@@ -17,7 +17,8 @@ const TabBar: React.FC<TabBarProps> = ({ tabItems, selectionHandler }) => {
 
   // When the tab items change, set the first one as the active tab.
   useLayoutEffect(() => {
-    setSelectedIndex(0);
+    if (selectionResettingOn)
+      setSelectedIndex(0);
   }, [tabItems]);
 
   return (
