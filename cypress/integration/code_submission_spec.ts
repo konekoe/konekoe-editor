@@ -49,7 +49,7 @@ describe("<CodeEditor />", function () {
       cy.contains("int main()"); // Test shown code
       cy.contains("source.c") // Test that the correct tab is active
       .should("have.attr", "tabindex")
-      .should("eq", 0);
+      .should("eq", "0");
     });    
   });
 

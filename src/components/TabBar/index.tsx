@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import { TabBarProps, TabProps } from "../../types";
 import { Tabs } from "@material-ui/core";
 import TabItem from "./Tab";
@@ -6,8 +6,6 @@ import TabItem from "./Tab";
 const TabBar: React.FC<TabBarProps> = ({ tabItems, selectionHandler }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   
-  // NOTE: Update this so that selection handler utilizes a string id.
-  // an explicit click handler allow utilization of TabItem prop values.
   const clickHandlerFactory = (id: string, index: number) => () => {
     if (selectedIndex !== index)
       selectionHandler(id);
@@ -17,9 +15,14 @@ const TabBar: React.FC<TabBarProps> = ({ tabItems, selectionHandler }) => {
     setSelectedIndex(newValue);
   };
 
+  // When the tab items change, set the first one as the active tab.
+  useLayoutEffect(() => {
+    setSelectedIndex(0);
+  }, [tabItems]);
+
   return (
     <Tabs
-     value={ selectedIndex }
+     value={ Math.min(selectedIndex, Math.max(tabItems.length - 1, 0)) } // When tab items change, the selected index might be out of bounds.
      onChange={ handleChange }
     >
       {

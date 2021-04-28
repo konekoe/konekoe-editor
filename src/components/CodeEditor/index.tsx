@@ -1,6 +1,6 @@
 import React, { createRef, useLayoutEffect, useState, useEffect } from "react";
 import ace, { Ace } from "ace-builds";
-import { CodeEditorProps, ExerciseFileDict, EditSessionDict } from "../../types";
+import { CodeEditorProps, ExerciseFileDict, EditSessionDict, TabItem } from "../../types";
 import TabBar from "../TabBar";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../state/store";
@@ -40,12 +40,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
   const classes = useStyles();
   const [editor, setEditor] = useState<Ace.Editor | undefined>();
   const [editorSessions, setEditorSessions] = useState<EditSessionDict>({});
+  const [editorTabs, setEditorTabs] = useState<TabItem[]>([]);
   const [activeSession, setActiveSession] = useState<string>("");
 
   // Fetch active files from store.
   const editorContent: ExerciseFileDict = useSelector((state: RootState) => state.submissions.activeSubmissions[exerciseId] || {});
   const submissionList: string[] = useSelector((state: RootState) => state.submissions.allSubmissions[exerciseId] || []);
-
+  
   const submissionRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionRequests[exerciseId] !== undefined);
   const submissionFetchRequestExists: boolean = useSelector((state: RootState) => state.submissions.submissionFetchRequests[exerciseId] !== undefined);
 
@@ -71,6 +72,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
     if (Object.keys(editorContent).length) {
       setActiveSession(Object.keys(editorContent)[0]);
       setEditorSessions(filesToEditSessions(Object.values(editorContent)));
+      setEditorTabs(filesToTabItems(Object.values(editorContent)));
     }
     else {
       setActiveSession("");
@@ -122,7 +124,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ exerciseId }) => {
           xs={ 11 }
           className={ classes.topContent }
         >
-          <TabBar selectionHandler={ handleTabClick } tabItems={ filesToTabItems(Object.values(editorContent)) }/>
+          <TabBar selectionHandler={ handleTabClick } tabItems={ editorTabs }/>
         </Grid>
         <Grid
           item
