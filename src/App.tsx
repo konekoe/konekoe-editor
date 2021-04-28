@@ -48,6 +48,7 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
   const [selectedExercise, setSelectedExercise] = useState<string>("");
   const [messageHandler, setMessageHandler] = useState<WebSocketMessageHandler>();
   const exerciseTabItems: TabItem[] = useSelector(exerciseTabSelector);
+  const [exerciseTabs, setExerciseTabs] = useState<TabItem[]>(exerciseTabItems);
   const exerciseDescription: string = useSelector((state: RootState) => state.exercises.descriptions[selectedExercise] || "No description given");
   const criticalError: CriticalError | null = useSelector((state: RootState) => state.error.criticalError);
   const minorError: MinorError | undefined = useSelector((state: RootState) => state.error.minorErrors[0]);
@@ -68,6 +69,7 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
   useEffect(() => {
     if (exerciseTabItems.length && selectedExercise === "") {
       setSelectedExercise(exerciseTabItems[0].id);
+      setExerciseTabs(exerciseTabItems);
     }
       
   },[exerciseTabItems]);
@@ -128,7 +130,7 @@ const App: React.FC<{ serverAddress: string, token: string, store: Store }> = ({
               item
               xs={ 12 }
             >
-              <TabBar tabItems={ exerciseTabItems } selectionHandler={ tabSelectionHandler }/>
+              <TabBar tabItems={ exerciseTabs } selectionHandler={ tabSelectionHandler }/>
             </Grid>
             <Grid
               container

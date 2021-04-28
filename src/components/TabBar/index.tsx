@@ -5,7 +5,7 @@ import TabItem from "./Tab";
 
 const TabBar: React.FC<TabBarProps> = ({ tabItems, selectionHandler }) => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  
+
   const clickHandlerFactory = (id: string, index: number) => () => {
     if (selectedIndex !== index)
       selectionHandler(id);
