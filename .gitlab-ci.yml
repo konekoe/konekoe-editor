@@ -34,6 +34,7 @@ End_To_End:
   script:
     - npm install
     - npm start &
+    - sleep 60 # Wait awhile so that the project can be built before the test are run
     - npm run cypress:run -- --browser chrome
     - npm run cypress:run -- --browser firefox
   artifacts:
