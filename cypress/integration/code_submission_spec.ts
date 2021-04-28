@@ -10,8 +10,6 @@ const testContent2 = "export type BooleanType = boolean;";
 describe("<CodeEditor />", function () {
   let server: ServerMock;
   
-  Cypress.config('defaultCommandTimeout', 60000);
-
   describe("tabs and editing files", function() {
 
     beforeEach(function(){
@@ -31,7 +29,6 @@ describe("<CodeEditor />", function () {
     it("Can switch between file tabs", function() {
       // Content of file received at index 0.
       cy.contains("import");
-      cy.wait(100);
       cy.contains("types.ts").click();
       //Content of second file with filename types.ts
       cy.contains("export");
@@ -39,12 +36,21 @@ describe("<CodeEditor />", function () {
 
     it("can write to file and edits persist when switching file tabs", function(){
       cy.contains("import");
-      cy.wait(100);
       cy.get(".ace_text-input").first().focus().type("This is a test");
       cy.contains("types.ts").click();
       cy.contains("function.ts").click();
       cy.contains("This is a test");
     });
+
+    it("Switching between exercises sets active file and filetab to index 0", function() {
+      cy.contains("types.ts").click();
+      cy.contains("export interface");
+      cy.contains("Exercise 2").click();
+      cy.contains("int main()"); // Test shown code
+      cy.contains("source.c") // Test that the correct tab is active
+      .should("have.attr", "tabindex")
+      .should("eq", 0);
+    });    
   });
 
   describe("file submission", function() {
