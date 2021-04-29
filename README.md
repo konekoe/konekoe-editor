@@ -63,7 +63,11 @@ The UI elements are implemented as [React function components](https://reactjs.o
 
 For styling the UI, the project utilizes [Material-UI](https://material-ui.com).
 
-## 2. Application architecture
+## 2. Application 
+
+![Diagram of application architecture](docs/img/architecture.png)
+
+In the above diagram, the boxes with a headers are React components. The arrows indicate passing of input values to child elements. Notably, with the React components the input values are passed as React props. 
 
 
 
