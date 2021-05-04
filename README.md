@@ -44,7 +44,7 @@ Notice that the project includes a submodule called *konekoe-editor-release*, wh
 
 ## Table of contents
 1. [Most important dependencies](#1-most-important-dependencies)
-2. [Application architecture](#2-listing-of-.env-values)
+2. [Application architecture](#2-application-architecture)
 3. [Structure of Redux store](#3-structure-of-redux-store)
 4. [Descriptions of core components](#4-descriptions-of-core-components)
     1. [CodeEditor](#4-1-codeeditor)
@@ -63,15 +63,39 @@ The UI elements are implemented as [React function components](https://reactjs.o
 
 For styling the UI, the project utilizes [Material-UI](https://material-ui.com).
 
-## 2. Application 
+Additionally, the core React components utilize libraries which will be discussed in section 4.
+
+## 2. Application architecture 
 
 ![Diagram of application architecture](docs/img/architecture.png)
 
-In the above diagram, the boxes with a headers are React components. The arrows indicate passing of input values to child elements. Notably, with the React components the input values are passed as React props. 
+In the above diagram, the boxes with a headers are React components. The color scheme along with the hierarchy of the boxes represents the depth of the components (how deep is the nesting). The arrows indicate passing of input values to child elements. Notably, with the React components the input values are passed as React props. 
 
+The root of the application is in the *src/index.tsx* file. Here the Redux store instance is created and the application mounted on the page expressed in the diagram as *document*. The application expects to find an HTML element with the id *root* and will attach the *App* component enclosed in a [React-Redux Provider](https://react-redux.js.org/api/provider) to this element. The Provider provides React components with access to the application store through the [Hook API](https://react-redux.js.org/api/hooks).
+
+Notice how the store instance is also passed to App as a prop. This is to provide the message handler object with access to the store as well. Additionally, App expects to receive a JSON Web Token and a WebSocket address as props. These values are expected to be found as data attributes on the root HTML element onto which the application is mounted.
+
+Notice the bullet list of values inside of App. These values are variables which are passed down to child components. Notably, *selectedExercise* is part of the internal state of App and controlled with the [useState hook](https://reactjs.org/docs/hooks-state.html). The other values are produced with [selector hooks](https://react-redux.js.org/api/hooks#useselector) from the Redux store. 
+
+The three core React component, CodeEditor, CodeTerminal and InfoBox, are discussed in detail in section 4. However, the above diagram also includes the MessageHandler object and components for error handling. The application's error handling utilizes the Redux store as well as [react-error-boundary](https://github.com/bvaughn/react-error-boundary#:~:text=%20react-error-boundary%20%201%20The%20problem.%20React%20v16,error.%20This%20will...%206%20LICENSE.%20%20More%20). Uncaught errors are caught by the error boundary inside of App. Three types of errors exist: critical, minor and messaging errors. Notably, only critical and minor errors have a distinct visualization tied to them. Messaging errors are produced by the server-client interface and will result in either a minor or critical error. A critical error is anologoues to a crash and represents a state from which the application can't proceed. For instance, an error during authentication caused by a malformed JWT will result in a critical error. Critical errors are visualized as an overlay displaying the error message. The overlay can't be removed and the application no longer used without refreshing the page. Minor errors are visualized with a modal displaying a title and an accompanying message. These errors don't halt the application's execution and are strictly informative. For instance, during a code submission the server might encounter a syntax error in the submitted code. This will produce a minor error (first received as a message error) which is displayed to the user. All errors are pushed to the Redux store and then consumed by App.
 
 
 ## 3. Structure of Redux store
+
+The application's Redux store is divided into four [slices](https://redux-toolkit.js.org/api/createslice/). Each slice represents a conceptual subsection of the store which are:
+
+* errors
+* exercises
+* submissions
+* terminal data
+
+The error slice contains state for storing errors and action creaters for registering and consuming errors. The *push* action creator handles registering of all types of errors. Minor errors are pushed onto a stack. Notably, only a single critical error can be placed in the state. A message error is interpreted as minor or critical error and the handled accordingly. The slice also contains action creators for popping minor erros from the stack and clearing message errors. Notably, the later action creator and its target state section are not utilized in the current version of the application.
+
+The exercise slice contains points, titles and descriptions for each of the exercises. The values are stored as dictionaries accessed with an exercise id. The slice also provides action creators for initializing the state and updating point values. Therefore, titles and descriptions are treated as immutable values.
+
+The submission slice contains state values related to exercise submissions. Each exercise is associated with a list of submission ids. These are ids for submissions the user has made. Along with the list of submission ids, an exericse is associated with an active submission. This submission is shown to the user and the state contains the files associated with the submission. Note that the files stored in the Redux store are not directly editted by the code editor. Instead they are fetched into the store and the values are copied into the editor. Additionally, each exercise can also be associated with a submission request and a fetch request. A submission request contains the code being sent for grading. A fetch request contains a submission id for fetching the associated submission files from the server.
+
+The terminal slice houses data to shown in the terminal component. Terminal data is exericse specific and therefore stored in a dictionary accessed with an exercise id. Data can be added with an action creator and later read with a selector. Terminal data associated with an exercise can also be cleared. Notably, the slice contains functionality for dealing with input data but as of writing this functionality is not utilized.
 
 ## 4. Descriptions of core components
 
