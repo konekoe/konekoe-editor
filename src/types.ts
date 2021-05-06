@@ -158,7 +158,7 @@ export interface RequestMessage {
   payload: RequestPayload;
 }
 
-export type ResponsePayload = ServerConnectResponse | SubmissionResponse | SubmissionFetchRequest | TerminalMessage;
+export type ResponsePayload = ServerConnectResponse | SubmissionResponse | SubmissionFetchResponse | TerminalMessage;
 
 export interface ResponseMessage {
   type: "server_connect" | "code_submission" | "submission_fetch" | "terminal_output";
