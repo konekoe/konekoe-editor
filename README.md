@@ -99,7 +99,18 @@ The terminal slice houses data to shown in the terminal component. Terminal data
 
 ## 4. Descriptions of core components
 
+This section covers the core React components, their usage of the Redux store and packages they utilize. In the diagrams, the bulleted lists represent internal values of the component. Note that the file *src/types.ts* contains type definitions, excluding external ones such as Ace.Editor, utilized in the project.
+
 ### 4.1. CodeEditor
+
+![Diagram of Code editor component.](docs/img/codeEditor.png)
+
+The diagram above illustrates the structure of the CodeEditor component. [Ace](https://ace.c9.io/index.html) is utilized for creating an editor view. CodeEditor creates an instance of the Ace.Editor class and mounts it on a div element. For the mounting a [reference](https://reactjs.org/docs/refs-and-the-dom.html) is created and utilizing an effect hook, the corresponding element is fetched. Note that this means that the Ace.Editor instance, the actual code editing element, only becomes available after the initial render of the CodeEditor component. 
+
+The CodeEditor utilizes its internal state to store Ace.EditorSession instances and a string id pointing to the currently active session. In practice, each session represents a file in edit. The sessions are created from the value of the *editorContent* selector. Notice that the EditorSessions are stored per *exerciseId*. When the exerciseId prop changes value, new EditorSessions are created. Therefore, unsubmitted edits made to the files can be lost. This limitation should be addressed in future versions.
+
+The component utilizes a Semantic-UI Grid for laying out its child components. A TabBar is utilized for selecting a file for editing. The TabBar receives as props an array of tab items and a selection callback function. Each tab is associated with a file and a file id found functioning as a key in the editorSessions dictionary. The selection handler callback updates the value of *activeEditorSession* based on the id of the selected tab. Along with the TabBar, the Grid includes a button for submitting the contents of the EditorSessions. Notably, a submission creates a *submissionRequest* which is pushed into the Redux store. As long as the request exists, an overlay becomes visible blocking the user from making submissions or editing the associated files. The overlay is implemented with the *Backdrop* element displayed in the diagram. Notice that the Backdrop also accepts a flag for a *submissionFetchRequest* as input. A submission fetch request is made whenever code files are fetched from the server. The CodeEditor creates the requests ondemand on when the *exerciseId* prop changes. Lastly, the Grid contains a div element onto which the Ace.Editor instance is mounted. 
+
 ### 4.2. CodeTerminal
 ### 4.1. InfoBox
 
