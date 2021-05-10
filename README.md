@@ -47,9 +47,9 @@ Notice that the project includes a submodule called *konekoe-editor-release*, wh
 2. [Application architecture](#2-application-architecture)
 3. [Structure of Redux store](#3-structure-of-redux-store)
 4. [Descriptions of core components](#4-descriptions-of-core-components)
-    1. [CodeEditor](#4-1-codeeditor)
-    2. [CodeTerminal](#4-2-codeterminal)
-    3. [InfoBox](#4-4-infobox)
+    1. [CodeEditor](#41-codeeditor)
+    2. [CodeTerminal](#42-codeterminal)
+    3. [InfoBox](#44-infobox)
 5. [Server-Client interface](#5-server-client-interface)
 
 ## 1. Most important dependencies
